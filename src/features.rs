@@ -5,10 +5,10 @@ pub trait Feature {
     fn to_tuple(&self) -> (f64, f64, f64, f64);
 }
 
-struct Point {
-    x: f64,
-    y: f64,
-    z: f64
+pub struct Point {
+    pub(crate) x: f64,
+    pub(crate) y: f64,
+    pub(crate) z: f64
 }
 
 impl Feature for Point {
@@ -21,10 +21,10 @@ impl Feature for Point {
     }
 }
 
-struct Vector {
-    x: f64,
-    y: f64,
-    z: f64
+pub struct Vector {
+    pub(crate) x: f64,
+    pub(crate) y: f64,
+    pub(crate) z: f64
 }
 
 impl Feature for Vector {
@@ -83,7 +83,7 @@ mod tests {
 
         let vector: &Vector = match feature.as_any().downcast_ref::<Vector>() {
             Some(vector) => vector,
-            None => panic!("&feature isn't a Point!"),
+            None => panic!("&feature isn't a Vector!"),
         };
 
         assert_eq!(a.0, vector.x);
@@ -93,7 +93,7 @@ mod tests {
 
     #[test]
     fn test_point_returns_tuple_w_equal_1_0() {
-        let point = Point{x: 4.0, y: -4.0, z: 3.0};
+        let point = Point { x: 4.0, y: -4.0, z: 3.0 };
 
         let tuple = point.to_tuple();
 
@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn test_vector_returns_tuple_w_equals_0_0() {
-        let vector = Vector{x: 4.0, y: -4.0, z: 3.0};
+        let vector = Vector { x: 4.0, y: -4.0, z: 3.0 };
 
         let tuple = vector.to_tuple();
 
