@@ -1,4 +1,4 @@
-use crate::features::{Point, Vector};
+use crate::features::{Point, Vector, Tuple};
 
 pub fn add(tuple_one:(f64, f64, f64, f64), tuple_two:(f64, f64, f64, f64)) -> (f64, f64, f64, f64) {
     let x = tuple_one.0 + tuple_two.0;
@@ -56,6 +56,28 @@ impl Point {
             y: self.y - _point.y,
             z: self.z - _point.z
         }
+    }
+}
+
+impl Tuple {
+    pub fn add(&self, _tuple: Tuple) -> Tuple {
+        todo!()
+    }
+
+    pub fn subtract(&self, _tuple: Tuple) -> Tuple {
+        todo!()
+    }
+
+    pub fn negate(&self) -> Tuple {
+        todo!()
+    }
+
+    pub fn multiply(&self, _tuple: Tuple) -> Tuple {
+        todo!()
+    }
+
+    pub fn divide(&self, _tuple: Tuple) -> Tuple {
+        todo!()
     }
 }
 
