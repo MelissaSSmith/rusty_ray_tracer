@@ -26,11 +26,21 @@ pub fn negate(tuple:(f64, f64, f64, f64)) -> (f64, f64, f64, f64) {
 }
 
 pub fn multiply(tuple:(f64, f64, f64, f64), scalar:f64) -> (f64, f64, f64, f64) {
-    todo!()
+    (
+        tuple.0 * scalar,
+        tuple.1 * scalar,
+        tuple.2 * scalar,
+        tuple.3 * scalar
+    )
 }
 
 pub fn divide(tuple:(f64, f64, f64, f64), scalar:f64) -> (f64, f64, f64, f64) {
-    todo!()
+    (
+        tuple.0 / scalar,
+        tuple.1 / scalar,
+        tuple.2 / scalar,
+        tuple.3 / scalar
+    )
 }
 
 impl Point {
@@ -317,7 +327,7 @@ mod tests {
         let tuple = (1.0, -2.0, 3.0, -4.0);
         let scalar = 2.0;
 
-        let new_tuple = multiply(tuple, scalar);
+        let new_tuple = divide(tuple, scalar);
 
         assert_eq!(0.5, new_tuple.0);
         assert_eq!(-1.0, new_tuple.1);
