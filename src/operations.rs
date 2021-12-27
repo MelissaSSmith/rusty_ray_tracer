@@ -1,3 +1,4 @@
+use std::ops::{Div, Mul, Neg};
 use crate::features::{Point, Vector, Tuple};
 
 pub fn add(tuple_one:(f64, f64, f64, f64), tuple_two:(f64, f64, f64, f64)) -> (f64, f64, f64, f64) {
@@ -90,28 +91,28 @@ impl Tuple {
 
     pub fn negate(&self) -> Tuple {
         Tuple{
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
-            w: -self.w
+            x: self.x.neg(),
+            y: self.y.neg(),
+            z: self.z.neg(),
+            w: self.w.neg()
         }
     }
 
     pub fn multiply(&self, _scalar: f64) -> Tuple {
         Tuple{
-            x: self.x * _scalar,
-            y: self.y * _scalar,
-            z: self.z * _scalar,
-            w: self.w * _scalar
+            x: self.x.mul(_scalar),
+            y: self.y.mul(_scalar),
+            z: self.z.mul(_scalar),
+            w: self.w.mul(_scalar)
         }
     }
 
     pub fn divide(&self, _scalar: f64) -> Tuple {
         Tuple{
-            x: self.x / _scalar,
-            y: self.y / _scalar,
-            z: self.z / _scalar,
-            w: self.w / _scalar
+            x: self.x.div(_scalar),
+            y: self.y.div(_scalar),
+            z: self.z.div(_scalar),
+            w: self.w.div(_scalar)
         }
     }
 }
@@ -135,10 +136,15 @@ impl Vector {
 
     pub fn negate(&self) -> Vector {
         Vector{
-            x: -self.x,
-            y: -self.y,
-            z: -self.z
+            x: self.x.neg(),
+            y: self.y.neg(),
+            z: self.z.neg()
         }
+    }
+
+    pub fn magnitude(&self) -> f64 {
+        let base = self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0);
+        base.sqrt()
     }
 }
 
@@ -435,5 +441,52 @@ mod tests {
         assert_eq!(-1.0, tuple.y);
         assert_eq!(1.5, tuple.z);
         assert_eq!(-2.0, tuple.w);
+    }
+
+    #[test]
+    fn test_compute_vector_magnitude_x_is_1() {
+        let vector = Vector{x:1.0, y:0.0, z:0.0};
+
+        let magnitude = vector.magnitude();
+
+        assert_eq!(1.0, magnitude);
+    }
+
+    #[test]
+    fn test_compute_vector_magnitude_y_is_1() {
+        let vector = Vector{x:0.0, y:1.0, z:0.0};
+
+        let magnitude = vector.magnitude();
+
+        assert_eq!(1.0, magnitude);
+    }
+
+    #[test]
+    fn test_compute_vector_magnitude_z_is_1() {
+        let vector = Vector{x:0.0, y:0.0, z:1.0};
+
+        let magnitude = vector.magnitude();
+
+        assert_eq!(1.0, magnitude);
+    }
+
+    #[test]
+    fn test_compute_vector_magnitude_1_2_3() {
+        let vector = Vector{x:1.0, y:2.0, z:3.0};
+
+        let magnitude = vector.magnitude();
+
+        let base: f64 = 14.0;
+        assert_eq!(base.sqrt(), magnitude);
+    }
+
+    #[test]
+    fn test_compute_vector_magnitude_1_2_3_negated() {
+        let vector = Vector{x:-1.0, y:-2.0, z:-3.0};
+
+        let magnitude = vector.magnitude();
+
+        let base: f64 = 14.0;
+        assert_eq!(base.sqrt(), magnitude);
     }
 }
