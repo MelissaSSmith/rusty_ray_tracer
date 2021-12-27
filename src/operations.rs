@@ -146,10 +146,35 @@ impl Vector {
         let base = self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0);
         base.sqrt()
     }
+
+    pub fn normalize(&self) -> Vector {
+        let magnitude = self.magnitude();
+        Vector {
+            x: self.x.div(magnitude),
+            y: self.y.div(magnitude),
+            z: self.z.div(magnitude)
+        }
+    }
+
+    pub fn dot(&self, _vector: Vector) -> f64 {
+        let product = self.x * _vector.x +
+            self.y * _vector.y +
+            self.z * _vector.z;
+        product
+    }
+
+    pub fn cross(&self, _vector: Vector) -> Vector {
+        Vector {
+            x: self.y * _vector.z - self.z * _vector.y,
+            y: self.z * _vector.x - self.x * _vector.z,
+            z: self.x * _vector.y - self.y * _vector.x
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::ops::Div;
     use crate::operations::{add, subtract, negate, multiply, divide};
     use crate::features::{create_feature, Point, Vector, Tuple};
 
@@ -488,5 +513,72 @@ mod tests {
 
         let base: f64 = 14.0;
         assert_eq!(base.sqrt(), magnitude);
+    }
+
+    #[test]
+    fn test_normalize_vector() {
+        let vector = Vector{x:4.0, y:0.0, z:0.0};
+
+        let normalized_vector = vector.normalize();
+
+        assert_eq!(1.0, normalized_vector.x);
+        assert_eq!(0.0, normalized_vector.y);
+        assert_eq!(0.0, normalized_vector.z);
+    }
+
+    #[test]
+    fn test_normalize_vector_1_2_3() {
+        let vector = Vector{x:1.0, y:2.0, z:3.0};
+
+        let normalized_vector = vector.normalize();
+
+        let base: f64 = 14.0;
+        assert_eq!(vector.x.div(base.sqrt()), normalized_vector.x);
+        assert_eq!(vector.y.div(base.sqrt()), normalized_vector.y);
+        assert_eq!(vector.z.div(base.sqrt()), normalized_vector.z);
+    }
+
+    #[test]
+    fn test_magnitude_of_normalized_vector_is_one() {
+        let vector = Vector{x:1.0, y:2.0, z:3.0};
+
+        let normalized_vector = vector.normalize();
+        let magnitude = normalized_vector.magnitude();
+
+        assert_eq!(1.0, magnitude);
+    }
+
+    #[test]
+    fn test_dot_product_of_two_vectors() {
+        let vector_a = Vector{x:1.0, y:2.0, z:3.0};
+        let vector_b = Vector{x:2.0, y:3.0, z:4.0};
+
+        let dot_product = vector_a.dot(vector_b);
+
+        assert_eq!(20.0, dot_product);
+    }
+
+    #[test]
+    fn test_cross_product_of_two_vectors_a_and_b() {
+        let vector_a = Vector{x:1.0, y:2.0, z:3.0};
+        let vector_b = Vector{x:2.0, y:3.0, z:4.0};
+
+        let cross_a_b = vector_a.cross(vector_b);
+
+        assert_eq!(-1.0, cross_a_b.x);
+        assert_eq!(2.0, cross_a_b.y);
+        assert_eq!(-1.0, cross_a_b.z);
+    }
+
+    #[test]
+    fn test_cross_product_of_two_vectors_b_and_a() {
+        let vector_a = Vector{x:1.0, y:2.0, z:3.0};
+        let vector_b = Vector{x:2.0, y:3.0, z:4.0};
+
+        let cross_b_a = vector_b.cross(vector_a);
+
+        assert_eq!(1.0, cross_b_a.x);
+        assert_eq!(-2.0, cross_b_a.y);
+        assert_eq!(1.0, cross_b_a.z);
     }
 }
