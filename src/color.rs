@@ -42,6 +42,29 @@ impl Color {
             blue: self.blue.mul(_scalar)
         }
     }
+
+    pub fn scale_color(&self) -> Color {
+        Color {
+            red: Color::scale_number(self.red),
+            green: Color::scale_number(self.green),
+            blue: Color::scale_number(self.blue)
+        }
+    }
+
+    fn scale_number(number: f64) -> f64 {
+        let new_number = number * 255.0;
+        if new_number > 255.0 {
+            return 255.0;
+        }
+        if new_number < 0.0 {
+            return 0.0;
+        }
+        new_number.round()
+    }
+
+    pub fn format_color_string(&self) -> String {
+        format!("{} {} {}", self.red, self.green, self.blue)
+    }
 }
 
 #[cfg(test)]

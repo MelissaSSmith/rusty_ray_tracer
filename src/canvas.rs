@@ -1,11 +1,12 @@
 use std::collections::HashMap;
+use std::ops::Div;
 use crate::color::Color;
 use crate::pixel::Pixel;
 
-struct Canvas {
-    width: i32,
-    height: i32,
-    pixels: HashMap<String, Pixel>
+pub struct Canvas {
+    pub(crate) width: i32,
+    pub(crate) height: i32,
+    pub(crate) pixels: HashMap<String, Pixel>
 }
 
 impl Canvas {
@@ -39,6 +40,26 @@ impl Canvas {
         let key = Canvas::create_key(_x, _y);
         let pixel = &self.pixels.get(&key);
         pixel.unwrap()
+    }
+
+    pub fn format_pixel_line(line_array: Vec<String>) -> String {
+        let mut line_string: String = line_array.join(" ");
+        if line_string.len() > 70 {
+            let num_of_line_splits = line_string.len().div(70);
+            for n in 0..num_of_line_splits {
+                let mut position = 70 * (n+1);
+                while position > 0 {
+                    let char = line_string.chars().nth(position).unwrap();
+                    if char != ' ' {
+                        position -= 1;
+                    } else {
+                        line_string.replace_range(position..position+1, "\n");
+                        position = 0;
+                    }
+                }
+            }
+        }
+        line_string
     }
 }
 
