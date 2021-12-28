@@ -1,14 +1,15 @@
+pub mod tuple;
+pub mod point;
+pub mod vector;
+
 use std::any::Any;
+use crate::features::point::Point;
+use crate::features::tuple::Tuple;
+use crate::features::vector::Vector;
 
 pub trait Feature {
     fn as_any(&self) -> &dyn Any;
     fn to_tuple(&self) -> (f64, f64, f64, f64);
-}
-
-pub struct Point {
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64
 }
 
 impl Feature for Point {
@@ -21,12 +22,6 @@ impl Feature for Point {
     }
 }
 
-pub struct Vector {
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64
-}
-
 impl Feature for Vector {
     fn as_any(&self) -> &dyn Any {
         self
@@ -35,13 +30,6 @@ impl Feature for Vector {
     fn to_tuple(&self) -> (f64, f64, f64, f64) {
         (self.x, self.y, self.z, 0.0)
     }
-}
-
-pub struct Tuple {
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64,
-    pub(crate) w: f64
 }
 
 impl Feature for Tuple {
