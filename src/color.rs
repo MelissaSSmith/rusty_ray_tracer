@@ -1,9 +1,9 @@
 use std::ops::{Add, Mul, Sub};
 
-struct Color {
-    red: f64,
-    green: f64,
-    blue: f64
+pub struct Color {
+    pub(crate) red: f64,
+    pub(crate) green: f64,
+    pub(crate) blue: f64
 }
 
 impl Color {
