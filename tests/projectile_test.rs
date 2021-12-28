@@ -1,0 +1,42 @@
+use rusty_ray_tracer::draw::canvas::Canvas;
+use rusty_ray_tracer::draw::color::Color;
+use rusty_ray_tracer::features::point::Point;
+use rusty_ray_tracer::features::vector::Vector;
+use crate::world::{Environment, Projectile};
+
+mod world;
+
+fn generate_new_projectile_position(position: Point, velocity: Vector, env: Environment) -> Projectile {
+    let projectile = world::Projectile::create(position, velocity);
+
+    world::tick(env, projectile)
+}
+
+#[test]
+fn projectile_test() {
+    let gravity = Vector::create(0.0, -0.1, 0.0);
+    let wind= Vector::create(-0.01, 0.0, 0.0);
+    let environment = world::Environment::create(gravity, wind);
+
+    let mut canvas = Canvas::create(900, 880);
+    let color = Color::create((1.0, 0.8, 0.6));
+
+    let mut n = 0;
+    let position = Point::create(0.0, 1.0, 0.0);
+    let velocity = Vector::create(1.0, 1.8, 0.0).normalize().multiply(11.25);
+
+    let mut projectile = world::Projectile::create(position, velocity);
+
+    while projectile.position.y > 0.0 {
+        let x = projectile.position.x.round() as i32;
+        let y = canvas.height - projectile.position.y.round() as i32;
+        canvas.write_pixel(x,y, color);
+
+        projectile = world::tick(environment, projectile);
+
+        n += 1;
+        println!("y position: {}. n: {}", projectile.position.y, n);
+    }
+
+    canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
+}

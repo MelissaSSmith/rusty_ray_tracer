@@ -1,4 +1,4 @@
-use std::ops::{Div, Neg};
+use std::ops::{Div, Mul, Neg};
 
 #[derive(Clone, Copy)]
 pub struct Vector {
@@ -25,6 +25,14 @@ impl Vector {
             x: self.x - _vector.x,
             y: self.y - _vector.y,
             z: self.z - _vector.z
+        }
+    }
+
+    pub fn multiply(&self, _scalar: f64) -> Vector {
+        Vector{
+            x: self.x.mul(_scalar),
+            y: self.y.mul(_scalar),
+            z: self.z.mul(_scalar)
         }
     }
 
@@ -93,6 +101,18 @@ mod tests {
         assert_eq!(-2.0, vector.x);
         assert_eq!(-4.0, vector.y);
         assert_eq!(-6.0, vector.z);
+    }
+
+    #[test]
+    fn test_multiply_tuple_type_by_scalar() {
+        let vector_a = Vector{x:1.0, y:-2.0, z:3.0};
+        let scalar = 3.5;
+
+        let vector = vector_a.multiply(scalar);
+
+        assert_eq!(3.5, vector.x);
+        assert_eq!(-7.0, vector.y);
+        assert_eq!(10.5, vector.z);
     }
 
     #[test]

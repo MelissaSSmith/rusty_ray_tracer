@@ -62,6 +62,13 @@ impl PPMFormat for Canvas {
     }
 }
 
+impl Canvas {
+    pub fn convert_to_ppm_and_save(&self, file_name: String) {
+        let ppm = self.convert_to_ppm();
+        Canvas::write_to_file(file_name, ppm);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::draw::canvas::Canvas;

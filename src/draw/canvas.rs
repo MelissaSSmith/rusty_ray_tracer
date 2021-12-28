@@ -5,7 +5,7 @@ use crate::draw::pixel::Pixel;
 
 pub struct Canvas {
     pub(crate) width: i32,
-    pub(crate) height: i32,
+    pub height: i32,
     pub(crate) pixels: HashMap<String, Pixel>
 }
 
@@ -32,8 +32,11 @@ impl Canvas {
 
     pub fn write_pixel(&mut self, _x: i32, _y: i32, _color: Color) {
         let key = Canvas::create_key(_x, _y);
-        let pixel = self.pixels.get_mut(&key).unwrap();
-        pixel.color = _color;
+        let pixel = self.pixels.get_mut(&key);
+        match pixel {
+            None => (),
+            Some(p) => {p.color = _color}
+        }
     }
 
     pub fn get_pixel(&self, _x: i32, _y: i32) -> &Pixel {
