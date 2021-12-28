@@ -1,5 +1,6 @@
 use std::ops::{Div, Neg};
 
+#[derive(Clone, Copy)]
 pub struct Vector {
     pub x: f64,
     pub y: f64,
@@ -7,6 +8,10 @@ pub struct Vector {
 }
 
 impl Vector {
+    pub fn create(x: f64, y:f64, z:f64) -> Vector {
+        Vector{x, y, z}
+    }
+
     pub fn add(&self, _vector: Vector) -> Vector {
         Vector{
             x: self.x + _vector.x,

@@ -1,4 +1,4 @@
-use crate::color::Color;
+use crate::draw::color::Color;
 
 pub struct Pixel {
     x: i32,

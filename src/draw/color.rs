@@ -69,8 +69,7 @@ impl Color {
 
 #[cfg(test)]
 mod tests {
-    use crate::color::{Color};
-    use crate::float_operations::equals;
+    use crate::draw::color::Color;
 
     #[test]
     fn test_create_color() {
@@ -128,5 +127,11 @@ mod tests {
         assert_eq!(0.9, new_color.red);
         assert_eq!(0.2, new_color.green);
         assert!(equals(0.04, new_color.blue));
+    }
+
+    fn equals(a: f64, b: f64) -> bool {
+        let epsilon = 0.00001;
+        let diff = a - b;
+        diff.abs() < epsilon
     }
 }

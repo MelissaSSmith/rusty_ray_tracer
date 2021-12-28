@@ -7,6 +7,10 @@ pub struct Point {
 }
 
 impl Point {
+    pub fn create(x: f64, y:f64, z:f64) -> Point {
+        Point{x, y, z}
+    }
+
     pub fn add(&self, _vector: Vector) -> Point {
         Point{
             x: self.x + _vector.x,

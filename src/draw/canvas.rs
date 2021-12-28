@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::ops::Div;
-use crate::color::Color;
-use crate::pixel::Pixel;
+use crate::draw::color::Color;
+use crate::draw::pixel::Pixel;
 
 pub struct Canvas {
     pub(crate) width: i32,
@@ -65,8 +65,8 @@ impl Canvas {
 
 #[cfg(test)]
 mod tests {
-    use crate::canvas::Canvas;
-    use crate::color::Color;
+    use crate::draw::canvas::Canvas;
+    use crate::draw::color::Color;
 
     #[test]
     fn test_create_canvas() {

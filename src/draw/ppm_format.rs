@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use crate::canvas::Canvas;
+use crate::draw::canvas::Canvas;
 
 trait PPMFormat {
     fn create_header(&self) -> String;
@@ -64,9 +64,9 @@ impl PPMFormat for Canvas {
 
 #[cfg(test)]
 mod tests {
-    use crate::canvas::Canvas;
-    use crate::color::Color;
-    use crate::ppm_format::{PPMFormat};
+    use crate::draw::canvas::Canvas;
+    use crate::draw::color::Color;
+    use crate::draw::ppm_format::PPMFormat;
 
     #[test]
     fn test_convert_canvas_to_ppm_header() {
