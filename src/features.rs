@@ -1,6 +1,7 @@
 pub mod tuple;
 pub mod point;
 pub mod vector;
+pub mod matrix;
 
 use std::any::Any;
 use crate::features::point::Point;

@@ -8,6 +8,10 @@ pub struct Tuple {
 }
 
 impl Tuple {
+    pub fn create(x: f64, y:f64, z:f64, w:f64) -> Tuple {
+        Tuple{x, y, z, w}
+    }
+
     pub fn add(&self, _tuple: Tuple) -> Tuple {
         Tuple{
             x: self.x + _tuple.x,
@@ -50,6 +54,26 @@ impl Tuple {
             y: self.y.div(_scalar),
             z: self.z.div(_scalar),
             w: self.w.div(_scalar)
+        }
+    }
+
+    pub fn dot(&self, _tuple: Tuple) -> f64 {
+        let product = self.x * _tuple.x +
+            self.y * _tuple.y +
+            self.z * _tuple.z +
+            self.w * _tuple.w;
+        product
+    }
+
+    pub fn convert_to_tuple(vec: &Vec<f64>) -> Tuple {
+        if vec.len() != 4 {
+            panic!("Invalid vector size!");
+        }
+        Tuple {
+            x: vec[0],
+            y: vec[1],
+            z: vec[2],
+            w: vec[3]
         }
     }
 }

@@ -38,5 +38,5 @@ fn projectile_test() {
         println!("y position: {}. n: {}", projectile.position.y, n);
     }
 
-    canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
+    //canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
 }
