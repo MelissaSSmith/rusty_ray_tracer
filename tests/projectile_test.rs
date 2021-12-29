@@ -21,7 +21,6 @@ fn projectile_test() {
     let mut canvas = Canvas::create(900, 880);
     let color = Color::create((1.0, 0.8, 0.6));
 
-    let mut n = 0;
     let position = Point::create(0.0, 1.0, 0.0);
     let velocity = Vector::create(1.0, 1.8, 0.0).normalize().multiply(11.25);
 
@@ -33,9 +32,6 @@ fn projectile_test() {
         canvas.write_pixel(x,y, color);
 
         projectile = world::tick(environment, projectile);
-
-        n += 1;
-        println!("y position: {}. n: {}", projectile.position.y, n);
     }
 
     //canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));

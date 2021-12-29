@@ -1,4 +1,5 @@
 use array2d::Array2D;
+use crate::features::floats::Operations;
 use crate::features::tuple::Tuple;
 
 struct Matrix {
@@ -25,10 +26,23 @@ impl Matrix{
     }
 
     pub fn equals(&self, _matrix: Matrix) -> bool {
-        self.matrix.eq(&_matrix.matrix)
+        let mut equals = true;
+
+        for row in 0..self.matrix.row_len() {
+            for column in 0..self.matrix.column_len() {
+                let value = self.get(row, column);
+                let other_value = _matrix.get(row, column);
+                if value.equals(other_value) == false {
+                    equals = false;
+                    break;
+                }
+            }
+        }
+
+        equals
     }
 
-    pub fn multiply(&self, _matrix: Matrix) -> Matrix {
+    pub fn multiply(&self, _matrix: &Matrix) -> Matrix {
         let mut vecs: Vec<Vec<f64>> = Vec::with_capacity(self.matrix.row_len());
         for _ in 0..self.matrix.row_len() {
             vecs.push(vec![0.0; self.matrix.row_len()]);
@@ -107,6 +121,24 @@ impl Matrix{
         }
         -minor
     }
+
+    fn is_invertible(&self) -> bool {
+        let determinant = self.determinant();
+        determinant != 0.0
+    }
+
+    fn inverse(&self) -> Matrix {
+        let determinant = self.determinant();
+        let mut vecs: Vec<Vec<f64>> = Vec::with_capacity(self.matrix.row_len());
+        for r in 0..self.matrix.as_rows().len() {
+            let mut row_vec = vec![];
+            for c in 0..self.matrix.as_columns().len() {
+                row_vec.push(self.cofactor(c,r) / determinant);
+            }
+            vecs.push(row_vec);
+        }
+        Matrix::create(vecs)
+    }
 }
 
 #[cfg(test)]
@@ -182,7 +214,7 @@ mod tests {
 
         let vec_1 = vec![2.0, 3.0, 4.0, 5.0];
         let vec_2 = vec![5.5, 6.5, 7.5, 8.5];
-        let vec_3 = vec![9.0, 10.0, 11.0, 12.0];
+        let vec_3 = vec![9.0, 6.0, 11.0, 12.0];
         let vec_4 = vec![13.5, 14.5, 15.5, 16.5];
         let m2 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
@@ -203,7 +235,7 @@ mod tests {
         let vec_4 = vec![1.0, 2.0, 7.0, 8.0];
         let m2 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let result = m1.multiply(m2);
+        let result = m1.multiply(&m2);
 
         let vec_1 = vec![20.0, 22.0, 50.0, 48.0];
         let vec_2 = vec![44.0, 54.0, 114.0, 108.0];
@@ -248,7 +280,7 @@ mod tests {
         let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
         let m2 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let result = m1.multiply(m2);
+        let result = m1.multiply(&m2);
 
         assert!(m1.equals(result));
     }
@@ -419,5 +451,112 @@ mod tests {
         assert_eq!(cofactor_c, 210.0);
         assert_eq!(cofactor_d, 51.0);
         assert_eq!(determinant, -4071.0);
+    }
+
+    #[test]
+    fn test_matrix_is_invertible() {
+        let vec_1 = vec![6.0, 4.0, 4.0, 4.0];
+        let vec_2 = vec![5.0, 5.0, 7.0, 6.0];
+        let vec_3 = vec![4.0, -9.0, 3.0, -7.0];
+        let vec_4 = vec![9.0, 1.0, 7.0, -6.0];
+        let m = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        assert!(m.is_invertible());
+    }
+
+    #[test]
+    fn test_matrix_is_not_invertible() {
+        let vec_1 = vec![-4.0, 2.0, -2.0, -3.0];
+        let vec_2 = vec![9.0, 6.0, 2.0, 6.0];
+        let vec_3 = vec![0.0, -5.0, 1.0, -5.0];
+        let vec_4 = vec![0.0, 0.0, 0.0, 0.0];
+        let m = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        assert_eq!(false, m.is_invertible());
+    }
+
+    #[test]
+    fn test_inverse_matrix() {
+        let vec_1 = vec![-5.0, 2.0, 6.0, -8.0];
+        let vec_2 = vec![1.0, -5.0, 1.0, 8.0];
+        let vec_3 = vec![7.0, 7.0, -6.0, -7.0];
+        let vec_4 = vec![1.0, -3.0, 7.0, 4.0];
+        let m = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        let inverse_m = m.inverse();
+
+        assert_eq!(532.0, m.determinant());
+        assert_eq!(-160.0, m.cofactor(2, 3));
+        assert_eq!(-160.0/532.0, inverse_m.get(3, 2));
+        assert_eq!(105.0, m.cofactor(3, 2));
+        assert_eq!(105.0/532.0, inverse_m.get(2, 3));
+
+        let vec_1 = vec![0.21805, 0.45113, 0.24060, -0.04511];
+        let vec_2 = vec![-0.80827, -1.45677, -0.44361, 0.52068];
+        let vec_3 = vec![-0.07895, -0.22368, -0.05263, 0.19737];
+        let vec_4 = vec![-0.52256, -0.81391, -0.30075, 0.30639];
+        let expected = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        assert!(expected.equals(inverse_m));
+    }
+
+    #[test]
+    fn test_inverse_matrix_2() {
+        let vec_1 = vec![8.0, -5.0, 9.0, 2.0];
+        let vec_2 = vec![7.0, 5.0, 6.0, 1.0];
+        let vec_3 = vec![-6.0, 0.0, 9.0, 6.0];
+        let vec_4 = vec![-3.0, 0.0, -9.0, -4.0];
+        let m = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        let inverse_m = m.inverse();
+
+        let vec_1 = vec![-0.15385, -0.15385, -0.28205, -0.53846];
+        let vec_2 = vec![-0.07692, 0.12308, 0.02564, 0.03077];
+        let vec_3 = vec![0.35897, 0.35897, 0.43590, 0.92308];
+        let vec_4 = vec![-0.69231, -0.69231, -0.76923, -1.92308];
+        let expected = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        assert!(expected.equals(inverse_m));
+    }
+
+    #[test]
+    fn test_inverse_matrix_3() {
+        let vec_1 = vec![9.0, 3.0, 0.0, 9.0];
+        let vec_2 = vec![-5.0, -2.0, -6.0, -3.0];
+        let vec_3 = vec![-4.0, 9.0, 6.0, 4.0];
+        let vec_4 = vec![-7.0, 6.0, 6.0, 2.0];
+        let m = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        let inverse_m = m.inverse();
+
+        let vec_1 = vec![-0.04074, -0.07778, 0.14444, -0.22222];
+        let vec_2 = vec![-0.07778, 0.03333, 0.36667, -0.33333];
+        let vec_3 = vec![-0.02901, -0.14630, -0.10926, 0.12963];
+        let vec_4 = vec![0.17778, 0.06667, -0.26667, 0.33333];
+        let expected = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        assert!(expected.equals(inverse_m));
+    }
+
+    #[test]
+    fn test_multiple_product_by_its_inverse() {
+        let vec_1 = vec![3.0, -9.0, 7.0, 3.0];
+        let vec_2 = vec![3.0, -8.0, 2.0, -9.0];
+        let vec_3 = vec![-4.0, 4.0, 4.0, 1.0];
+        let vec_4 = vec![-6.0, 5.0, 1.0, 1.0];
+        let a = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        let vec_1 = vec![8.0, 2.0, 2.0, 2.0];
+        let vec_2 = vec![3.0, -1.0, 7.0, 0.0];
+        let vec_3 = vec![7.0, 0.0, 5.0, 4.0];
+        let vec_4 = vec![6.0, -2.0, 0.0, 5.0];
+        let b = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+
+        let c = a.multiply(&b);
+        let inverse_b = b.inverse();
+
+        let product = c.multiply(&inverse_b);
+
+        assert!(a.equals(product));
     }
 }
