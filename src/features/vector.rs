@@ -1,76 +1,60 @@
-use std::ops::{Div, Mul, Neg};
+use crate::features::tuple::Tuple;
 
 #[derive(Clone, Copy)]
 pub struct Vector {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64
+    pub(crate) tuple: Tuple
 }
 
 impl Vector {
     pub fn create(x: f64, y:f64, z:f64) -> Vector {
-        Vector{x, y, z}
+        Vector{tuple: Tuple::create(x, y, z, 0.0)}
+    }
+
+    pub(crate) fn create_with_tuple(tuple: Tuple) -> Vector {
+        Vector{tuple}
     }
 
     pub fn add(&self, _vector: Vector) -> Vector {
-        Vector{
-            x: self.x + _vector.x,
-            y: self.y + _vector.y,
-            z: self.z + _vector.z
-        }
+        let tuple = self.tuple.add(_vector.tuple);
+        Vector::create_with_tuple(tuple)
     }
 
     pub fn subtract(&self, _vector: Vector) -> Vector {
-        Vector{
-            x: self.x - _vector.x,
-            y: self.y - _vector.y,
-            z: self.z - _vector.z
-        }
+        let tuple = self.tuple.subtract(_vector.tuple);
+        Vector::create_with_tuple(tuple)
     }
 
     pub fn multiply(&self, _scalar: f64) -> Vector {
-        Vector{
-            x: self.x.mul(_scalar),
-            y: self.y.mul(_scalar),
-            z: self.z.mul(_scalar)
-        }
+        let tuple = self.tuple.multiply(_scalar);
+        Vector::create_with_tuple(tuple)
     }
 
     pub fn negate(&self) -> Vector {
-        Vector{
-            x: self.x.neg(),
-            y: self.y.neg(),
-            z: self.z.neg()
-        }
+        let tuple = self.tuple.negate();
+        Vector::create_with_tuple(tuple)
     }
 
     pub fn magnitude(&self) -> f64 {
-        let base = self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0);
-        base.sqrt()
+        self.tuple.magnitude()
     }
 
     pub fn normalize(&self) -> Vector {
         let magnitude = self.magnitude();
-        Vector {
-            x: self.x.div(magnitude),
-            y: self.y.div(magnitude),
-            z: self.z.div(magnitude)
-        }
+        let tuple = self.tuple.divide(magnitude);
+        Vector::create_with_tuple(tuple)
     }
 
     pub fn dot(&self, _vector: Vector) -> f64 {
-        let product = self.x * _vector.x +
-            self.y * _vector.y +
-            self.z * _vector.z;
-        product
+        self.tuple.dot(_vector.tuple)
     }
 
     pub fn cross(&self, _vector: Vector) -> Vector {
-        Vector {
-            x: self.y * _vector.z - self.z * _vector.y,
-            y: self.z * _vector.x - self.x * _vector.z,
-            z: self.x * _vector.y - self.y * _vector.x
-        }
+        let tuple = self.tuple.cross(_vector.tuple);
+        Vector::create_with_tuple(tuple)
+    }
+
+    pub(crate) fn equals(&self, _vector: Vector) -> bool {
+        self.tuple.equals(_vector.tuple)
     }
 }
 
@@ -81,54 +65,50 @@ mod tests {
 
     #[test]
     fn test_add_two_vectors_creates_new_vector() {
-        let vector_a = Vector{x: 3.0, y:-2.0, z:5.0};
-        let vector_b = Vector{x: -2.0, y:3.0, z:1.0};
+        let vector_a = Vector::create(3.0, -2.0, 5.0);
+        let vector_b = Vector::create(-2.0, 3.0, 1.0);
 
         let new_vector = vector_a.add(vector_b);
 
-        assert_eq!(1.0, new_vector.x);
-        assert_eq!(1.0, new_vector.y);
-        assert_eq!(6.0, new_vector.z);
+        let expected_vector = Vector::create(1.0, 1.0, 6.0);
+        assert!(expected_vector.equals(new_vector));
     }
 
     #[test]
     fn test_subtract_vectors_creates_vector() {
-        let vector_a = Vector{x:3.0, y:2.0, z:1.0};
-        let vector_b = Vector{x:5.0, y:6.0, z:7.0};
+        let vector_a = Vector::create(3.0, 2.0, 1.0);
+        let vector_b = Vector::create(5.0, 6.0, 7.0);
 
         let vector = vector_a.subtract(vector_b);
 
-        assert_eq!(-2.0, vector.x);
-        assert_eq!(-4.0, vector.y);
-        assert_eq!(-6.0, vector.z);
+        let expected_vector = Vector::create(-2.0, -4.0, -6.0);
+        assert!(expected_vector.equals(vector));
     }
 
     #[test]
     fn test_multiply_tuple_type_by_scalar() {
-        let vector_a = Vector{x:1.0, y:-2.0, z:3.0};
+        let vector_a = Vector::create(1.0, -2.0, 3.0);
         let scalar = 3.5;
 
         let vector = vector_a.multiply(scalar);
 
-        assert_eq!(3.5, vector.x);
-        assert_eq!(-7.0, vector.y);
-        assert_eq!(10.5, vector.z);
+        let expected_vector = Vector::create(3.5, -7.0, 10.5);
+        assert!(expected_vector.equals(vector));
     }
 
     #[test]
     fn test_negate_vector() {
-        let vector_a = Vector{x:1.0, y:-2.0, z:3.0};
+        let vector_a = Vector::create(1.0, -2.0, 3.0);
 
         let vector = vector_a.negate();
 
-        assert_eq!(-1.0, vector.x);
-        assert_eq!(2.0, vector.y);
-        assert_eq!(-3.0, vector.z);
+        let expected_vector = Vector::create(-1.0, 2.0, -3.0);
+        assert!(expected_vector.equals(vector));
     }
 
     #[test]
     fn test_compute_vector_magnitude_x_is_1() {
-        let vector = Vector{x:1.0, y:0.0, z:0.0};
+        let vector = Vector::create(1.0, 0.0, 0.0);
 
         let magnitude = vector.magnitude();
 
@@ -137,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_compute_vector_magnitude_y_is_1() {
-        let vector = Vector{x:0.0, y:1.0, z:0.0};
+        let vector = Vector::create(0.0, 1.0, 0.0);
 
         let magnitude = vector.magnitude();
 
@@ -146,7 +126,7 @@ mod tests {
 
     #[test]
     fn test_compute_vector_magnitude_z_is_1() {
-        let vector = Vector{x:0.0, y:0.0, z:1.0};
+        let vector = Vector::create(0.0, 0.0, 1.0);
 
         let magnitude = vector.magnitude();
 
@@ -155,7 +135,7 @@ mod tests {
 
     #[test]
     fn test_compute_vector_magnitude_1_2_3() {
-        let vector = Vector{x:1.0, y:2.0, z:3.0};
+        let vector = Vector::create(1.0, 2.0, 3.0);
 
         let magnitude = vector.magnitude();
 
@@ -165,7 +145,7 @@ mod tests {
 
     #[test]
     fn test_compute_vector_magnitude_1_2_3_negated() {
-        let vector = Vector{x:-1.0, y:-2.0, z:-3.0};
+        let vector = Vector::create(-1.0, -2.0, -3.0);
 
         let magnitude = vector.magnitude();
 
@@ -175,30 +155,29 @@ mod tests {
 
     #[test]
     fn test_normalize_vector() {
-        let vector = Vector{x:4.0, y:0.0, z:0.0};
+        let vector = Vector::create(4.0, 0.0, 0.0);
 
         let normalized_vector = vector.normalize();
 
-        assert_eq!(1.0, normalized_vector.x);
-        assert_eq!(0.0, normalized_vector.y);
-        assert_eq!(0.0, normalized_vector.z);
+        let expected_vector = Vector::create(1.0, 0.0, 0.0);
+        assert!(expected_vector.equals(normalized_vector));
     }
 
     #[test]
     fn test_normalize_vector_1_2_3() {
-        let vector = Vector{x:1.0, y:2.0, z:3.0};
+        let vector = Vector::create(1.0, 2.0, 3.0);
 
         let normalized_vector = vector.normalize();
 
         let base: f64 = 14.0;
-        assert_eq!(vector.x.div(base.sqrt()), normalized_vector.x);
-        assert_eq!(vector.y.div(base.sqrt()), normalized_vector.y);
-        assert_eq!(vector.z.div(base.sqrt()), normalized_vector.z);
+        assert_eq!(vector.tuple.x.div(base.sqrt()), normalized_vector.tuple.x);
+        assert_eq!(vector.tuple.y.div(base.sqrt()), normalized_vector.tuple.y);
+        assert_eq!(vector.tuple.z.div(base.sqrt()), normalized_vector.tuple.z);
     }
 
     #[test]
     fn test_magnitude_of_normalized_vector_is_one() {
-        let vector = Vector{x:1.0, y:2.0, z:3.0};
+        let vector = Vector::create(1.0, 2.0, 3.0);
 
         let normalized_vector = vector.normalize();
         let magnitude = normalized_vector.magnitude();
@@ -208,8 +187,8 @@ mod tests {
 
     #[test]
     fn test_dot_product_of_two_vectors() {
-        let vector_a = Vector{x:1.0, y:2.0, z:3.0};
-        let vector_b = Vector{x:2.0, y:3.0, z:4.0};
+        let vector_a = Vector::create(1.0, 2.0, 3.0);
+        let vector_b = Vector::create(2.0, 3.0, 4.0);
 
         let dot_product = vector_a.dot(vector_b);
 
@@ -218,25 +197,23 @@ mod tests {
 
     #[test]
     fn test_cross_product_of_two_vectors_a_and_b() {
-        let vector_a = Vector{x:1.0, y:2.0, z:3.0};
-        let vector_b = Vector{x:2.0, y:3.0, z:4.0};
+        let vector_a = Vector::create(1.0, 2.0, 3.0);
+        let vector_b = Vector::create(2.0, 3.0, 4.0);
 
         let cross_a_b = vector_a.cross(vector_b);
 
-        assert_eq!(-1.0, cross_a_b.x);
-        assert_eq!(2.0, cross_a_b.y);
-        assert_eq!(-1.0, cross_a_b.z);
+        let expected_vector = Vector::create(-1.0, 2.0, -1.0);
+        assert!(expected_vector.equals(cross_a_b));
     }
 
     #[test]
     fn test_cross_product_of_two_vectors_b_and_a() {
-        let vector_a = Vector{x:1.0, y:2.0, z:3.0};
-        let vector_b = Vector{x:2.0, y:3.0, z:4.0};
+        let vector_a = Vector::create(1.0, 2.0, 3.0);
+        let vector_b = Vector::create(2.0, 3.0, 4.0);
 
         let cross_b_a = vector_b.cross(vector_a);
 
-        assert_eq!(1.0, cross_b_a.x);
-        assert_eq!(-2.0, cross_b_a.y);
-        assert_eq!(1.0, cross_b_a.z);
+        let expected_vector = Vector::create(1.0, -2.0, 1.0);
+        assert!(expected_vector.equals(cross_b_a));
     }
 }

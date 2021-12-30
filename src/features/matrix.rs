@@ -1,5 +1,5 @@
 use array2d::Array2D;
-use crate::features::floats::Operations;
+use crate::features::operations::Operations;
 use crate::features::tuple::Tuple;
 
 struct Matrix {

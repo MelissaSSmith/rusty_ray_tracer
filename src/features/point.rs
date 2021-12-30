@@ -1,39 +1,38 @@
+use std::ops::Mul;
+use crate::features::tuple::Tuple;
 use crate::features::vector::Vector;
 
 #[derive(Clone, Copy)]
 pub struct Point {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64
+    pub tuple: Tuple
 }
 
 impl Point {
     pub fn create(x: f64, y:f64, z:f64) -> Point {
-        Point{x, y, z}
+        Point{tuple: Tuple::create(x, y, z, 1.0)}
+    }
+
+    fn create_with_tuple(tuple: Tuple) -> Point {
+        Point{tuple}
     }
 
     pub fn add(&self, _vector: Vector) -> Point {
-        Point{
-            x: self.x + _vector.x,
-            y: self.y + _vector.y,
-            z: self.z + _vector.z
-        }
+        let tuple = self.tuple.add(_vector.tuple);
+        Point::create_with_tuple(tuple)
     }
 
-    pub fn subtract_vector(&self, _vector: Vector) -> Vector {
-        Vector{
-            x: self.x - _vector.x,
-            y: self.y - _vector.y,
-            z: self.z - _vector.z
-        }
+    pub fn subtract_vector(&self, _vector: Vector) -> Point {
+        let tuple = self.tuple.subtract(_vector.tuple);
+        Point::create_with_tuple(tuple)
     }
 
     pub fn subtract_point(&self, _point: Point) -> Vector {
-        Vector{
-            x: self.x - _point.x,
-            y: self.y - _point.y,
-            z: self.z - _point.z
-        }
+        let tuple = self.tuple.subtract(_point.tuple);
+        Vector::create_with_tuple(tuple)
+    }
+
+    fn equals(&self, _point: Point) -> bool {
+        self.tuple.equals(_point.tuple)
     }
 }
 
@@ -44,37 +43,34 @@ mod tests {
 
     #[test]
     fn test_add_vector_and_point_creates_point() {
-        let point = Point{x: 3.0, y:-2.0, z:5.0};
-        let vector = Vector{x: -2.0, y:3.0, z:1.0};
+        let point = Point::create(3.0, -2.0, 5.0);
+        let vector = Vector::create(-2.0, 3.0, 1.0);
 
         let new_point = point.add(vector);
 
-        assert_eq!(1.0, new_point.x);
-        assert_eq!(1.0, new_point.y);
-        assert_eq!(6.0, new_point.z);
+        let expected_point = Point::create(1.0, 1.0, 6.0);
+        assert!(expected_point.equals(new_point));
     }
 
     #[test]
     fn test_subtract_points_creates_vector() {
-        let point_a = Point{x:3.0, y:2.0, z:1.0};
-        let point_b = Point{x:5.0, y:6.0, z:7.0};
+        let point_a = Point::create(3.0, 2.0, 1.0);
+        let point_b = Point::create(5.0, 6.0, 7.0);
 
         let vector = point_a.subtract_point(point_b);
 
-        assert_eq!(-2.0, vector.x);
-        assert_eq!(-4.0, vector.y);
-        assert_eq!(-6.0, vector.z);
+        let expected_vector = Vector::create(-2.0, -4.0, -6.0);
+        assert!(expected_vector.equals(vector));
     }
 
     #[test]
-    fn test_subtract_vector_from_point_creates_vector() {
-        let point_a = Point{x:3.0, y:2.0, z:1.0};
-        let vector_a = Vector{x:5.0, y:6.0, z:7.0};
+    fn test_subtract_vector_from_point_creates_point() {
+        let point_a = Point::create(3.0, 2.0, 1.0);
+        let vector_a = Vector::create(5.0, 6.0, 7.0);
 
-        let vector = point_a.subtract_vector(vector_a);
+        let point = point_a.subtract_vector(vector_a);
 
-        assert_eq!(-2.0, vector.x);
-        assert_eq!(-4.0, vector.y);
-        assert_eq!(-6.0, vector.z);
+        let expected_point = Point::create(-2.0, -4.0, -6.0);
+        assert!(expected_point.equals(point));
     }
 }

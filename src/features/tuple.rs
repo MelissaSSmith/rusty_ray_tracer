@@ -1,5 +1,7 @@
 use std::ops::{Div, Mul, Neg};
+use crate::features::operations::Operations;
 
+#[derive(Clone, Copy)]
 pub struct Tuple {
     pub x: f64,
     pub y: f64,
@@ -39,6 +41,12 @@ impl Tuple {
         }
     }
 
+    pub fn magnitude(&self) -> f64 {
+        let base = self.x.powf(2.0) + self.y.powf(2.0) +
+            self.z.powf(2.0) + self.w.powf(2.0);
+        base.sqrt()
+    }
+
     pub fn multiply(&self, _scalar: f64) -> Tuple {
         Tuple{
             x: self.x.mul(_scalar),
@@ -63,6 +71,25 @@ impl Tuple {
             self.z * _tuple.z +
             self.w * _tuple.w;
         product
+    }
+
+    pub fn cross(&self, _tuple: Tuple) -> Tuple {
+        Tuple {
+            x: self.y * _tuple.z - self.z * _tuple.y,
+            y: self.z * _tuple.x - self.x * _tuple.z,
+            z: self.x * _tuple.y - self.y * _tuple.x,
+            w: self.w
+        }
+    }
+
+    pub fn equals(&self, _tuple: Tuple) -> bool {
+        if self.x.equals(_tuple.x) &&
+            self.y.equals(_tuple.y) &&
+            self.z.equals(_tuple.z) &&
+            self.w.equals(_tuple.w) {
+            return true;
+        }
+        false
     }
 
     pub fn convert_to_tuple(vec: &Vec<f64>) -> Tuple {

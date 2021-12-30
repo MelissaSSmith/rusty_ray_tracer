@@ -2,7 +2,8 @@ pub mod tuple;
 pub mod point;
 pub mod vector;
 pub mod matrix;
-pub mod floats;
+pub mod operations;
+mod transformations;
 
 use std::any::Any;
 use crate::features::point::Point;
@@ -20,7 +21,7 @@ impl Feature for Point {
     }
 
     fn to_tuple(&self) -> (f64, f64, f64, f64) {
-        (self.x, self.y, self.z, 1.0)
+        (self.tuple.x, self.tuple.y, self.tuple.z, 1.0)
     }
 }
 
@@ -30,7 +31,7 @@ impl Feature for Vector {
     }
 
     fn to_tuple(&self) -> (f64, f64, f64, f64) {
-        (self.x, self.y, self.z, 0.0)
+        (self.tuple.x, self.tuple.y, self.tuple.z, 0.0)
     }
 }
 
@@ -46,9 +47,9 @@ impl Feature for Tuple {
 
 pub fn create_feature(tuple:(f64, f64, f64, f64)) -> Box<dyn Feature> {
     match tuple.3 {
-        x if x == 0.0 => Box::new(Vector{x: tuple.0, y:tuple.1, z:tuple.2}),
-        x if x == 1.0 => Box::new(Point{x: tuple.0, y:tuple.1, z:tuple.2}),
-        _ => Box::new(Tuple{x: tuple.0, y:tuple.1, z:tuple.2, w:tuple.3})
+        x if x == 0.0 => Box::new(Vector::create(tuple.0, tuple.1, tuple.2)),
+        x if x == 1.0 => Box::new(Point::create(tuple.0, tuple.1, tuple.2)),
+        _ => Box::new(Tuple::create(tuple.0, tuple.1, tuple.2, tuple.3))
     }
 }
 
@@ -67,9 +68,9 @@ mod tests {
             None => panic!("&feature isn't a Point!"),
         };
 
-        assert_eq!(a.0, point.x);
-        assert_eq!(a.1, point.y);
-        assert_eq!(a.2, point.z);
+        assert_eq!(a.0, point.tuple.x);
+        assert_eq!(a.1, point.tuple.y);
+        assert_eq!(a.2, point.tuple.z);
     }
 
     #[test]
@@ -83,9 +84,9 @@ mod tests {
             None => panic!("&feature isn't a Vector!"),
         };
 
-        assert_eq!(a.0, vector.x);
-        assert_eq!(a.1, vector.y);
-        assert_eq!(a.2, vector.z);
+        assert_eq!(a.0, vector.tuple.x);
+        assert_eq!(a.1, vector.tuple.y);
+        assert_eq!(a.2, vector.tuple.z);
     }
 
     #[test]
@@ -107,31 +108,31 @@ mod tests {
 
     #[test]
     fn test_point_returns_tuple_w_equal_1_0() {
-        let point = Point { x: 4.0, y: -4.0, z: 3.0 };
+        let point = Point::create(4.0, -4.0, 3.0);
 
         let tuple = point.to_tuple();
 
-        assert_eq!(point.x, tuple.0);
-        assert_eq!(point.y, tuple.1);
-        assert_eq!(point.z, tuple.2);
+        assert_eq!(point.tuple.x, tuple.0);
+        assert_eq!(point.tuple.y, tuple.1);
+        assert_eq!(point.tuple.z, tuple.2);
         assert_eq!(1.0, tuple.3);
     }
 
     #[test]
     fn test_vector_returns_tuple_w_equals_0_0() {
-        let vector = Vector { x: 4.0, y: -4.0, z: 3.0 };
+        let vector = Vector::create(4.0,-4.0,3.0);
 
         let tuple = vector.to_tuple();
 
-        assert_eq!(vector.x, tuple.0);
-        assert_eq!(vector.y, tuple.1);
-        assert_eq!(vector.z, tuple.2);
+        assert_eq!(vector.tuple.x, tuple.0);
+        assert_eq!(vector.tuple.y, tuple.1);
+        assert_eq!(vector.tuple.z, tuple.2);
         assert_eq!(0.0, tuple.3)
     }
 
     #[test]
     fn test_tuple_type_return_equivalent_tuple() {
-        let tuple_feature = Tuple { x: 4.0, y: -4.0, z: 3.0, w: 6.0 };
+        let tuple_feature = Tuple::create(4.0,-4.0,3.0,6.0);
 
         let tuple = tuple_feature.to_tuple();
 
