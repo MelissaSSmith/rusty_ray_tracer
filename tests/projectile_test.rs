@@ -1,16 +1,10 @@
 use rusty_ray_tracer::draw::canvas::Canvas;
 use rusty_ray_tracer::draw::color::Color;
+use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::vector::Vector;
-use crate::world::{Environment, Projectile};
 
 mod world;
-
-fn generate_new_projectile_position(position: Point, velocity: Vector, env: Environment) -> Projectile {
-    let projectile = world::Projectile::create(position, velocity);
-
-    world::tick(env, projectile)
-}
 
 #[test]
 fn projectile_test() {

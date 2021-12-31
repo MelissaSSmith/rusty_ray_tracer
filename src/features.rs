@@ -4,6 +4,9 @@ pub mod vector;
 pub mod matrix;
 pub mod operations;
 pub mod transformations;
+pub mod ray;
+pub mod shapes;
+pub mod intersection;
 
 use std::any::Any;
 use crate::features::point::Point;

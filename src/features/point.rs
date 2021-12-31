@@ -1,4 +1,3 @@
-use std::ops::Mul;
 use crate::features::tuple::Tuple;
 use crate::features::vector::Vector;
 

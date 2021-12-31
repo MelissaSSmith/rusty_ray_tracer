@@ -11,6 +11,10 @@ trait PPMFormat {
     fn write_to_file(file_name: String, file_data: String);
 }
 
+pub trait PPMFile {
+    fn convert_to_ppm_and_save(&self, file_name: String);
+}
+
 impl PPMFormat for Canvas {
     fn create_header(&self) -> String {
         format!("P3\n{} {}\n255", self.width, self.height)
@@ -62,8 +66,8 @@ impl PPMFormat for Canvas {
     }
 }
 
-impl Canvas {
-    pub fn convert_to_ppm_and_save(&self, file_name: String) {
+impl PPMFile for Canvas {
+    fn convert_to_ppm_and_save(&self, file_name: String) {
         let ppm = self.convert_to_ppm();
         Canvas::write_to_file(file_name, ppm);
     }

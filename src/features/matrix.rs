@@ -1,5 +1,4 @@
 use array2d::Array2D;
-use crate::features::Feature;
 use crate::features::operations::Operations;
 use crate::features::point::Point;
 use crate::features::tuple::Tuple;
@@ -33,7 +32,7 @@ impl Matrix{
     }
 
     pub fn set(&mut self, x: usize, y: usize, val: f64) {
-        self.matrix.set(x, y, val);
+        self.matrix.set(x, y, val); //todo: handle result
     }
 
     pub fn equals(&self, _matrix: Matrix) -> bool {

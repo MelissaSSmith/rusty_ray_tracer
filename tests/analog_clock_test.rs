@@ -1,6 +1,7 @@
 use std::f64::consts::PI;
 use rusty_ray_tracer::draw::canvas::Canvas;
 use rusty_ray_tracer::draw::color::Color;
+use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::transformations::{rotation_y};
 
@@ -25,5 +26,5 @@ fn analog_clock_test() {
         canvas.write_pixel(x_coor, y_coor as i32, color);
     }
 
-    canvas.convert_to_ppm_and_save(String::from("analog_clock_test.ppm"));
+    //canvas.convert_to_ppm_and_save(String::from("analog_clock_test.ppm"));
 }
