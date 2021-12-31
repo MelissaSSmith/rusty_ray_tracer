@@ -4,7 +4,7 @@ use crate::features::vector::Vector;
 
 #[derive(Clone, Copy)]
 pub struct Point {
-    pub tuple: Tuple
+    tuple: Tuple
 }
 
 impl Point {
@@ -12,17 +12,21 @@ impl Point {
         Point{tuple: Tuple::create(x, y, z, 1.0)}
     }
 
-    fn create_with_tuple(tuple: Tuple) -> Point {
+    pub(crate) fn create_with_tuple(tuple: Tuple) -> Point {
         Point{tuple}
     }
 
+    pub fn value(&self) -> Tuple {
+        self.tuple
+    }
+
     pub fn add(&self, _vector: Vector) -> Point {
-        let tuple = self.tuple.add(_vector.tuple);
+        let tuple = self.tuple.add(_vector.value());
         Point::create_with_tuple(tuple)
     }
 
     pub fn subtract_vector(&self, _vector: Vector) -> Point {
-        let tuple = self.tuple.subtract(_vector.tuple);
+        let tuple = self.tuple.subtract(_vector.value());
         Point::create_with_tuple(tuple)
     }
 
@@ -31,7 +35,7 @@ impl Point {
         Vector::create_with_tuple(tuple)
     }
 
-    fn equals(&self, _point: Point) -> bool {
+    pub(crate) fn equals(&self, _point: Point) -> bool {
         self.tuple.equals(_point.tuple)
     }
 }

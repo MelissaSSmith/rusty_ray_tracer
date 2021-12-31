@@ -2,7 +2,7 @@ use crate::features::tuple::Tuple;
 
 #[derive(Clone, Copy)]
 pub struct Vector {
-    pub(crate) tuple: Tuple
+    tuple: Tuple
 }
 
 impl Vector {
@@ -12,6 +12,10 @@ impl Vector {
 
     pub(crate) fn create_with_tuple(tuple: Tuple) -> Vector {
         Vector{tuple}
+    }
+
+    pub fn value(&self) -> Tuple {
+        self.tuple
     }
 
     pub fn add(&self, _vector: Vector) -> Vector {

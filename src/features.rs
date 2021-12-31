@@ -21,7 +21,7 @@ impl Feature for Point {
     }
 
     fn to_tuple(&self) -> (f64, f64, f64, f64) {
-        (self.tuple.x, self.tuple.y, self.tuple.z, 1.0)
+        (self.value().x, self.value().y, self.value().z, 1.0)
     }
 }
 
@@ -31,7 +31,7 @@ impl Feature for Vector {
     }
 
     fn to_tuple(&self) -> (f64, f64, f64, f64) {
-        (self.tuple.x, self.tuple.y, self.tuple.z, 0.0)
+        (self.value().x, self.value().y, self.value().z, 0.0)
     }
 }
 
@@ -68,9 +68,9 @@ mod tests {
             None => panic!("&feature isn't a Point!"),
         };
 
-        assert_eq!(a.0, point.tuple.x);
-        assert_eq!(a.1, point.tuple.y);
-        assert_eq!(a.2, point.tuple.z);
+        assert_eq!(a.0, point.value().x);
+        assert_eq!(a.1, point.value().y);
+        assert_eq!(a.2, point.value().z);
     }
 
     #[test]
@@ -84,9 +84,9 @@ mod tests {
             None => panic!("&feature isn't a Vector!"),
         };
 
-        assert_eq!(a.0, vector.tuple.x);
-        assert_eq!(a.1, vector.tuple.y);
-        assert_eq!(a.2, vector.tuple.z);
+        assert_eq!(a.0, vector.value().x);
+        assert_eq!(a.1, vector.value().y);
+        assert_eq!(a.2, vector.value().z);
     }
 
     #[test]
@@ -112,9 +112,9 @@ mod tests {
 
         let tuple = point.to_tuple();
 
-        assert_eq!(point.tuple.x, tuple.0);
-        assert_eq!(point.tuple.y, tuple.1);
-        assert_eq!(point.tuple.z, tuple.2);
+        assert_eq!(point.value().x, tuple.0);
+        assert_eq!(point.value().y, tuple.1);
+        assert_eq!(point.value().z, tuple.2);
         assert_eq!(1.0, tuple.3);
     }
 
@@ -124,9 +124,9 @@ mod tests {
 
         let tuple = vector.to_tuple();
 
-        assert_eq!(vector.tuple.x, tuple.0);
-        assert_eq!(vector.tuple.y, tuple.1);
-        assert_eq!(vector.tuple.z, tuple.2);
+        assert_eq!(vector.value().x, tuple.0);
+        assert_eq!(vector.value().y, tuple.1);
+        assert_eq!(vector.value().z, tuple.2);
         assert_eq!(0.0, tuple.3)
     }
 

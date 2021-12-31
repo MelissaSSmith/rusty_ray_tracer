@@ -1,8 +1,11 @@
 use array2d::Array2D;
+use crate::features::Feature;
 use crate::features::operations::Operations;
+use crate::features::point::Point;
 use crate::features::tuple::Tuple;
+use crate::features::vector::Vector;
 
-struct Matrix {
+pub(crate) struct Matrix {
     matrix: Array2D<f64>
 }
 
@@ -11,6 +14,14 @@ impl Matrix{
         Matrix{
             matrix: Array2D::from_rows(&vecs)
         }
+    }
+
+    pub fn create_identity() -> Matrix {
+        let vec_1 = vec![1.0, 0.0, 0.0, 0.0];
+        let vec_2 = vec![0.0, 1.0, 0.0, 0.0];
+        let vec_3 = vec![0.0, 0.0, 1.0, 0.0];
+        let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
+        Matrix::create(vec![vec_1, vec_2, vec_3, vec_4])
     }
 
     pub fn get(&self, x: usize, y: usize) -> f64 {
@@ -62,7 +73,15 @@ impl Matrix{
         new_matrix
     }
 
-    pub fn multiply_by_tuple(&self, _tuple: Tuple) -> Tuple {
+    pub fn multiply_point(&self, _point: Point) -> Point {
+        Point::create_with_tuple(self.multiply_tuple(_point.value()))
+    }
+
+    pub fn multiply_vector(&self, _vector: Vector) -> Vector {
+        Vector::create_with_tuple(self.multiply_tuple(_vector.value()))
+    }
+
+    fn multiply_tuple(&self, _tuple: Tuple) -> Tuple {
         let rows = self.matrix.as_rows();
         let mut result_list = vec![];
         for row in 0..rows.len() {
@@ -127,7 +146,7 @@ impl Matrix{
         determinant != 0.0
     }
 
-    fn inverse(&self) -> Matrix {
+    pub(crate) fn inverse(&self) -> Matrix {
         let determinant = self.determinant();
         let mut vecs: Vec<Vec<f64>> = Vec::with_capacity(self.matrix.row_len());
         for r in 0..self.matrix.as_rows().len() {
@@ -256,7 +275,7 @@ mod tests {
 
         let tuple = Tuple::create(1.0, 2.0, 3.0, 1.0);
 
-        let result = m1.multiply_by_tuple(tuple);
+        let result = m1.multiply_tuple(tuple);
 
         let expected = Tuple::create(18.0, 24.0, 33.0, 1.0);
 
@@ -295,7 +314,7 @@ mod tests {
 
         let tuple = Tuple::create(1.0, 2.0, 3.0, 1.0);
 
-        let result = m2.multiply_by_tuple(tuple);
+        let result = m2.multiply_tuple(tuple);
 
         let expected = Tuple::create(1.0, 2.0, 3.0, 1.0);
         assert_eq!(expected.x, result.x);
