@@ -1,6 +1,6 @@
 use crate::features::matrix::Matrix;
 
-fn translation(x: &f64, y: &f64, z: &f64) -> Matrix {
+pub fn translation(x: &f64, y: &f64, z: &f64) -> Matrix {
     let mut matrix = Matrix::create_identity();
     matrix.set(0, 3, *x);
     matrix.set(1, 3, *y);
@@ -8,7 +8,7 @@ fn translation(x: &f64, y: &f64, z: &f64) -> Matrix {
     matrix
 }
 
-fn scaling(x: &f64, y: &f64, z: &f64) -> Matrix {
+pub fn scaling(x: &f64, y: &f64, z: &f64) -> Matrix {
     let mut matrix = Matrix::create_identity();
     matrix.set(0, 0, *x);
     matrix.set(1, 1, *y);
@@ -16,7 +16,7 @@ fn scaling(x: &f64, y: &f64, z: &f64) -> Matrix {
     matrix
 }
 
-fn rotation_x(radians: &f64) -> Matrix {
+pub fn rotation_x(radians: &f64) -> Matrix {
     let mut matrix = Matrix::create_identity();
     matrix.set(1, 1, radians.cos());
     matrix.set(1, 2, -radians.sin());
@@ -25,7 +25,7 @@ fn rotation_x(radians: &f64) -> Matrix {
     matrix
 }
 
-fn rotation_y(radians: &f64) -> Matrix {
+pub fn rotation_y(radians: &f64) -> Matrix {
     let mut matrix = Matrix::create_identity();
     matrix.set(0, 0, radians.cos());
     matrix.set(0, 2, radians.sin());
@@ -34,7 +34,7 @@ fn rotation_y(radians: &f64) -> Matrix {
     matrix
 }
 
-fn rotation_z(radians: &f64) -> Matrix {
+pub fn rotation_z(radians: &f64) -> Matrix {
     let mut matrix = Matrix::create_identity();
     matrix.set(0, 0, radians.cos());
     matrix.set(0, 1, -radians.sin());
@@ -43,13 +43,13 @@ fn rotation_z(radians: &f64) -> Matrix {
     matrix
 }
 
-fn shearing(x_y: &f64, x_z: &f64, y_x: &f64, y_z: &f64, z_x: &f64, z_y: &f64) -> Matrix {
+pub fn shearing(x_y: &f64, x_z: &f64, y_x: &f64, y_z: &f64, z_x: &f64, z_y: &f64) -> Matrix {
     let mut matrix = Matrix::create_identity();
-    matrix.set(1, 0, *x_y);
-    matrix.set(2, 0, *x_z);
-    matrix.set(0, 1, *y_x);
+    matrix.set(0, 1, *x_y);
+    matrix.set(0, 2, *x_z);
+    matrix.set(1, 0, *y_x);
     matrix.set(1, 2, *y_z);
-    matrix.set(0, 2, *z_x);
+    matrix.set(2, 0, *z_x);
     matrix.set(2, 1, *z_y);
     matrix
 }
@@ -288,17 +288,17 @@ mod tests {
         let point = Point::create(1.0, 0.0, 1.0);
         let a = rotation_x(&(PI/2.0));
         let b = scaling(&5.0, &5.0, &5.0);
-        let c = translation(&10.5, &5.0, &7.0);
+        let c = translation(&10.0, &5.0, &7.0);
 
         let transformed_point = a.multiply_point(point);
-        let expected_point = Point::create(15.0, 0.0, 7.0);
+        let expected_point = Point::create(1.0, -1.0, 0.0);
         assert!(expected_point.equals(transformed_point));
 
-        let transformed_point = b.multiply_point(point);
-        let expected_point = Point::create(15.0, 0.0, 7.0);
+        let transformed_point = b.multiply_point(transformed_point);
+        let expected_point = Point::create(5.0, -5.0, 0.0);
         assert!(expected_point.equals(transformed_point));
 
-        let transformed_point = c.multiply_point(point);
+        let transformed_point = c.multiply_point(transformed_point);
         let expected_point = Point::create(15.0, 0.0, 7.0);
         assert!(expected_point.equals(transformed_point));
     }
@@ -308,7 +308,7 @@ mod tests {
         let point = Point::create(1.0, 0.0, 1.0);
         let a = rotation_x(&(PI/2.0));
         let b = scaling(&5.0, &5.0, &5.0);
-        let c = translation(&10.5, &5.0, &7.0);
+        let c = translation(&10.0, &5.0, &7.0);
 
         let transformed_point = c.multiply_point(b.multiply_point(a.multiply_point(point)));
 

@@ -3,7 +3,7 @@ pub mod point;
 pub mod vector;
 pub mod matrix;
 pub mod operations;
-mod transformations;
+pub mod transformations;
 
 use std::any::Any;
 use crate::features::point::Point;

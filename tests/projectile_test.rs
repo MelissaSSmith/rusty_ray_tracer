@@ -26,13 +26,13 @@ fn projectile_test() {
 
     let mut projectile = world::Projectile::create(position, velocity);
 
-    while projectile.position.tuple.y > 0.0 {
-        let x = projectile.position.tuple.x.round() as i32;
-        let y = canvas.height - projectile.position.tuple.y.round() as i32;
+    while projectile.position.value().y > 0.0 {
+        let x = projectile.position.value().x.round() as i32;
+        let y = canvas.height - projectile.position.value().y.round() as i32;
         canvas.write_pixel(x,y, color);
 
         projectile = world::tick(environment, projectile);
     }
 
-    canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
+    //canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
 }

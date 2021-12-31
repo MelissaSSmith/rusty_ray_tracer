@@ -4,7 +4,7 @@ use crate::draw::color::Color;
 use crate::draw::pixel::Pixel;
 
 pub struct Canvas {
-    pub(crate) width: i32,
+    pub width: i32,
     pub height: i32,
     pub(crate) pixels: HashMap<String, Pixel>
 }
