@@ -1,7 +1,6 @@
 use std::f64::consts::PI;
 use rusty_ray_tracer::draw::canvas::Canvas;
 use rusty_ray_tracer::draw::color::Color;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::matrix::Matrix;
 use rusty_ray_tracer::features::point::Point;
 
@@ -17,7 +16,7 @@ fn analog_clock_test() {
     let twelve = Point::create(0.0, 0.0, 1.0);
     let num_of_permutations = 13;
     for n in 1..num_of_permutations {
-        let rotation = Matrix::rotation_y((n as f64 * (PI/6.0)));
+        let rotation = Matrix::rotation_y(n as f64 * (PI/6.0));
         let clock_hand = rotation.multiply_point(twelve);
 
         let x_coor = (clock_hand.value().x * clock_radius).round() as i32 + center_x_coor;

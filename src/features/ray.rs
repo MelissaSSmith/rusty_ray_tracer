@@ -8,7 +8,7 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub(crate) fn create(origin: Point, direction: Vector) -> Ray {
+    pub fn create(origin: Point, direction: Vector) -> Ray {
         Ray{origin, direction}
     }
 

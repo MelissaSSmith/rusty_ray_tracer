@@ -1,7 +1,7 @@
 use crate::features::intersection::Intersection;
 use crate::features::ray::Ray;
 
-pub(crate) mod sphere;
+pub mod sphere;
 
 pub trait Shape {
     type Item;

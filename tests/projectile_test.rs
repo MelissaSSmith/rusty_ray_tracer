@@ -1,6 +1,5 @@
 use rusty_ray_tracer::draw::canvas::Canvas;
 use rusty_ray_tracer::draw::color::Color;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::vector::Vector;
 

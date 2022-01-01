@@ -12,7 +12,7 @@ impl<T: Shape + Shape<Item = T>> Intersection<T> {
         Intersection{t: _t, object: _shape}
     }
 
-    fn hit(intersections: Vec<Intersection<T>>) -> Option<Intersection<T>> {
+    pub fn hit(intersections: Vec<Intersection<T>>) -> Option<Intersection<T>> {
         let mut hit: Option<Intersection<T>> = None;
         for intersection in intersections {
             let h = &hit;
