@@ -65,7 +65,7 @@ mod tests {
         let origin = Point::create(1.0, 2.0, 3.0);
         let direction = Vector::create(0.0, 1.0, 0.0);
         let ray = Ray::create(origin, direction);
-        let matrix = Matrix::translation(3.0, 4.0, 5.0);
+        let matrix = Matrix::translate(3.0, 4.0, 5.0);
 
         let new_ray = ray.transform(matrix);
 
@@ -78,7 +78,7 @@ mod tests {
         let origin = Point::create(1.0, 2.0, 3.0);
         let direction = Vector::create(0.0, 1.0, 0.0);
         let ray = Ray::create(origin, direction);
-        let matrix = Matrix::scaling(2.0, 3.0, 4.0);
+        let matrix = Matrix::scale(2.0, 3.0, 4.0);
 
         let new_ray = ray.transform(matrix);
 

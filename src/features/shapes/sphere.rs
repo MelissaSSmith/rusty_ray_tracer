@@ -149,11 +149,11 @@ mod tests {
     #[test]
     fn test_change_transformation_in_a_sphere() {
         let mut sphere = Sphere::create();
-        let transform = Matrix::translation(2.0, 3.0, 4.0);
+        let transform = Matrix::translate(2.0, 3.0, 4.0);
 
         sphere.set_transform(transform);
 
-        assert!(sphere.transformation().equals(Matrix::translation(2.0, 3.0, 4.0)));
+        assert!(sphere.transformation().equals(Matrix::translate(2.0, 3.0, 4.0)));
     }
 
     #[test]
@@ -162,7 +162,7 @@ mod tests {
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
         let mut sphere = Sphere::create();
-        sphere.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        sphere.set_transform(Matrix::scale(2.0, 2.0, 2.0));
 
         let intersections = sphere.intersect(ray);
 
@@ -177,7 +177,7 @@ mod tests {
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
         let mut sphere = Sphere::create();
-        sphere.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        sphere.set_transform(Matrix::translate(5.0, 0.0, 0.0));
 
         let intersections = sphere.intersect(ray);
 
