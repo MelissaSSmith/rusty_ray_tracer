@@ -3,6 +3,7 @@ use crate::features::matrix::Matrix;
 use crate::features::point::Point;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
+use crate::features::vector::Vector;
 
 #[derive(Clone)]
 pub struct Sphere {
@@ -44,6 +45,13 @@ impl Shape for Sphere {
         vec![Intersection::create(t1, self.clone()), Intersection::create(t2, self.clone())]
     }
 
+    fn normal(&self, world_point: Point) -> Vector {
+        let object_point = self.clone().transformation().inverse().multiply_point(world_point);
+        let object_normal = object_point.subtract_point(Point::create(0.0, 0.0, 0.0));
+        let world_normal = self.clone().transformation().inverse().transpose().multiply_vector(object_normal);
+        world_normal.normalize()
+    }
+
     fn equals(&self, _: Sphere) -> bool {
         true
     }
@@ -51,6 +59,7 @@ impl Shape for Sphere {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::{FRAC_1_SQRT_2, PI};
     use crate::features::matrix::Matrix;
     use crate::features::point::Point;
     use crate::features::ray::Ray;
@@ -182,5 +191,71 @@ mod tests {
         let intersections = sphere.intersect(ray);
 
         assert_eq!(intersections.len(), 0);
+    }
+
+    #[test]
+    fn test_normal_on_a_sphere_at_a_point_on_the_x_axis() {
+        let sphere = Sphere::create();
+
+        let normal = sphere.normal(Point::create(1.0, 0.0, 0.0));
+
+        assert!(normal.equals(Vector::create(1.0, 0.0, 0.0)));
+    }
+
+    #[test]
+    fn test_normal_on_a_sphere_at_a_point_on_the_y_axis() {
+        let sphere = Sphere::create();
+
+        let normal = sphere.normal(Point::create(0.0, 1.0, 0.0));
+
+        assert!(normal.equals(Vector::create(0.0, 1.0, 0.0)));
+    }
+
+    #[test]
+    fn test_normal_on_a_sphere_at_a_point_on_the_z_axis() {
+        let sphere = Sphere::create();
+
+        let normal = sphere.normal(Point::create(0.0, 0.0, 1.0));
+
+        assert!(normal.equals(Vector::create(0.0, 0.0, 1.0)));
+    }
+
+    #[test]
+    fn test_normal_on_a_sphere_at_a_nonaxial_point() {
+        let sphere = Sphere::create();
+
+        let normal = sphere.normal(Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
+
+        assert!(normal.equals(Vector::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0)));
+    }
+
+    #[test]
+    fn test_normal_is_a_normalized_vector() {
+        let sphere = Sphere::create();
+
+        let normal = sphere.normal(Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
+
+        assert!(normal.equals(normal.normalize()));
+    }
+
+    #[test]
+    fn test_compute_normal_on_a_translated_sphere() {
+        let mut sphere = Sphere::create();
+        sphere.set_transform(Matrix::translate(0.0, 1.0, 0.0));
+
+        let normal = sphere.normal(Point::create(0.0, 1.70711, -FRAC_1_SQRT_2));
+
+        assert!(normal.equals(Vector::create(0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2)));
+    }
+
+    #[test]
+    fn test_compute_normal_on_a_transformed_sphere() {
+        let mut sphere = Sphere::create();
+        let matrix = Matrix::scale(1.0, 0.5, 1.0).multiply(&Matrix::rotate_z(PI/5.0));
+        sphere.set_transform(matrix);
+
+        let normal = sphere.normal(Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0));
+
+        assert!(normal.equals(Vector::create(0.0, 0.97014, -0.24254)));
     }
 }

@@ -11,7 +11,8 @@ impl Point {
         Point{tuple: Tuple::create(x, y, z, 1.0)}
     }
 
-    pub(crate) fn create_with_tuple(tuple: Tuple) -> Point {
+    pub(crate) fn create_with_tuple(mut tuple: Tuple) -> Point {
+        tuple.w = 1.0;
         Point{tuple}
     }
 

@@ -1,8 +1,6 @@
 use rusty_ray_tracer::draw::canvas::Canvas;
-use rusty_ray_tracer::draw::color::Color;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
+use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::intersection::Intersection;
-use rusty_ray_tracer::features::matrix::Matrix;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::Shape;
@@ -13,7 +11,7 @@ fn sphere_shadow_test() {
     let ray_origin = Point::create(0.0, 0.0, -5.0);
     let wall_z = 10.0;
     let wall_size = 7.0;
-    let canvas_pixels = 100;
+    let canvas_pixels = 50;
     let pixel_size = wall_size / canvas_pixels as f64;
     let half = wall_size / 2.0;
 

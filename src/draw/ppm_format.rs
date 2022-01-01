@@ -76,7 +76,7 @@ impl PPMFile for Canvas {
 #[cfg(test)]
 mod tests {
     use crate::draw::canvas::Canvas;
-    use crate::draw::color::Color;
+    use crate::features::color::Color;
     use crate::draw::ppm_format::PPMFormat;
 
     #[test]

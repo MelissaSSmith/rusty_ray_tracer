@@ -10,7 +10,8 @@ impl Vector {
         Vector{tuple: Tuple::create(x, y, z, 0.0)}
     }
 
-    pub(crate) fn create_with_tuple(tuple: Tuple) -> Vector {
+    pub(crate) fn create_with_tuple(mut tuple: Tuple) -> Vector {
+        tuple.w = 0.0;
         Vector{tuple}
     }
 
@@ -55,6 +56,11 @@ impl Vector {
     pub fn cross(&self, _vector: Vector) -> Vector {
         let tuple = self.tuple.cross(_vector.tuple);
         Vector::create_with_tuple(tuple)
+    }
+
+    fn reflect(&self, normal: Vector) -> Vector {
+        let temp = normal.multiply(2.0).multiply(self.dot(normal));
+        self.subtract(temp)
     }
 
     pub(crate) fn equals(&self, _vector: Vector) -> bool {
@@ -219,5 +225,25 @@ mod tests {
 
         let expected_vector = Vector::create(1.0, -2.0, 1.0);
         assert!(expected_vector.equals(cross_b_a));
+    }
+
+    #[test]
+    fn test_reflect_vector_approaching_45_degrees() {
+        let vector = Vector::create(1.0, -1.0, 0.0);
+        let normal = Vector::create(0.0, 1.0, 0.0);
+
+        let reflection = vector.reflect(normal);
+
+        assert!(reflection.equals(Vector::create(1.0, 1.0, 0.0)));
+    }
+
+    #[test]
+    fn test_reflect_vector_off_a_slanted_surface() {
+        let vector = Vector::create(0.0, -1.0, 0.0);
+        let normal = Vector::create(2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0, 0.0);
+
+        let reflection = vector.reflect(normal);
+
+        assert!(reflection.equals(Vector::create(1.0, 0.0, 0.0)));
     }
 }

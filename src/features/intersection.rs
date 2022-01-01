@@ -1,4 +1,3 @@
-use std::borrow::Borrow;
 use crate::features::shapes::Shape;
 
 #[derive(Clone)]

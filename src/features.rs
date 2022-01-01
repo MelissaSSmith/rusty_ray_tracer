@@ -7,6 +7,7 @@ pub mod transformations;
 pub mod ray;
 pub mod shapes;
 pub mod intersection;
+pub mod color;
 
 use std::any::Any;
 use crate::features::point::Point;
@@ -58,7 +59,7 @@ pub fn create_feature(tuple:(f64, f64, f64, f64)) -> Box<dyn Feature> {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::{create_feature, Feature, Point, Vector, Tuple};
+    use crate::features::{create_feature, Feature, Point, Tuple, Vector};
 
     #[test]
     fn tuple_with_w_equals_1_0_is_a_point() {

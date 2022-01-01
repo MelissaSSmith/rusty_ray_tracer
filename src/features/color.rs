@@ -8,8 +8,8 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn create(tuple: (f64, f64, f64)) -> Color {
-        Color{red:tuple.0, green:tuple.1, blue:tuple.2}
+    pub fn create(color: (f64, f64, f64)) -> Color {
+        Color{red:color.0, green:color.1, blue:color.2}
     }
 
     pub fn add(&self, _color: Color) -> Color {
@@ -70,7 +70,7 @@ impl Color {
 
 #[cfg(test)]
 mod tests {
-    use crate::draw::color::Color;
+    use crate::features::color::Color;
 
     #[test]
     fn test_create_color() {
