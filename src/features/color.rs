@@ -66,6 +66,12 @@ impl Color {
     pub fn format_color_string(&self) -> String {
         format!("{} {} {}", self.red, self.green, self.blue)
     }
+
+    pub fn equals(&self, other_color: Color) -> bool {
+        self.red == other_color.red &&
+            self.green == other_color.green &&
+            self.blue == other_color.blue
+    }
 }
 
 #[cfg(test)]

@@ -1,4 +1,5 @@
 use crate::features::intersection::Intersection;
+use crate::features::material::Material;
 use crate::features::matrix::Matrix;
 use crate::features::point::Point;
 use crate::features::ray::Ray;
@@ -7,12 +8,16 @@ use crate::features::vector::Vector;
 
 #[derive(Clone)]
 pub struct Sphere {
-    transformation: Matrix
+    transformation: Matrix,
+    material: Material
 }
 
 impl Sphere {
     pub fn create() -> Sphere {
-        Sphere{transformation: Matrix::create_identity()}
+        Sphere {
+            transformation: Matrix::create_identity(),
+            material: Material::create()
+        }
     }
 
     pub fn transformation(self) -> Matrix {
@@ -21,6 +26,10 @@ impl Sphere {
 
     pub fn set_transform(&mut self, _transformation: Matrix) {
         self.transformation = _transformation;
+    }
+
+    pub fn set_material(&mut self, _material: Material) {
+        self.material = _material;
     }
 }
 
@@ -52,14 +61,16 @@ impl Shape for Sphere {
         world_normal.normalize()
     }
 
-    fn equals(&self, _: Sphere) -> bool {
-        true
+    fn equals(&self, other_sphere: Sphere) -> bool {
+        self.material.equals(other_sphere.material) &&
+            self.transformation.equals(other_sphere.transformation)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use std::f64::consts::{FRAC_1_SQRT_2, PI};
+    use crate::features::material::Material;
     use crate::features::matrix::Matrix;
     use crate::features::point::Point;
     use crate::features::ray::Ray;
@@ -257,5 +268,25 @@ mod tests {
         let normal = sphere.normal(Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0));
 
         assert!(normal.equals(Vector::create(0.0, 0.97014, -0.24254)));
+    }
+
+    #[test]
+    fn test_sphere_has_a_default_material() {
+        let sphere = Sphere::create();
+
+        let material = Material::create();
+
+        assert!(material.equals(sphere.material));
+    }
+
+    #[test]
+    fn test_sphere_may_be_assigned_a_material() {
+        let mut sphere = Sphere::create();
+        let mut material = Material::create();
+        material.set_ambient(1.0);
+
+        sphere.set_material(material);
+
+        assert!(material.equals(sphere.material));
     }
 }
