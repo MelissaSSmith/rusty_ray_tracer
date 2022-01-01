@@ -1,3 +1,4 @@
+use crate::features::matrix::Matrix;
 use crate::features::point::Point;
 use crate::features::vector::Vector;
 
@@ -14,10 +15,17 @@ impl Ray {
     fn position(&self, _t: f64) -> Point {
         self.origin.add(self.direction.multiply(_t))
     }
+
+    pub fn transform(&self, _matrix: Matrix) -> Ray {
+        let new_point = _matrix.multiply_point(self.origin);
+        let new_vector = _matrix.multiply_vector(self.direction);
+        Ray::create(new_point, new_vector)
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::features::matrix::Matrix;
     use crate::features::point::Point;
     use crate::features::ray::Ray;
     use crate::features::vector::Vector;
@@ -50,5 +58,31 @@ mod tests {
 
         let point_4 = ray.position(2.5);
         assert!(Point::create(4.5,3.0,4.0).equals(point_4));
+    }
+
+    #[test]
+    fn test_translate_a_ray() {
+        let origin = Point::create(1.0, 2.0, 3.0);
+        let direction = Vector::create(0.0, 1.0, 0.0);
+        let ray = Ray::create(origin, direction);
+        let matrix = Matrix::translation(3.0, 4.0, 5.0);
+
+        let new_ray = ray.transform(matrix);
+
+        assert!(new_ray.origin.equals(Point::create(4.0, 6.0, 8.0)));
+        assert!(new_ray.direction.equals(Vector::create(0.0, 1.0, 0.0)));
+    }
+
+    #[test]
+    fn test_scale_a_ray() {
+        let origin = Point::create(1.0, 2.0, 3.0);
+        let direction = Vector::create(0.0, 1.0, 0.0);
+        let ray = Ray::create(origin, direction);
+        let matrix = Matrix::scaling(2.0, 3.0, 4.0);
+
+        let new_ray = ray.transform(matrix);
+
+        assert!(new_ray.origin.equals(Point::create(2.0, 6.0, 12.0)));
+        assert!(new_ray.direction.equals(Vector::create(0.0, 3.0, 0.0)));
     }
 }

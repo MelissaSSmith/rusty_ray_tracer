@@ -4,6 +4,7 @@ use crate::features::point::Point;
 use crate::features::tuple::Tuple;
 use crate::features::vector::Vector;
 
+#[derive(Clone)]
 pub struct Matrix {
     matrix: Array2D<f64>
 }
