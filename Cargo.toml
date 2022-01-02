@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 array2d = "0.2.1"
+
+[profile.test] # fixed
+opt-level = 2

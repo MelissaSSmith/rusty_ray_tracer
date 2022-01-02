@@ -1,5 +1,4 @@
 use rusty_ray_tracer::draw::canvas::Canvas;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::intersection::Intersection;
@@ -50,5 +49,5 @@ fn sphere_shadow_test() {
         }
     }
 
-    canvas.convert_to_ppm_and_save(String::from("sphere_shadow_test.ppm"));
+    //.convert_to_ppm_and_save(String::from("sphere_shadow_test.ppm"));
 }

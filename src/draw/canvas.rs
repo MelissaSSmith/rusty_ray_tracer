@@ -46,14 +46,15 @@ impl Canvas {
     }
 
     pub fn format_pixel_line(line_array: Vec<String>) -> String {
+        let max_line_length = 70;
         let mut line_string: String = line_array.join(" ");
-        if line_string.len() > 70 {
-            let num_of_line_splits = line_string.len().div(70);
+        if line_string.len() > max_line_length {
+            let num_of_line_splits = line_string.len().div(max_line_length);
             for n in 0..num_of_line_splits {
-                let mut position = 70 * (n+1);
+                let mut position = max_line_length * (n+1);
                 while position > 0 {
                     match line_string.chars().nth(position) {
-                        None => {}
+                        None => { position -= 1; }
                         Some(char) => {
                             if char != ' ' {
                                 position -= 1;
