@@ -10,6 +10,7 @@ pub mod intersection;
 pub mod color;
 pub mod light;
 pub mod material;
+pub mod world;
 
 use std::any::Any;
 use crate::features::point::Point;

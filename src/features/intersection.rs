@@ -1,18 +1,18 @@
 use crate::features::shapes::Shape;
 
 #[derive(Clone)]
-pub struct Intersection<T: Shape> {
+pub struct Intersection {
     pub t: f64,
-    pub object: T
+    pub object: Box<dyn Shape>
 }
 
-impl<T: Shape + Shape<Item = T>> Intersection<T> {
-    pub fn create(_t: f64, _shape: T) -> Intersection<T> {
+impl Intersection {
+    pub fn create(_t: f64, _shape: Box<dyn Shape>) -> Intersection {
         Intersection{t: _t, object: _shape}
     }
 
-    pub fn hit(intersections: Vec<Intersection<T>>) -> Option<Intersection<T>> {
-        let mut hit: Option<Intersection<T>> = None;
+    pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
+        let mut hit: Option<Intersection> = None;
         for intersection in intersections {
             let h = &hit;
             if intersection.t > 0.0 {
@@ -26,8 +26,8 @@ impl<T: Shape + Shape<Item = T>> Intersection<T> {
         hit
     }
 
-    fn equals(&self, _intersection: Intersection<T>) -> bool {
-        self.t == _intersection.t && self.object.equals(_intersection.object)
+    fn equals(&self, _intersection: Intersection) -> bool {
+        self.t == _intersection.t && self.object == _intersection.object
     }
 }
 
@@ -39,7 +39,7 @@ mod tests {
     #[test]
     fn test_intersection_encapsulates_t_and_object() {
         let sphere = Sphere::create();
-        let intersection = Intersection::create(3.5, sphere);
+        let intersection = Intersection::create(3.5, Box::new(sphere));
 
         assert_eq!(intersection.t, 3.5);
     }
@@ -47,8 +47,8 @@ mod tests {
     #[test]
     fn test_aggregating_intersections() {
         let s = Sphere::create();
-        let i1 = Intersection::create(1.0, s.clone());
-        let i2 = Intersection::create(2.0, s.clone());
+        let i1 = Intersection::create(1.0, Box::new(s.clone()));
+        let i2 = Intersection::create(2.0, Box::new(s.clone()));
 
         let intersections = vec![i1.clone(), i2.clone()];
 
@@ -60,8 +60,8 @@ mod tests {
     #[test]
     fn test_hit_when_all_intersections_have_position_t() {
         let s = Sphere::create();
-        let i1 = Intersection::create(1.0, s.clone());
-        let i2 = Intersection::create(2.0, s.clone());
+        let i1 = Intersection::create(1.0, Box::new(s.clone()));
+        let i2 = Intersection::create(2.0, Box::new(s.clone()));
 
         let intersections = vec![i1.clone(), i2.clone()];
         let hit = Intersection::hit(intersections);
@@ -73,8 +73,8 @@ mod tests {
     #[test]
     fn test_hit_when_some_intersections_have_negative_t() {
         let s = Sphere::create();
-        let i1 = Intersection::create(-1.0, s.clone());
-        let i2 = Intersection::create(1.0, s.clone());
+        let i1 = Intersection::create(-1.0, Box::new(s.clone()));
+        let i2 = Intersection::create(1.0, Box::new(s.clone()));
 
         let intersections = vec![i1.clone(), i2.clone()];
         let hit = Intersection::hit(intersections);
@@ -86,8 +86,8 @@ mod tests {
     #[test]
     fn test_no_hit_when_all_intersections_have_negative_t() {
         let s = Sphere::create();
-        let i1 = Intersection::create(-2.0, s.clone());
-        let i2 = Intersection::create(-1.0, s.clone());
+        let i1 = Intersection::create(-2.0, Box::new(s.clone()));
+        let i2 = Intersection::create(-1.0, Box::new(s.clone()));
 
         let intersections = vec![i1, i2];
         let hit = Intersection::hit(intersections);
@@ -98,10 +98,10 @@ mod tests {
     #[test]
     fn test_hit_is_always_lowest_non_negative_intersection() {
         let s = Sphere::create();
-        let i1 = Intersection::create(5.0, s.clone());
-        let i2 = Intersection::create(7.0, s.clone());
-        let i3 = Intersection::create(-3.0, s.clone());
-        let i4 = Intersection::create(2.0, s.clone());
+        let i1 = Intersection::create(5.0, Box::new(s.clone()));
+        let i2 = Intersection::create(7.0, Box::new(s.clone()));
+        let i3 = Intersection::create(-3.0, Box::new(s.clone()));
+        let i4 = Intersection::create(2.0, Box::new(s.clone()));
 
         let intersections = vec![i1, i2, i3, i4.clone()];
         let hit = Intersection::hit(intersections);

@@ -4,7 +4,7 @@ use crate::features::light::PointLight;
 use crate::features::point::Point;
 use crate::features::vector::Vector;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Material {
     color: Color,
     ambient: f64,
@@ -38,6 +38,14 @@ impl Material {
 
     pub fn set_color(&mut self, color: Color) {
         self.color = color;
+    }
+
+    pub fn set_diffuse(&mut self, diffuse: f64) {
+        self.diffuse = diffuse;
+    }
+
+    pub fn set_specular(&mut self, specular: f64) {
+        self.specular = specular;
     }
 
     pub fn lighting(&self, light: PointLight, position: Point, eye_vector: Vector, normal_vector: Vector) -> Color {

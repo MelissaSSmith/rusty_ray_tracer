@@ -68,7 +68,7 @@ impl PPMFormat for Canvas {
 
 impl PPMFile for Canvas {
     fn convert_to_ppm_and_save(&self, file_name: String) {
-        let mut file = Canvas::open_new_file(file_name);
+        let file = Canvas::open_new_file(file_name);
         Canvas::write_line_to_file(&file, self.create_header());
         self.write_to_ppm(&file);
         Canvas::write_line_to_file(&file, Canvas::create_termination());

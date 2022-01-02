@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::matrix::Matrix;
@@ -6,7 +7,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::vector::Vector;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Sphere {
     transformation: Matrix,
     material: Material
@@ -19,28 +20,45 @@ impl Sphere {
             material: Material::create()
         }
     }
-
-    pub fn transformation(self) -> Matrix {
-        self.transformation
-    }
-
-    pub fn material(self) -> Material {
-        self.material
-    }
-
-    pub fn set_transform(&mut self, _transformation: Matrix) {
-        self.transformation = _transformation;
-    }
-
-    pub fn set_material(&mut self, _material: Material) {
-        self.material = _material;
-    }
 }
 
 impl Shape for Sphere {
-    type Item = self::Sphere;
+    fn equals(&self, other: &dyn Any) -> bool {
+        other.downcast_ref::<Self>().map_or(false, |a| self == a)
+    }
 
-    fn intersect(&self, _ray: Ray) -> Vec<Intersection<Sphere>> {
+    fn box_clone(&self) -> Box<dyn Shape> {
+        Box::new(self.clone())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn transformation(self) -> Matrix {
+        self.transformation
+    }
+
+    fn material(&self) -> Material {
+        self.material
+    }
+
+    fn set_transform(&mut self, _transformation: Matrix) {
+        self.transformation = _transformation;
+    }
+
+    fn set_material(&mut self, _material: Material) {
+        self.material = _material;
+    }
+
+    fn normal(&self, world_point: Point) -> Vector {
+        let object_point = self.clone().transformation().inverse().multiply_point(world_point);
+        let object_normal = object_point.subtract_point(Point::create(0.0, 0.0, 0.0));
+        let world_normal = self.clone().transformation().inverse().transpose().multiply_vector(object_normal);
+        world_normal.normalize()
+    }
+
+    fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
         let transformed_ray = _ray.transform(self.clone().transformation().inverse());
         let sphere_to_ray = transformed_ray.origin.subtract_point(Point::create(0.0,0.0,0.0));
         let a = transformed_ray.direction.dot(transformed_ray.direction);
@@ -55,19 +73,7 @@ impl Shape for Sphere {
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
-        vec![Intersection::create(t1, self.clone()), Intersection::create(t2, self.clone())]
-    }
-
-    fn normal(&self, world_point: Point) -> Vector {
-        let object_point = self.clone().transformation().inverse().multiply_point(world_point);
-        let object_normal = object_point.subtract_point(Point::create(0.0, 0.0, 0.0));
-        let world_normal = self.clone().transformation().inverse().transpose().multiply_vector(object_normal);
-        world_normal.normalize()
-    }
-
-    fn equals(&self, other_sphere: Sphere) -> bool {
-        self.material.equals(other_sphere.material) &&
-            self.transformation.equals(other_sphere.transformation)
+        vec![Intersection::create(t1, Box::new(self.clone())), Intersection::create(t2, Box::new(self.clone()))]
     }
 }
 
