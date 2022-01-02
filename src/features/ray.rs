@@ -2,6 +2,7 @@ use crate::features::matrix::Matrix;
 use crate::features::point::Point;
 use crate::features::vector::Vector;
 
+#[derive(Clone, Copy)]
 pub struct Ray {
     pub(crate) origin: Point,
     pub(crate) direction: Vector
@@ -12,8 +13,12 @@ impl Ray {
         Ray{origin, direction}
     }
 
-    fn position(&self, _t: f64) -> Point {
+    pub fn position(&self, _t: f64) -> Point {
         self.origin.add(self.direction.multiply(_t))
+    }
+
+    pub fn direction(&self) -> Vector {
+        self.direction
     }
 
     pub fn transform(&self, _matrix: Matrix) -> Ray {

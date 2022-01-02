@@ -97,9 +97,9 @@ mod tests {
         let height = 3;
         let mut canvas = Canvas::create(width, height);
 
-        let color_a = Color::create((1.5, 0.0, 0.0));
-        let color_b = Color::create((0.0, 0.5, 0.0));
-        let color_c = Color::create((-0.5, 0.0, 1.0));
+        let color_a = Color::create(1.5, 0.0, 0.0);
+        let color_b = Color::create(0.0, 0.5, 0.0);
+        let color_c = Color::create(-0.5, 0.0, 1.0);
 
         canvas.write_pixel(0, 0, color_a);
         canvas.write_pixel(2, 1, color_b);
@@ -119,7 +119,7 @@ mod tests {
 
         for x in 0..width {
             for y in 0..height {
-                let color = Color::create((1.0,0.8,0.6));
+                let color = Color::create(1.0,0.8,0.6);
                 canvas.write_pixel(x, y, color);
             }
         }
@@ -148,7 +148,7 @@ mod tests {
 
         for x in 0..width {
             for y in 0..height {
-                let color = Color::create((1.0,0.8,0.6));
+                let color = Color::create(1.0,0.8,0.6);
                 canvas.write_pixel(x, y, color);
             }
         }

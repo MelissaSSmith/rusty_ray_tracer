@@ -7,7 +7,7 @@ use rusty_ray_tracer::features::point::Point;
 #[test]
 fn analog_clock_test() {
     let mut canvas = Canvas::create(300, 300);
-    let color = Color::create((1.0,1.0,1.0));
+    let color = Color::create(1.0,1.0,1.0);
     let clock_radius = canvas.width as f64 * 0.375;
 
     let center_x_coor = canvas.width / 2;

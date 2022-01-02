@@ -24,6 +24,10 @@ impl Sphere {
         self.transformation
     }
 
+    pub fn material(self) -> Material {
+        self.material
+    }
+
     pub fn set_transform(&mut self, _transformation: Matrix) {
         self.transformation = _transformation;
     }

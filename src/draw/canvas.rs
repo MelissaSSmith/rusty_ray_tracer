@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::ops::Div;
 use crate::features::color::Color;
 use crate::draw::pixel::Pixel;
+use crate::features::color::consts::BLACK;
 
 pub struct Canvas {
     pub width: i32,
@@ -14,9 +15,8 @@ impl Canvas {
         let mut default_pixels = HashMap::<String, Pixel>::new();
         for x in 0.._width {
             for y in 0.._height {
-                let default_color = Color::create((0.0,0.0,0.0));
                 let key = Canvas::create_key(x, y);
-                default_pixels.insert(key, Pixel::create(x, y, default_color));
+                default_pixels.insert(key, Pixel::create(x, y, BLACK));
             }
         }
         Canvas {
@@ -52,13 +52,18 @@ impl Canvas {
             for n in 0..num_of_line_splits {
                 let mut position = 70 * (n+1);
                 while position > 0 {
-                    let char = line_string.chars().nth(position).unwrap();
-                    if char != ' ' {
-                        position -= 1;
-                    } else {
-                        line_string.replace_range(position..position+1, "\n");
-                        position = 0;
+                    match line_string.chars().nth(position) {
+                        None => {}
+                        Some(char) => {
+                            if char != ' ' {
+                                position -= 1;
+                            } else {
+                                line_string.replace_range(position..position+1, "\n");
+                                position = 0;
+                            }
+                        }
                     }
+
                 }
             }
         }
@@ -99,7 +104,7 @@ mod tests {
 
         let x = 2;
         let y = 3;
-        let color = Color::create((1.0, 0.0, 0.0));
+        let color = Color::create(1.0, 0.0, 0.0);
 
         canvas.write_pixel(x, y, color);
 

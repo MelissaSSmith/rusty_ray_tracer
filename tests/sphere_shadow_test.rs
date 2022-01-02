@@ -1,6 +1,10 @@
 use rusty_ray_tracer::draw::canvas::Canvas;
+use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::color::Color;
+use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::intersection::Intersection;
+use rusty_ray_tracer::features::light::PointLight;
+use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::Shape;
@@ -16,8 +20,14 @@ fn sphere_shadow_test() {
     let half = wall_size / 2.0;
 
     let mut canvas = Canvas::create(canvas_pixels, canvas_pixels);
-    let color = Color::create((1.0, 0.0, 0.0));
-    let shape = Sphere::create();
+    let mut shape = Sphere::create();
+    let mut material = Material::create();
+    material.set_color(Color::create(1.0, 0.2, 1.0));
+    shape.set_material(material);
+
+    //light source
+    let light_position = Point::create(-10.0, 10.0, -10.0);
+    let light = PointLight::create(WHITE, light_position);
 
     for y in 0..canvas_pixels {
         let world_y = half - pixel_size * y as f64;
@@ -29,10 +39,16 @@ fn sphere_shadow_test() {
 
             match Intersection::hit(shape.intersect(ray)) {
                 None => {}
-                Some(_) => { canvas.write_pixel(x, y, color) }
+                Some(hit) => {
+                    let point = ray.position(hit.t);
+                    let normal = hit.object.normal(point);
+                    let eye = ray.direction().negate();
+                    let color = hit.object.material().lighting(light, point, eye, normal);
+                    canvas.write_pixel(x, y, color);
+                }
             }
         }
     }
 
-    //canvas.convert_to_ppm_and_save(String::from("sphere_shadow_test.ppm"));
+    canvas.convert_to_ppm_and_save(String::from("sphere_shadow_test.ppm"));
 }

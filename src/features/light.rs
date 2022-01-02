@@ -1,13 +1,14 @@
 use crate::features::color::Color;
 use crate::features::point::Point;
 
-struct PointLight {
-    intensity: Color,
-    position: Point
+#[derive(Clone, Copy)]
+pub struct PointLight {
+    pub(crate) intensity: Color,
+    pub(crate) position: Point
 }
 
 impl PointLight {
-    fn create(intensity: Color, position: Point) -> PointLight {
+    pub fn create(intensity: Color, position: Point) -> PointLight {
         PointLight{intensity, position}
     }
 }
@@ -20,7 +21,7 @@ mod tests {
 
     #[test]
     fn test_point_light_has_position_and_intensity() {
-        let intensity = Color::create((1.0, 1.0, 1.0));
+        let intensity = Color::create(1.0, 1.0, 1.0);
         let position = Point::create(0.0, 0.0, 0.0);
 
         let light = PointLight::create(intensity, position);

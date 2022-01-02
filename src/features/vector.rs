@@ -58,7 +58,7 @@ impl Vector {
         Vector::create_with_tuple(tuple)
     }
 
-    fn reflect(&self, normal: Vector) -> Vector {
+    pub fn reflect(&self, normal: Vector) -> Vector {
         let temp = normal.multiply(2.0).multiply(self.dot(normal));
         self.subtract(temp)
     }

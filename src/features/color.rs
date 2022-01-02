@@ -1,4 +1,5 @@
 use std::ops::{Add, Mul, Sub};
+use crate::features::operations::Operations;
 
 #[derive(Clone, Copy)]
 pub struct Color {
@@ -8,8 +9,8 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn create(color: (f64, f64, f64)) -> Color {
-        Color{red:color.0, green:color.1, blue:color.2}
+    pub fn create(red: f64, green: f64, blue: f64) -> Color {
+        Color{red, green, blue}
     }
 
     pub fn add(&self, _color: Color) -> Color {
@@ -68,10 +69,18 @@ impl Color {
     }
 
     pub fn equals(&self, other_color: Color) -> bool {
-        self.red == other_color.red &&
-            self.green == other_color.green &&
-            self.blue == other_color.blue
+        self.red.equals(other_color.red) &&
+            self.green.equals(other_color.green) &&
+            self.blue.equals(other_color.blue)
     }
+}
+
+pub mod consts {
+    use crate::features::color::Color;
+
+    pub const BLACK: Color = Color {red: 0.0, green: 0.0, blue: 0.0};
+    pub const WHITE: Color = Color {red: 1.0, green: 1.0, blue: 1.0};
+    pub const RED: Color = Color {red: 1.0, green: 0.0, blue: 0.0};
 }
 
 #[cfg(test)]
@@ -80,18 +89,17 @@ mod tests {
 
     #[test]
     fn test_create_color() {
-        let tuple = (-0.5, 0.4, 1.7);
-        let color = Color::create(tuple);
+        let color = Color::create(-0.5, 0.4, 1.7);
 
-        assert_eq!(tuple.0, color.red);
-        assert_eq!(tuple.1, color.green);
-        assert_eq!(tuple.2, color.blue);
+        assert_eq!(-0.5, color.red);
+        assert_eq!(0.4, color.green);
+        assert_eq!(1.7, color.blue);
     }
 
     #[test]
     fn test_add_colors() {
-        let color_a = Color::create((0.9, 0.6, 0.75));
-        let color_b = Color::create((0.7, 0.1, 0.25));
+        let color_a = Color::create(0.9, 0.6, 0.75);
+        let color_b = Color::create(0.7, 0.1, 0.25);
 
         let new_color = color_a.add(color_b);
 
@@ -102,8 +110,8 @@ mod tests {
 
     #[test]
     fn test_subtract_colors() {
-        let color_a = Color::create((0.9, 0.6, 0.75));
-        let color_b = Color::create((0.7, 0.1, 0.25));
+        let color_a = Color::create(0.9, 0.6, 0.75);
+        let color_b = Color::create(0.7, 0.1, 0.25);
 
         let new_color = color_a.subtract(color_b);
 
@@ -114,7 +122,7 @@ mod tests {
 
     #[test]
     fn test_multiply_color_by_scalar() {
-        let color_a = Color::create((0.2, 0.3, 0.4));
+        let color_a = Color::create(0.2, 0.3, 0.4);
         let scalar = 2.0;
 
         let new_color = color_a.multiply(scalar);
@@ -126,8 +134,8 @@ mod tests {
 
     #[test]
     fn test_multiply_colors() {
-        let color_a = Color::create((1.0, 0.2, 0.4));
-        let color_b = Color::create((0.9, 1.0, 0.1));
+        let color_a = Color::create(1.0, 0.2, 0.4);
+        let color_b = Color::create(0.9, 1.0, 0.1);
 
         let new_color = color_a.multiply_colors(color_b);
 

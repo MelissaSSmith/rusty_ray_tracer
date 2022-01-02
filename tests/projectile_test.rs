@@ -12,7 +12,7 @@ fn projectile_test() {
     let environment = world::Environment::create(gravity, wind);
 
     let mut canvas = Canvas::create(900, 880);
-    let color = Color::create((1.0, 0.8, 0.6));
+    let color = Color::create(1.0, 0.8, 0.6);
 
     let position = Point::create(0.0, 1.0, 0.0);
     let velocity = Vector::create(1.0, 1.8, 0.0).normalize().multiply(11.25);
