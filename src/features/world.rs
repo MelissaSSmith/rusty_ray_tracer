@@ -23,6 +23,13 @@ impl World {
             objects: vec![]
         }
     }
+    
+    pub fn create_world(light: PointLight, objects: Vec<Box<dyn Shape>>) -> Self {
+        Self {
+            objects,
+            light: Some(light)
+        }
+    }
 
     pub fn create_default() -> Self {
         let mut s1_material = Material::create();

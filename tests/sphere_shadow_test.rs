@@ -1,3 +1,4 @@
+use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::WHITE;
@@ -10,6 +11,7 @@ use rusty_ray_tracer::features::shapes::Shape;
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
 
 #[test]
+#[ignore]
 fn sphere_shadow_test() {
     let ray_origin = Point::create(0.0, 0.0, -5.0);
     let wall_z = 10.0;
@@ -49,5 +51,5 @@ fn sphere_shadow_test() {
         }
     }
 
-    //.convert_to_ppm_and_save(String::from("sphere_shadow_test.ppm"));
+    canvas.convert_to_ppm_and_save(String::from("sphere_shadow_test.ppm"));
 }

@@ -1,3 +1,4 @@
+use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::point::Point;
@@ -6,6 +7,7 @@ use rusty_ray_tracer::features::vector::Vector;
 mod world;
 
 #[test]
+#[ignore]
 fn projectile_test() {
     let gravity = Vector::create(0.0, -0.1, 0.0);
     let wind= Vector::create(-0.01, 0.0, 0.0);
@@ -27,5 +29,5 @@ fn projectile_test() {
         projectile = world::tick(environment, projectile);
     }
 
-    //canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
+    canvas.convert_to_ppm_and_save(String::from("projectile_test.ppm"));
 }

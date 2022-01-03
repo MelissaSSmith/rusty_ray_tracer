@@ -4,7 +4,7 @@ use crate::features::point::Point;
 use crate::features::ray::Ray;
 use crate::features::world::World;
 
-struct Camera {
+pub struct Camera {
     h_size: i32,
     v_size: i32,
     field_of_view: f64,
@@ -49,7 +49,7 @@ impl Camera {
         Ray::create(origin, direction)
     }
 
-    fn render(&self, world: World) -> Canvas {
+    pub fn render(&self, world: World) -> Canvas {
         let mut canvas = Canvas::create(self.h_size, self.v_size);
 
         for y in 0..self.v_size {
@@ -61,6 +61,10 @@ impl Camera {
         }
 
         canvas
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix) {
+        self.transform = transform;
     }
 
     fn calculate_pixel_size(h_size: i32, v_size: i32, field_of_view: f64) -> PixelSize {

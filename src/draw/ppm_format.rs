@@ -56,7 +56,11 @@ impl PPMFormat for Canvas {
     fn open_new_file(file_name: String) -> File {
         let path = Path::new(&file_name);
 
-        OpenOptions::new().write(true).truncate(true).open(path).unwrap()
+        OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(path).unwrap()
     }
 
     fn write_line_to_file(mut file: &File, line: String) {
