@@ -1,5 +1,6 @@
 use crate::features::color::Color;
-use crate::features::color::consts::WHITE;
+use crate::features::color::consts::{BLACK, WHITE};
+use crate::features::computation::Computation;
 use crate::features::intersection::Intersection;
 use crate::features::light::PointLight;
 use crate::features::material::Material;
@@ -8,11 +9,6 @@ use crate::features::point::Point;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::shapes::sphere::Sphere;
-
-// #[derive(Clone, PartialEq)]
-// enum Object {
-//     Sphere(Sphere)
-// }
 
 #[derive(Clone)]
 struct World {
@@ -63,6 +59,26 @@ impl World {
         intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
         intersections
     }
+
+    fn shade_hit(&self, computation: Computation) -> Color {
+        computation.clone().object().material().lighting(
+            self.light.unwrap(),
+            computation.point(),
+            computation.eye_vector(),
+            computation.normal_vector()
+        )
+    }
+
+    fn color_at(&self, _ray: Ray) -> Color {
+        let intersection = Intersection::hit(self.intersect(_ray));
+        return match intersection {
+            None => { BLACK }
+            Some(i) => {
+                let computations = i.prepare_computations(_ray);
+                self.shade_hit(computations)
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -70,6 +86,7 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::WHITE;
     use crate::features::intersection::Intersection;
+    use crate::features::light::PointLight;
     use crate::features::material::Material;
     use crate::features::matrix::Matrix;
     use crate::features::point::Point;
@@ -119,5 +136,77 @@ mod tests {
         assert_eq!(intersections[1].t, 4.5);
         assert_eq!(intersections[2].t, 5.5);
         assert_eq!(intersections[3].t, 6.0);
+    }
+
+    #[test]
+    fn test_shading_an_intersection() {
+        let world = World::create_default();
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+        let shape = world.clone().objects()[0].clone();
+        let intersection = Intersection::create(4.0, shape);
+
+        let computation = intersection.prepare_computations(ray);
+        let color = world.shade_hit(computation);
+
+        assert!(color.equals(Color::create(0.38066, 0.47583, 0.2855)));
+    }
+
+    #[test]
+    fn test_shading_an_intersection_from_the_inside() {
+        let mut world = World::create_default();
+        world.light = Some(PointLight::create(WHITE, Point::create(0.0, 0.25, 0.0)));
+        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 1.0));
+        let shape = world.clone().objects()[1].clone();
+        let intersection = Intersection::create(0.5, shape);
+
+        let computation = intersection.prepare_computations(ray);
+        let color = world.shade_hit(computation);
+
+        assert!(color.equals(Color::create(0.90498, 0.90498, 0.90498)));
+    }
+
+    #[test]
+    fn test_color_when_a_ray_misses() {
+        let world = World::create_default();
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 1.0, 0.0));
+
+        let color = world.color_at(ray);
+
+        assert!(color.equals(Color::create(0.0, 0.0, 0.0)));
+    }
+
+    #[test]
+    fn test_color_when_a_ray_hits() {
+        let world = World::create_default();
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+
+        let color = world.color_at(ray);
+
+        assert!(color.equals(Color::create(0.38066, 0.47583, 0.2855)));
+    }
+
+    #[test]
+    fn test_color_with_an_intersection_behind_the_ray() {
+        let mut s1_material = Material::create();
+        s1_material.set_color(Color::create(0.8, 1.0, 0.6));
+        s1_material.set_diffuse(0.7);
+        s1_material.set_specular(0.2);
+        s1_material.set_ambient(1.0);
+        let mut s1 = Sphere::create();
+        s1.set_material(s1_material);
+        let mut s2_material = Material::create();
+        s2_material.set_ambient(1.0);
+        let mut s2 = Sphere::create();
+        s2.set_transform(Matrix::scale(0.5, 0.5, 0.5));
+        s2.set_material(s2_material);
+        let light = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
+        let mut world = World::create();
+        world.light = Some(light);
+        world.objects = vec![Box::new(s1), Box::new(s2)];
+        let ray = Ray::create(Point::create(0.0, 0.0, 0.75), Vector::create(0.0, 0.0, -1.0));
+
+        let color = world.color_at(ray);
+
+        assert!(color.equals(world.objects[1].material().color()));
     }
 }

@@ -1,3 +1,5 @@
+use crate::features::computation::Computation;
+use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 
 #[derive(Clone)]
@@ -26,6 +28,19 @@ impl Intersection {
         hit
     }
 
+    pub(crate) fn prepare_computations(&self, _ray: Ray) -> Computation {
+        let mut computation = Computation::create(self.t, self.object.clone());
+
+        computation.set_point(_ray.position(self.t));
+        computation.set_eye_vector(_ray.direction.negate());
+        computation.set_normal_vector(self.object.normal(computation.point()));
+        if computation.normal_vector().dot(computation.eye_vector()) < 0.0 {
+            computation.set_inside(true);
+            computation.set_normal_vector(computation.normal_vector().negate());
+        }
+        computation
+    }
+
     fn equals(&self, _intersection: Intersection) -> bool {
         self.t == _intersection.t && self.object == _intersection.object
     }
@@ -34,7 +49,11 @@ impl Intersection {
 #[cfg(test)]
 mod tests {
     use crate::features::intersection::Intersection;
+    use crate::features::point::Point;
+    use crate::features::ray::Ray;
+    use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
+    use crate::features::vector::Vector;
 
     #[test]
     fn test_intersection_encapsulates_t_and_object() {
@@ -108,5 +127,45 @@ mod tests {
 
         assert_eq!(hit.is_some(), true);
         assert!(i4.equals(hit.unwrap()));
+    }
+
+    #[test]
+    fn test_precompute_state_of_an_intersection() {
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+        let shape = Sphere::create();
+        let intersection = Intersection::create(4.0, Box::new(shape.clone()));
+
+        let computation = intersection.prepare_computations(ray);
+
+        assert_eq!(4.0, computation.t());
+        assert!(computation.point().equals(Point::create(0.0, 0.0, -1.0)));
+        assert!(computation.eye_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+        assert!(computation.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+        assert!(computation.object().equals(shape.as_any()));
+    }
+
+    #[test]
+    fn test_hit_when_an_intersection_occurs_on_the_outside() {
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+        let shape = Sphere::create();
+        let intersection = Intersection::create(4.0, Box::new(shape.clone()));
+
+        let computation = intersection.prepare_computations(ray);
+
+        assert_eq!(false, computation.inside());
+    }
+
+    #[test]
+    fn test_hit_when_an_intersection_occurs_on_the_inside() {
+        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 1.0));
+        let shape = Sphere::create();
+        let intersection = Intersection::create(1.0, Box::new(shape.clone()));
+
+        let computation = intersection.prepare_computations(ray);
+
+        assert_eq!(true, computation.inside());
+        assert!(computation.point().equals(Point::create(0.0, 0.0, 1.0)));
+        assert!(computation.eye_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+        assert!(computation.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
     }
 }

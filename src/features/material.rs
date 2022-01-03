@@ -48,6 +48,10 @@ impl Material {
         self.specular = specular;
     }
 
+    pub fn color(&self) -> Color {
+        self.color
+    }
+
     pub fn lighting(&self, light: PointLight, position: Point, eye_vector: Vector, normal_vector: Vector) -> Color {
         let effective_color = self.color.multiply_colors(light.intensity);
         let light_vector = light.position.subtract_point(position).normalize();

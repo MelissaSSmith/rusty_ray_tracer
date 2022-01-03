@@ -11,6 +11,7 @@ pub mod color;
 pub mod light;
 pub mod material;
 pub mod world;
+pub mod computation;
 
 use std::any::Any;
 use crate::features::point::Point;

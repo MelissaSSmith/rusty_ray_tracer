@@ -21,6 +21,10 @@ impl Ray {
         self.direction
     }
 
+    pub fn origin(&self) -> Point {
+        self.origin
+    }
+
     pub fn transform(&self, _matrix: Matrix) -> Ray {
         let new_point = _matrix.multiply_point(self.origin);
         let new_vector = _matrix.multiply_vector(self.direction);
