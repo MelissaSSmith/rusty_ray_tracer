@@ -53,7 +53,7 @@ impl Vector {
         self.tuple.dot(_vector.tuple)
     }
 
-    pub fn cross(&self, _vector: Vector) -> Vector {
+    pub fn cross(&self, _vector: &Vector) -> Vector {
         let tuple = self.tuple.cross(_vector.tuple);
         Vector::create_with_tuple(tuple)
     }
@@ -210,7 +210,7 @@ mod tests {
         let vector_a = Vector::create(1.0, 2.0, 3.0);
         let vector_b = Vector::create(2.0, 3.0, 4.0);
 
-        let cross_a_b = vector_a.cross(vector_b);
+        let cross_a_b = vector_a.cross(&vector_b);
 
         let expected_vector = Vector::create(-1.0, 2.0, -1.0);
         assert!(expected_vector.equals(cross_a_b));
@@ -221,7 +221,7 @@ mod tests {
         let vector_a = Vector::create(1.0, 2.0, 3.0);
         let vector_b = Vector::create(2.0, 3.0, 4.0);
 
-        let cross_b_a = vector_b.cross(vector_a);
+        let cross_b_a = vector_b.cross(&vector_a);
 
         let expected_vector = Vector::create(1.0, -2.0, 1.0);
         assert!(expected_vector.equals(cross_b_a));

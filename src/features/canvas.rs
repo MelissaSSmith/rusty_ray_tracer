@@ -1,22 +1,21 @@
 use std::collections::HashMap;
 use std::ops::Div;
 use crate::features::color::Color;
-use crate::draw::pixel::Pixel;
 use crate::features::color::consts::BLACK;
 
 pub struct Canvas {
     pub width: i32,
     pub height: i32,
-    pub(crate) pixels: HashMap<String, Pixel>
+    pub(crate) pixels: HashMap<String, Color>
 }
 
 impl Canvas {
     pub fn create(_width: i32, _height: i32) -> Canvas {
-        let mut default_pixels = HashMap::<String, Pixel>::new();
+        let mut default_pixels = HashMap::<String, Color>::new();
         for x in 0.._width {
             for y in 0.._height {
                 let key = Canvas::create_key(x, y);
-                default_pixels.insert(key, Pixel::create(x, y, BLACK));
+                default_pixels.insert(key, BLACK);
             }
         }
         Canvas {
@@ -35,11 +34,11 @@ impl Canvas {
         let pixel = self.pixels.get_mut(&key);
         match pixel {
             None => (),
-            Some(p) => {p.color = _color}
+            Some(color) => {*color = _color}
         }
     }
 
-    pub fn get_pixel(&self, _x: i32, _y: i32) -> &Pixel {
+    pub fn get_pixel(&self, _x: i32, _y: i32) -> &Color {
         let key = Canvas::create_key(_x, _y);
         let pixel = &self.pixels.get(&key);
         pixel.unwrap()
@@ -74,7 +73,7 @@ impl Canvas {
 
 #[cfg(test)]
 mod tests {
-    use crate::draw::canvas::Canvas;
+    use crate::features::canvas::Canvas;
     use crate::features::color::Color;
 
     #[test]
@@ -90,9 +89,9 @@ mod tests {
 
         for key_value in canvas.pixels {
             let pixel = key_value.1;
-            assert_eq!(0.0, pixel.color.red);
-            assert_eq!(0.0, pixel.color.green);
-            assert_eq!(0.0, pixel.color.blue);
+            assert_eq!(0.0, pixel.red);
+            assert_eq!(0.0, pixel.green);
+            assert_eq!(0.0, pixel.blue);
         }
     }
 
@@ -111,8 +110,8 @@ mod tests {
 
         let new_pixel = canvas.get_pixel(x, y);
 
-        assert_eq!(1.0, new_pixel.color.red);
-        assert_eq!(0.0, new_pixel.color.blue);
-        assert_eq!(0.0, new_pixel.color.green);
+        assert_eq!(1.0, new_pixel.red);
+        assert_eq!(0.0, new_pixel.blue);
+        assert_eq!(0.0, new_pixel.green);
     }
 }

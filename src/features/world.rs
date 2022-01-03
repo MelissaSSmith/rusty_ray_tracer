@@ -11,7 +11,7 @@ use crate::features::shapes::Shape;
 use crate::features::shapes::sphere::Sphere;
 
 #[derive(Clone)]
-struct World {
+pub struct World {
     objects: Vec<Box<dyn Shape>>,
     light: Option<PointLight>
 }
@@ -24,7 +24,7 @@ impl World {
         }
     }
 
-    fn create_default() -> Self {
+    pub fn create_default() -> Self {
         let mut s1_material = Material::create();
         s1_material.set_color(Color::create(0.8, 1.0, 0.6));
         s1_material.set_diffuse(0.7);
@@ -69,7 +69,7 @@ impl World {
         )
     }
 
-    fn color_at(&self, _ray: Ray) -> Color {
+    pub(crate) fn color_at(&self, _ray: Ray) -> Color {
         let intersection = Intersection::hit(self.intersect(_ray));
         return match intersection {
             None => { BLACK }

@@ -1,4 +1,6 @@
 use crate::features::matrix::Matrix;
+use crate::features::point::Point;
+use crate::features::vector::Vector;
 
 impl Matrix {
     pub fn translate(x: f64, y: f64, z: f64) -> Matrix {
@@ -53,6 +55,19 @@ impl Matrix {
         matrix.set(2, 0, z_x);
         matrix.set(2, 1, z_y);
         matrix
+    }
+
+    pub fn view_transform(from: Point, to: Point, up: Vector) -> Matrix {
+        let forward = to.subtract_point(from).normalize();
+        let left = forward.cross(&up.normalize());
+        let true_up = left.cross(&forward);
+        let vec_1 = vec![left.value().x, left.value().y, left.value().z, 0.0];
+        let vec_2 = vec![true_up.value().x, true_up.value().y, true_up.value().z, 0.0];
+        let vec_3 = vec![-forward.value().x, -forward.value().y, -forward.value().z, 0.0];
+        let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
+        let orientation = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+        let translation = Matrix::translate(-from.value().x, -from.value().y, -from.value().z);
+        orientation.multiply(&translation)
     }
 }
 
@@ -316,5 +331,53 @@ mod tests {
 
         let expected_point = Point::create(15.0, 0.0, 7.0);
         assert!(expected_point.equals(transformed_point));
+    }
+
+    #[test]
+    fn test_transformation_matrix_for_the_default_orientation() {
+        let from = Point::create(0.0, 0.0, 0.0);
+        let to = Point::create(0.0, 0.0, -1.0);
+        let up = Vector::create(0.0, 1.0, 0.0);
+
+        let matrix = Matrix::view_transform(from, to, up);
+
+        assert!(matrix.equals(Matrix::create_identity()));
+    }
+
+    #[test]
+    fn test_transformation_matrix_looking_in_positive_z_direction() {
+        let from = Point::create(0.0, 0.0, 0.0);
+        let to = Point::create(0.0, 0.0, 1.0);
+        let up = Vector::create(0.0, 1.0, 0.0);
+
+        let matrix = Matrix::view_transform(from, to, up);
+
+        assert!(matrix.equals(Matrix::scale(-1.0, 1.0, -1.0)));
+    }
+
+    #[test]
+    fn test_transformation_matrix_moves_the_world() {
+        let from = Point::create(0.0, 0.0, 8.0);
+        let to = Point::create(0.0, 0.0, 0.0);
+        let up = Vector::create(0.0, 1.0, 0.0);
+
+        let matrix = Matrix::view_transform(from, to, up);
+
+        assert!(matrix.equals(Matrix::translate(0.0, 0.0, -8.0)));
+    }
+
+    #[test]
+    fn test_arbitrary_view_transformation() {
+        let from = Point::create(1.0, 3.0, 2.0);
+        let to = Point::create(4.0, -2.0, 8.0);
+        let up = Vector::create(1.0, 1.0, 0.0);
+
+        let matrix = Matrix::view_transform(from, to, up);
+
+        let vec_1 = vec![-0.50709, 0.50709, 0.67612, -2.36643];
+        let vec_2 = vec![0.76772, 0.60609, 0.12122, -2.82843];
+        let vec_3 = vec![-0.35857, 0.59761, -0.71714, 0.0];
+        let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
+        assert!(matrix.equals(Matrix::create(vec![vec_1, vec_2, vec_3, vec_4])));
     }
 }

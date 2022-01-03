@@ -1,4 +1,4 @@
-use rusty_ray_tracer::draw::canvas::Canvas;
+use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::intersection::Intersection;

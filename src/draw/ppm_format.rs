@@ -1,7 +1,7 @@
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
-use crate::draw::canvas::Canvas;
+use crate::features::canvas::Canvas;
 
 trait PPMFormat {
     fn create_header(&self) -> String;
@@ -30,7 +30,7 @@ impl PPMFormat for Canvas {
             let mut line_array = Vec::<String>::new();
             for w in 0..self.width {
                 let pixel = self.get_pixel(w, h);
-                let scaled_color = pixel.color.scale_color();
+                let scaled_color = pixel.scale_color();
                 line_array.push(scaled_color.format_color_string());
             }
 
@@ -77,7 +77,7 @@ impl PPMFile for Canvas {
 
 #[cfg(test)]
 mod tests {
-    use crate::draw::canvas::Canvas;
+    use crate::features::canvas::Canvas;
     use crate::features::color::Color;
     use crate::draw::ppm_format::PPMFormat;
 

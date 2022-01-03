@@ -1,5 +1,5 @@
 use std::f64::consts::PI;
-use rusty_ray_tracer::draw::canvas::Canvas;
+use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::matrix::Matrix;
 use rusty_ray_tracer::features::point::Point;
