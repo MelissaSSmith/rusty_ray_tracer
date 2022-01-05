@@ -9,3 +9,7 @@ impl Operations for f64 {
         diff.abs() < epsilon
     }
 }
+
+pub mod consts {
+    pub const EPSILON: f64 = 0.00001;
+}

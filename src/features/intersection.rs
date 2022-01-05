@@ -1,4 +1,5 @@
 use crate::features::computation::Computation;
+use crate::features::operations::consts::EPSILON;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 
@@ -38,6 +39,9 @@ impl Intersection {
             computation.set_inside(true);
             computation.set_normal_vector(computation.normal_vector().negate());
         }
+        let over_point = computation.point().add(computation.normal_vector().multiply(EPSILON));
+        computation.set_over_point(over_point);
+
         computation
     }
 
@@ -49,6 +53,7 @@ impl Intersection {
 #[cfg(test)]
 mod tests {
     use crate::features::intersection::Intersection;
+    use crate::features::matrix::Matrix;
     use crate::features::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::Shape;
@@ -167,5 +172,19 @@ mod tests {
         assert!(computation.point().equals(Point::create(0.0, 0.0, 1.0)));
         assert!(computation.eye_vector().equals(Vector::create(0.0, 0.0, -1.0)));
         assert!(computation.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+    }
+
+    #[test]
+    fn test_hit_should_offset_the_point() {
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+        let mut sphere = Sphere::create();
+        sphere.set_transform(Matrix::translate(0.0, 0.0, 1.0));
+
+        let intersection = Intersection::create(5.0, Box::new(sphere.clone()));
+
+        let computation = intersection.prepare_computations(ray);
+
+        assert!(computation.over_point().value().z < -f64::EPSILON/2.0);
+        assert!(computation.point().value().z > computation.over_point().value().z);
     }
 }
