@@ -7,6 +7,7 @@ use crate::features::ray::Ray;
 use crate::features::vector::Vector;
 
 pub mod sphere;
+pub mod plane;
 
 pub trait Shape: Any {
     fn equals(&self, other: &dyn Any) -> bool;
