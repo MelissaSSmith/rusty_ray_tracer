@@ -36,12 +36,12 @@ impl Shape for Plane {
         self
     }
 
-    fn transformation(self) -> Matrix {
-        self.transformation
+    fn transformation(&self) -> Matrix {
+        self.transformation.clone()
     }
 
     fn material(&self) -> Material {
-        self.material
+        self.material.clone()
     }
 
     fn set_transform(&mut self, _transformation: Matrix) {

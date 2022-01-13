@@ -14,6 +14,7 @@ pub mod world;
 pub mod computation;
 pub mod camera;
 pub mod canvas;
+pub mod patterns;
 
 use std::any::Any;
 use crate::features::point::Point;

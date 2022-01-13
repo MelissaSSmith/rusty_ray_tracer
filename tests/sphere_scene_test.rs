@@ -21,7 +21,7 @@ fn sphere_scene_test() {
 
     let mut floor = Sphere::create();
     floor.set_transform(Matrix::scale(10.0, 0.01, 10.0));
-    floor.set_material(material);
+    floor.set_material(material.clone());
 
     let mut left_wall = Sphere::create();
     let lw_transform = Matrix::translate(0.0, 0.0, 5.0)
@@ -29,7 +29,7 @@ fn sphere_scene_test() {
         .multiply(&Matrix::rotate_x(PI/2.0))
         .multiply(&Matrix::scale(10.0, 0.01, 10.0));
     left_wall.set_transform(lw_transform);
-    left_wall.set_material(material);
+    left_wall.set_material(material.clone());
 
     let mut right_wall = Sphere::create();
     let rw_transform = Matrix::translate(0.0, 0.0, 5.0)

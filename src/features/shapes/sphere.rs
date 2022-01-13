@@ -35,12 +35,12 @@ impl Shape for Sphere {
         self
     }
 
-    fn transformation(self) -> Matrix {
-        self.transformation
+    fn transformation(&self) -> Matrix {
+        self.transformation.clone()
     }
 
     fn material(&self) -> Material {
-        self.material
+        self.material.clone()
     }
 
     fn set_transform(&mut self, _transformation: Matrix) {
@@ -295,7 +295,7 @@ mod tests {
         let mut material = Material::create();
         material.set_ambient(1.0);
 
-        sphere.set_material(material);
+        sphere.set_material(material.clone());
 
         assert!(material.equals(sphere.material));
     }

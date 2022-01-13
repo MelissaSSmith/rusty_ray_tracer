@@ -13,7 +13,7 @@ pub trait Shape: Any {
     fn equals(&self, other: &dyn Any) -> bool;
     fn box_clone(&self) -> Box<dyn Shape>;
     fn as_any(&self) -> &dyn Any;
-    fn transformation(self) -> Matrix;
+    fn transformation(&self) -> Matrix;
     fn material(&self) -> Material;
     fn set_transform(&mut self, _transformation: Matrix);
     fn set_material(&mut self, _material: Material);

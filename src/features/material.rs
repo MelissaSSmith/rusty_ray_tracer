@@ -1,11 +1,13 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
+use crate::features::patterns::stripe::StripePattern;
 use crate::features::point::Point;
 use crate::features::vector::Vector;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct Material {
+    pattern: Option<StripePattern>,
     color: Color,
     ambient: f64,
     diffuse: f64,
@@ -16,11 +18,31 @@ pub struct Material {
 impl Material {
     pub fn create() -> Material {
         Material {
+            pattern: None,
             color: WHITE,
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0
+        }
+    }
+
+    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, color: Option<Color>, pattern: Option<StripePattern>) -> Material {
+        let m_color = match color {
+            None => { WHITE }
+            Some(c) => { c }
+        };
+        let m_shininess = match shininess {
+            None => { 200.0 }
+            Some(s) => { s }
+        };
+        Material{
+            pattern,
+            color: m_color,
+            ambient,
+            diffuse,
+            specular,
+            shininess: m_shininess
         }
     }
 
@@ -53,7 +75,12 @@ impl Material {
     }
 
     pub fn lighting(&self, light: PointLight, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
-        let effective_color = self.color.multiply_colors(light.intensity);
+        let color = match &self.pattern {
+            None => { self.color }
+            Some(p) => { p.stripe_at(position) }
+        };
+
+        let effective_color = color.multiply_colors(light.intensity);
         let light_vector = light.position.subtract_point(position).normalize();
         let ambient = effective_color.multiply(self.ambient);
 
@@ -92,9 +119,10 @@ impl Material {
 #[cfg(test)]
 mod tests {
     use crate::features::color::Color;
-    use crate::features::color::consts::WHITE;
+    use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::light::PointLight;
     use crate::features::material::Material;
+    use crate::features::patterns::stripe::StripePattern;
     use crate::features::point::Point;
     use crate::features::vector::Vector;
 
@@ -185,5 +213,19 @@ mod tests {
         let result = material.lighting(light, position, eye_vector, normal_vector, in_shadow);
 
         assert!(result.equals(Color::create(0.1, 0.1, 0.1)));
+    }
+
+    #[test]
+    fn test_lighting_with_a_pattern_applied() {
+        let material = Material::create_with_attributes(1.0, 0.0, 0.0, None, None, Some(StripePattern::create(WHITE, BLACK)));
+        let eye_vector = Vector::create(0.0, 0.0, -1.0);
+        let normal_vector = Vector::create(0.0, 0.0, -1.0);
+        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
+
+        let c1 = material.lighting(light, Point::create(0.9, 0.0, 0.0), eye_vector, normal_vector, false);
+        let c2 = material.lighting(light, Point::create(1.1, 0.0, 0.0), eye_vector, normal_vector, false);
+
+        assert!(c1.equals(WHITE));
+        assert!(c2.equals(BLACK));
     }
 }
