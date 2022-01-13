@@ -15,7 +15,7 @@ use rusty_ray_tracer::features::vector::Vector;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-//#[ignore]
+#[ignore]
 fn sphere_scene_test() {
     let mut material = Material::create();
     material.set_color(Color::create(1.0, 0.9, 0.9));

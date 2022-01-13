@@ -1,6 +1,7 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
+use crate::features::patterns::Pattern;
 use crate::features::patterns::stripe::StripePattern;
 use crate::features::point::Point;
 use crate::features::vector::Vector;
@@ -77,7 +78,7 @@ impl Material {
     pub fn lighting(&self, light: PointLight, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
         let color = match &self.pattern {
             None => { self.color }
-            Some(p) => { p.stripe_at(position) }
+            Some(p) => { p.pattern_at(position) }
         };
 
         let effective_color = color.multiply_colors(light.intensity);
