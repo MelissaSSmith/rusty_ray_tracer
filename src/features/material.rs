@@ -8,7 +8,7 @@ use crate::features::vector::Vector;
 
 #[derive(Clone, PartialEq)]
 pub struct Material {
-    pattern: Option<StripePattern>,
+    pattern: Option<Box<dyn Pattern>>,
     color: Color,
     ambient: f64,
     diffuse: f64,
@@ -28,7 +28,7 @@ impl Material {
         }
     }
 
-    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, color: Option<Color>, pattern: Option<StripePattern>) -> Material {
+    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn Pattern>>) -> Material {
         let m_color = match color {
             None => { WHITE }
             Some(c) => { c }
@@ -69,6 +69,10 @@ impl Material {
 
     pub fn set_specular(&mut self, specular: f64) {
         self.specular = specular;
+    }
+
+    pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
+        self.pattern = Some(pattern);
     }
 
     pub fn color(&self) -> Color {
@@ -218,7 +222,8 @@ mod tests {
 
     #[test]
     fn test_lighting_with_a_pattern_applied() {
-        let material = Material::create_with_attributes(1.0, 0.0, 0.0, None, None, Some(StripePattern::create(WHITE, BLACK)));
+        let pattern = StripePattern::create(WHITE, BLACK);
+        let material = Material::create_with_attributes(1.0, 0.0, 0.0, None, None, Some(Box::new(pattern)));
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));

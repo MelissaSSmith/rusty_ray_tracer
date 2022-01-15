@@ -5,6 +5,8 @@ use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::intersection::Intersection;
 use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
+use rusty_ray_tracer::features::matrix::Matrix;
+use rusty_ray_tracer::features::patterns::ring::RingPattern;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::Shape;
@@ -15,16 +17,18 @@ use rusty_ray_tracer::features::shapes::sphere::Sphere;
 fn sphere_shadow_test() {
     let ray_origin = Point::create(0.0, 0.0, -5.0);
     let wall_z = 10.0;
-    let wall_size = 7.0;
-    let canvas_pixels = 50;
+    let wall_size = 28.0;
+    let canvas_pixels = 200;
     let pixel_size = wall_size / canvas_pixels as f64;
     let half = wall_size / 2.0;
 
     let mut canvas = Canvas::create(canvas_pixels, canvas_pixels);
     let mut shape = Sphere::create();
+    let pattern = RingPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
     let mut material = Material::create();
-    material.set_color(Color::create(1.0, 0.2, 1.0));
+    material.set_pattern(Box::new(pattern));
     shape.set_material(material);
+    shape.set_transform(Matrix::scale(2.0, 2.0, 2.0));
 
     //light source
     let light_position = Point::create(-10.0, 10.0, -10.0);

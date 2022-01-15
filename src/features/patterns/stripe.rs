@@ -35,7 +35,11 @@ impl Pattern for StripePattern {
         self
     }
 
-    fn set_pattern_transformation(&mut self, transform: Matrix) {
+    fn transformation(&self) -> Matrix {
+        self.transformation.clone()
+    }
+
+    fn transform(&mut self, transform: Matrix) {
         self.transformation = transform;
     }
 
@@ -45,13 +49,6 @@ impl Pattern for StripePattern {
         }
 
         self.color_b
-    }
-
-    fn pattern_at_object(&self, object: Box<dyn Shape>, point: Point) -> Color {
-        let object_point = object.transformation().inverse().multiply_point(point);
-        let pattern_point = self.transformation.inverse().multiply_point(object_point);
-
-        self.pattern_at(pattern_point)
     }
 }
 
@@ -118,7 +115,7 @@ mod tests {
     fn test_stripes_with_a_pattern_transformation() {
         let object = Sphere::create();
         let mut pattern = StripePattern::create(WHITE, BLACK);
-        pattern.set_pattern_transformation(Matrix::scale(2.0, 2.0, 2.0));
+        pattern.transform(Matrix::scale(2.0, 2.0, 2.0));
 
         let c = pattern.pattern_at_object(Box::new(object), Point::create(1.5, 0.0, 0.0));
 
@@ -130,7 +127,7 @@ mod tests {
         let mut object = Sphere::create();
         object.set_transform(Matrix::scale(2.0, 2.0, 2.0 ));
         let mut pattern = StripePattern::create(WHITE, BLACK);
-        pattern.set_pattern_transformation(Matrix::translate(0.5, 0.0, 0.0));
+        pattern.transform(Matrix::translate(0.5, 0.0, 0.0));
 
         let c = pattern.pattern_at_object(Box::new(object), Point::create(2.5, 0.0, 0.0));
 

@@ -6,6 +6,10 @@ use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::matrix::Matrix;
+use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
+use rusty_ray_tracer::features::patterns::gradient::GradientPattern;
+use rusty_ray_tracer::features::patterns::Pattern;
+use rusty_ray_tracer::features::patterns::ring::RingPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::shapes::plane::Plane;
@@ -15,48 +19,55 @@ use rusty_ray_tracer::features::vector::Vector;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-#[ignore]
+//#[ignore]
 fn sphere_scene_test() {
     let mut material = Material::create();
     material.set_color(Color::create(1.0, 0.9, 0.9));
     material.set_specular(0.0);
 
     let mut middle = Sphere::create();
-    middle.set_transform(Matrix::translate(-0.5, 1.0, 0.5));
-    let mid_pattern = StripePattern::create(Color::create(0.0, 0.0, 1.0), Color::create(0.1, 1.0, 0.5));
-    let mid_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, Some(mid_pattern));
+    middle.set_transform(Matrix::translate(-0.5, 1.0, 0.5).multiply(&Matrix::rotate_x(PI/2.0)));
+    let mut mid_pattern = RingPattern::create(Color::create(0.0, 0.0, 1.0), Color::create(0.1, 1.0, 0.5));
+    mid_pattern.transform(Matrix::shear(1.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+    let mid_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, Some(Box::new(mid_pattern)));
     middle.set_material(mid_material);
 
     let mut right = Sphere::create();
     let r_transform = Matrix::translate(1.5, 0.5, -0.5)
         .multiply(&Matrix::scale(0.5, 0.5, 0.5));
-    right.set_transform(r_transform);
-    let r_pattern = StripePattern::create(Color::create(0.0, 0.0, 1.0), Color::create(0.5, 1.0, 0.1));
-    let r_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, Some(r_pattern));
+    right.set_transform(r_transform.clone());
+    let r_pattern = GradientPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(0.5, 1.0, 0.1));
+    let r_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, Some(Box::new(r_pattern)));
     right.set_material(r_material);
 
     let mut left = Sphere::create();
     let l_transform = Matrix::translate(-1.5, 0.33, -0.75)
-        .multiply(&Matrix::scale(0.33, 0.33, 0.33));
+        .multiply(&Matrix::scale(0.4, 0.4, 0.4));
     left.set_transform(l_transform);
-    let l_pattern =StripePattern::create(Color::create(0.0, 0.0, 1.0), Color::create(1.0, 0.8, 0.1));
-    let l_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, Some(l_pattern));
+    let mut l_pattern = RingPattern::create(Color::create(0.0, 0.01, 1.0), Color::create(1.0, 0.0, 0.0));
+    l_pattern.transform(Matrix::translate(-1.5, 0.33, -0.75));
+    let l_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, Some(Box::new(l_pattern)));
     left.set_material(l_material);
 
+    let pattern = CheckerPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
+    let mut floor_material = material.clone();
+    floor_material.set_pattern(Box::new(pattern));
+
     let mut backdrop = Plane::create();
-    let backdrop_transform = Matrix::translate(0.0, 0.0, 2.0)
+    let backdrop_transform = Matrix::translate(0.0, 0.0, 5.0)
         .multiply(&Matrix::rotate_x(PI/2.0));
     backdrop.set_transform(backdrop_transform);
+    backdrop.set_material(floor_material.clone());
 
     let mut floor = Plane::create();
-    floor.set_material(material);
+    floor.set_material(floor_material);
 
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
     let objects: Vec<Box<dyn Shape>> = vec![Box::new(floor), Box::new(backdrop),
                                             Box::new(middle), Box::new(right), Box::new(left)];
     let world = World::create_world(light_source, objects);
 
-    let mut camera = Camera::create(300, 250, PI/3.0);
+    let mut camera = Camera::create(100, 50, PI/3.0);
     camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
     let canvas = camera.render(world);
