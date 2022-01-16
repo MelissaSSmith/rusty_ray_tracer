@@ -17,7 +17,7 @@ use rusty_ray_tracer::features::vector::Vector;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-//#[ignore]
+#[ignore]
 fn sphere_scene_test() {
     let mut pattern_a = StripePattern::create(Color::create(1.0, 0.7529, 0.7961), Color::create(0.906, 0.329, 0.502));
     let transform_a = Matrix::rotate_y(FRAC_PI_4).multiply(&Matrix::scale(0.25, 0.25, 0.25));

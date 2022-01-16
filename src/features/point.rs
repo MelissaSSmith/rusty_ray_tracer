@@ -40,13 +40,6 @@ impl Point {
     }
 }
 
-pub mod consts {
-    use crate::features::point::Point;
-    use crate::features::tuple::Tuple;
-
-    pub const ORIGIN: Point = Point { tuple: Tuple{ x: 0.0, y: 0.0, z: 0.0, w: 1.0 } };
-}
-
 #[cfg(test)]
 mod tests {
     use crate::features::point::Point;

@@ -3,7 +3,6 @@ use crate::features::color::Color;
 use crate::features::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
-use crate::features::point::consts::ORIGIN;
 use crate::features::point::Point;
 
 #[derive(Clone)]
