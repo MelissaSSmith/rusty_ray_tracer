@@ -69,9 +69,11 @@ impl World {
 
     fn shade_hit(&self, computation: Computation) -> Color {
         let shadowed = self.is_shadowed(computation.over_point());
+        let object = computation.clone().object();
 
         computation.clone().object().material().lighting(
             self.light.unwrap(),
+            object,
             computation.over_point(),
             computation.eye_vector(),
             computation.normal_vector(),
@@ -151,8 +153,6 @@ mod tests {
         assert!(world.clone().light().unwrap().position.equals(Point::create(-10.0, 10.0, -10.0)));
         assert!(world.clone().light().unwrap().intensity.equals(WHITE));
         assert_eq!(2, world.clone().objects().len());
-        assert!(world.clone().objects()[0].equals(s1.as_any()));
-        assert!(world.clone().objects()[1].equals(s2.as_any()));
     }
 
     #[test]

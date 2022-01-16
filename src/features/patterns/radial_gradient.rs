@@ -3,32 +3,34 @@ use crate::features::color::Color;
 use crate::features::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
+use crate::features::point::consts::ORIGIN;
 use crate::features::point::Point;
 
 #[derive(Clone)]
-pub struct GradientPattern {
+pub struct RadialGradientPattern {
     pattern_a: Box<dyn Pattern>,
     pattern_b: Box<dyn Pattern>,
     transformation: Matrix
 }
 
-impl GradientPattern {
-    pub fn create(color_a: Color, color_b: Color) -> GradientPattern {
-        GradientPattern{
+impl RadialGradientPattern {
+    pub fn create(color_a: Color, color_b: Color) -> RadialGradientPattern {
+        RadialGradientPattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::create_identity()  }
+            transformation: Matrix::create_identity()
+        }
     }
 
-    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> GradientPattern {
-        GradientPattern{
+    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> RadialGradientPattern {
+        RadialGradientPattern{
             pattern_a,
             pattern_b,
             transformation: Matrix::create_identity() }
     }
 }
 
-impl Pattern for GradientPattern {
+impl Pattern for RadialGradientPattern {
     fn box_clone(&self) -> Box<dyn Pattern> {
         Box::new(self.clone())
     }
@@ -42,16 +44,19 @@ impl Pattern for GradientPattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        self.transformation = transform;
+        let new_transform = self.transformation.multiply(&transform);
+        self.transformation = new_transform;
     }
 
     fn pattern_at(&self, point: Point) -> Color {
         let tp = self.transformation.inverse().multiply_point(point);
-        let color_a = self.pattern_a.pattern_at(tp);
-        let distance = self.pattern_b.pattern_at(tp).subtract(color_a);
-        let fraction = tp.value().x - tp.value().x.floor();
+        let distance = (tp.value().x.powi(2) + tp.value().z.powi(2)).sqrt();
+        let fraction = distance - distance.floor();
 
-        color_a.add(distance.multiply(fraction))
+        let color_a = self.pattern_a.pattern_at(tp);
+        let color_b = self.pattern_b.pattern_at(tp).subtract(color_a);
+
+        color_a.add(color_b.multiply(fraction))
     }
 }
 
@@ -59,17 +64,20 @@ impl Pattern for GradientPattern {
 mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
-    use crate::features::patterns::gradient::GradientPattern;
     use crate::features::patterns::Pattern;
+    use crate::features::patterns::radial_gradient::RadialGradientPattern;
     use crate::features::point::Point;
 
     #[test]
-    fn gradient_linearly_interpolates_between_colors() {
-        let pattern = GradientPattern::create(WHITE, BLACK);
+    fn gradient_both_x_and_z_interpolates_between_colors() {
+        let pattern = RadialGradientPattern::create(WHITE, BLACK);
 
         assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.0)).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.25, 0.0, 0.0)).equals(Color::create(0.75, 0.75, 0.75)));
         assert!(pattern.pattern_at(Point::create(0.5, 0.0, 0.0)).equals(Color::create(0.5, 0.5, 0.5)));
         assert!(pattern.pattern_at(Point::create(0.75, 0.0, 0.0)).equals(Color::create(0.25, 0.25, 0.25)));
+        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.25)).equals(Color::create(0.75, 0.75, 0.75)));
+        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.5)).equals(Color::create(0.5, 0.5, 0.5)));
+        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.75)).equals(Color::create(0.25, 0.25, 0.25)));
     }
 }

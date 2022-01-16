@@ -8,9 +8,11 @@ pub mod stripe;
 pub mod gradient;
 pub mod ring;
 pub mod checkers;
+pub mod radial_gradient;
+pub mod blended;
+pub mod solid;
 
 pub trait Pattern: Any {
-    fn equals(&self, other: &dyn Any) -> bool;
     fn box_clone(&self) -> Box<dyn Pattern>;
     fn as_any(&self) -> &dyn Any;
     fn transformation(&self) -> Matrix;
@@ -22,12 +24,6 @@ pub trait Pattern: Any {
         let pattern_point = self.transformation().inverse().multiply_point(object_point);
 
         self.pattern_at(pattern_point)
-    }
-}
-
-impl PartialEq for Box<dyn Pattern> {
-    fn eq(&self, other: &Box<dyn Pattern>) -> bool {
-        self.equals(other.as_any())
     }
 }
 

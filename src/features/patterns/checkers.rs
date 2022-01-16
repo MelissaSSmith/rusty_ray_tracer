@@ -1,28 +1,35 @@
 use std::any::Any;
 use crate::features::color::Color;
 use crate::features::matrix::Matrix;
+use crate::features::operations::consts::EPSILON;
 use crate::features::patterns::Pattern;
+use crate::features::patterns::solid::SolidPattern;
 use crate::features::point::Point;
-use crate::features::shapes::Shape;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct CheckerPattern {
-    color_a: Color,
-    color_b: Color,
+    pattern_a: Box<dyn Pattern>,
+    pattern_b: Box<dyn Pattern>,
     transformation: Matrix
 }
 
 impl CheckerPattern {
     pub fn create(color_a: Color, color_b: Color) -> CheckerPattern {
-        CheckerPattern{ color_a, color_b, transformation: Matrix::create_identity() }
+        CheckerPattern{
+            pattern_a: Box::new(SolidPattern::create(color_a)),
+            pattern_b: Box::new(SolidPattern::create(color_b)),
+            transformation: Matrix::create_identity() }
+    }
+
+    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> CheckerPattern {
+        CheckerPattern{
+            pattern_a,
+            pattern_b,
+            transformation: Matrix::create_identity() }
     }
 }
 
 impl Pattern for CheckerPattern {
-    fn equals(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
-    }
-
     fn box_clone(&self) -> Box<dyn Pattern> {
         Box::new(self.clone())
     }
@@ -40,12 +47,15 @@ impl Pattern for CheckerPattern {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        let value = point.value().x.floor() + point.value().y.floor() + point.value().z.floor();
+        let tp = self.transformation.inverse().multiply_point(point);
+        let value = (tp.value().x + EPSILON).floor()
+            + (tp.value().y + EPSILON).floor()
+            + (tp.value().z + EPSILON).floor();
         if value % 2.0 == 0.0 {
-            return self.color_a;
+            return self.pattern_a.pattern_at(tp);
         }
 
-        self.color_b
+        self.pattern_b.pattern_at(tp)
     }
 }
 

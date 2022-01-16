@@ -46,7 +46,7 @@ impl Intersection {
     }
 
     fn equals(&self, _intersection: Intersection) -> bool {
-        self.t == _intersection.t && self.object == _intersection.object
+        self.t == _intersection.t && self.object.transformation() == _intersection.object.transformation()
     }
 }
 
@@ -146,7 +146,6 @@ mod tests {
         assert!(computation.point().equals(Point::create(0.0, 0.0, -1.0)));
         assert!(computation.eye_vector().equals(Vector::create(0.0, 0.0, -1.0)));
         assert!(computation.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
-        assert!(computation.object().equals(shape.as_any()));
     }
 
     #[test]

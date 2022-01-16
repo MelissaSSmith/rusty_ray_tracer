@@ -7,7 +7,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::vector::Vector;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct Sphere {
     transformation: Matrix,
     material: Material
@@ -23,10 +23,6 @@ impl Sphere {
 }
 
 impl Shape for Sphere {
-    fn equals(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
-    }
-
     fn box_clone(&self) -> Box<dyn Shape> {
         Box::new(self.clone())
     }

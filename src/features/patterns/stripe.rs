@@ -2,31 +2,34 @@ use std::any::Any;
 use crate::features::color::Color;
 use crate::features::matrix::Matrix;
 use crate::features::patterns::Pattern;
+use crate::features::patterns::solid::SolidPattern;
 use crate::features::point::Point;
-use crate::features::shapes::Shape;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct StripePattern {
-    color_a: Color,
-    color_b: Color,
+    pattern_a: Box<dyn Pattern>,
+    pattern_b: Box<dyn Pattern>,
     transformation: Matrix
 }
 
 impl StripePattern {
     pub fn create(color_a: Color, color_b: Color) -> StripePattern {
         StripePattern {
-            color_a,
-            color_b,
+            pattern_a: Box::new(SolidPattern::create(color_a)),
+            pattern_b: Box::new(SolidPattern::create(color_b)),
             transformation: Matrix::create_identity()
         }
+    }
+
+    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> StripePattern {
+        StripePattern{
+            pattern_a,
+            pattern_b,
+            transformation: Matrix::create_identity() }
     }
 }
 
 impl Pattern for StripePattern {
-    fn equals(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
-    }
-
     fn box_clone(&self) -> Box<dyn Pattern> {
         Box::new(self.clone())
     }
@@ -40,15 +43,18 @@ impl Pattern for StripePattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        self.transformation = transform;
+        let new_transform = self.transformation.multiply(&transform);
+        self.transformation = new_transform;
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        if point.value().x.floor() % 2.0 == 0.0 {
-            return self.color_a;
+        let tp = self.transformation.inverse().multiply_point(point);
+
+        if tp.value().x.floor() % 2.0 == 0.0 {
+            return self.pattern_a.pattern_at(tp);
         }
 
-        self.color_b
+        self.pattern_b.pattern_at(tp)
     }
 }
 
@@ -61,14 +67,6 @@ mod tests {
     use crate::features::point::Point;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
-
-    #[test]
-    fn test_create_stripe_pattern() {
-        let pattern = StripePattern::create(WHITE, BLACK);
-
-        assert!(pattern.color_a.equals(WHITE));
-        assert!(pattern.color_b.equals(BLACK));
-    }
 
     #[test]
     fn test_stripe_pattern_is_constant_in_y() {

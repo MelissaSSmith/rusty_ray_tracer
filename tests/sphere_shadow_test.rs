@@ -1,3 +1,4 @@
+use std::f64::consts::PI;
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
@@ -6,7 +7,8 @@ use rusty_ray_tracer::features::intersection::Intersection;
 use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::matrix::Matrix;
-use rusty_ray_tracer::features::patterns::ring::RingPattern;
+use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
+use rusty_ray_tracer::features::patterns::Pattern;
 use rusty_ray_tracer::features::point::Point;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::Shape;
@@ -24,7 +26,7 @@ fn sphere_shadow_test() {
 
     let mut canvas = Canvas::create(canvas_pixels, canvas_pixels);
     let mut shape = Sphere::create();
-    let pattern = RingPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
+    let pattern = CheckerPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
     let mut material = Material::create();
     material.set_pattern(Box::new(pattern));
     shape.set_material(material);
@@ -48,7 +50,7 @@ fn sphere_shadow_test() {
                     let point = ray.position(hit.t);
                     let normal = hit.object.normal(point);
                     let eye = ray.direction().negate();
-                    let color = hit.object.material().lighting(light, point, eye, normal, false);
+                    let color = hit.object.material().lighting(light, hit.object, point, eye, normal, false);
                     canvas.write_pixel(x, y, color);
                 }
             }
