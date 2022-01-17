@@ -2,6 +2,7 @@ use crate::features::computation::Computation;
 use crate::features::operations::consts::EPSILON;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
+use crate::features::vector::Vector;
 
 #[derive(Clone)]
 pub struct Intersection {
@@ -39,6 +40,7 @@ impl Intersection {
             computation.set_inside(true);
             computation.set_normal_vector(computation.normal_vector().negate());
         }
+        computation.set_reflect_vector(_ray.direction.reflect(computation.normal_vector()));
         let over_point = computation.point().add(computation.normal_vector().multiply(EPSILON));
         computation.set_over_point(over_point);
 
@@ -53,9 +55,11 @@ impl Intersection {
 #[cfg(test)]
 mod tests {
     use crate::features::intersection::Intersection;
+    use crate::features::material::Material;
     use crate::features::matrix::Matrix;
     use crate::features::point::Point;
     use crate::features::ray::Ray;
+    use crate::features::shapes::plane::Plane;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
     use crate::features::vector::Vector;
@@ -185,5 +189,16 @@ mod tests {
 
         assert!(computation.over_point().value().z < -f64::EPSILON/2.0);
         assert!(computation.point().value().z > computation.over_point().value().z);
+    }
+
+    #[test]
+    fn test_precompute_the_reflection_vector() {
+        let shape = Plane::create();
+        let ray = Ray::create(Point::create(0.0, 1.0, -1.0), Vector::create(0.0, -2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0));
+        let intersection = Intersection::create(2.0_f64.sqrt(), Box::new(shape));
+
+        let computation = intersection.prepare_computations(ray);
+
+        assert!(computation.reflect_vector().equals(Vector::create(0.0, 2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0)));
     }
 }

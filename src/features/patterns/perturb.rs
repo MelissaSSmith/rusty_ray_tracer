@@ -8,12 +8,17 @@ use crate::features::point::Point;
 #[derive(Clone)]
 pub struct PerturbedPattern {
     pattern: Box<dyn Pattern>,
-    transformation: Matrix
+    transformation: Matrix,
+    scale: f64
 }
 
 impl PerturbedPattern {
-    pub fn create(pattern: Box<dyn Pattern>) -> PerturbedPattern {
-        PerturbedPattern { pattern, transformation: Matrix::create_identity() }
+    pub fn create(pattern: Box<dyn Pattern>, scale: Option<f64>) -> PerturbedPattern {
+        let s = match scale {
+            None => { 1.0 }
+            Some(s) => { s }
+        };
+        PerturbedPattern { pattern, transformation: Matrix::create_identity(), scale: s }
     }
 
     fn fade(&self, t: f64) -> f64 {
@@ -66,11 +71,9 @@ impl Pattern for PerturbedPattern {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        let scale = 0.1;
-
-        let new_x = point.value().x + self.noise(point.value().x , point.value().y, point.value().z) * scale;
-        let new_y = point.value().y + self.noise(point.value().x , point.value().y, point.value().z + 1.0) * scale;
-        let new_z = point.value().z + self.noise(point.value().x , point.value().y, point.value().z + 2.0) * scale;
+        let new_x = point.value().x + (self.noise(point.value().x , point.value().y + 0.1, point.value().z) * self.scale);
+        let new_y = point.value().y + (self.noise(point.value().x , point.value().y + 0.2, point.value().z + 1.0) * self.scale);
+        let new_z = point.value().z + (self.noise(point.value().x , point.value().y + 0.3, point.value().z + 2.0) * self.scale);
         self.pattern.pattern_at(Point::create(new_x, new_y, new_z))
     }
 }
@@ -83,7 +86,7 @@ mod tests {
 
     #[test]
     fn test_fade() {
-        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)));
+        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)), None);
 
         let fade = pattern.fade(1.0);
 
@@ -92,7 +95,7 @@ mod tests {
 
     #[test]
     fn test_lerp() {
-        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)));
+        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)), None);
 
         let fade = pattern.lerp(1.0, 2.0, 3.0);
 
@@ -101,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_grad() {
-        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)));
+        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)), None);
 
         let grad = pattern.grad(0, 1.0, 1.0, 1.0);
 

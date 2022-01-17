@@ -1,12 +1,13 @@
-pub trait Operations {
-    fn equals(self, _: f64) -> bool;
+use crate::features::operations::consts::EPSILON;
+
+pub trait Operations<Rhs = Self> {
+    fn equals(self, _: Rhs) -> bool;
 }
 
 impl Operations for f64 {
     fn equals(self, b: f64) -> bool {
-        let epsilon = 0.00001;
         let diff = self - b;
-        diff.abs() < epsilon
+        diff.abs() < EPSILON
     }
 }
 

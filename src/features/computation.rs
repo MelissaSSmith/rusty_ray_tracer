@@ -10,7 +10,8 @@ pub struct Computation {
     over_point: Point,
     eye_vector: Vector,
     normal_vector: Vector,
-    inside: bool
+    inside: bool,
+    reflect_vector: Vector
 }
 
 impl Computation {
@@ -22,7 +23,8 @@ impl Computation {
             over_point: Point::create(0.0, 0.0, 0.0),
             eye_vector: Vector::create(0.0, 0.0, 0.0),
             normal_vector: Vector::create(0.0, 0.0, 0.0),
-            inside: false
+            inside: false,
+            reflect_vector: Vector::create(0.0, 0.0, 0.0)
         }
     }
 
@@ -54,6 +56,8 @@ impl Computation {
         self.inside
     }
 
+    pub fn reflect_vector(&self) -> Vector { self.reflect_vector }
+
     pub fn set_point(&mut self, _point: Point) {
         self.point = _point;
     }
@@ -72,5 +76,9 @@ impl Computation {
 
     pub fn set_inside(&mut self, _inside:bool) {
         self.inside = _inside;
+    }
+
+    pub fn set_reflect_vector(&mut self, _reflect: Vector) {
+        self.reflect_vector = _reflect;
     }
 }

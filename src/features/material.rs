@@ -13,7 +13,8 @@ pub struct Material {
     ambient: f64,
     diffuse: f64,
     specular: f64,
-    shininess: f64
+    shininess: f64,
+    reflective: f64
 }
 
 impl Material {
@@ -24,11 +25,12 @@ impl Material {
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
-            shininess: 200.0
+            shininess: 200.0,
+            reflective: 0.0
         }
     }
 
-    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn Pattern>>) -> Material {
+    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, reflective: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn Pattern>>) -> Material {
         let m_color = match color {
             None => { WHITE }
             Some(c) => { c }
@@ -37,13 +39,18 @@ impl Material {
             None => { 200.0 }
             Some(s) => { s }
         };
+        let m_reflective = match reflective {
+            None => { 0.0 }
+            Some(r) => { r }
+        };
         Material{
             pattern,
             color: m_color,
             ambient,
             diffuse,
             specular,
-            shininess: m_shininess
+            shininess: m_shininess,
+            reflective: m_reflective
         }
     }
 
@@ -52,6 +59,7 @@ impl Material {
             self.diffuse == other_material.diffuse &&
             self.specular == other_material.specular &&
             self.shininess == other_material.shininess &&
+            self.reflective == other_material.reflective &&
             self.color.equals(other_material.color)
     }
 
@@ -71,12 +79,20 @@ impl Material {
         self.specular = specular;
     }
 
+    pub fn set_reflective(&mut self, reflective: f64) {
+        self.reflective = reflective;
+    }
+
     pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
         self.pattern = Some(pattern);
     }
 
     pub fn color(&self) -> Color {
         self.color
+    }
+
+    pub fn reflective(&self) -> f64 {
+        self.reflective
     }
 
     pub fn lighting(&self, light: PointLight, object: Box<dyn Shape>, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
@@ -140,6 +156,7 @@ mod tests {
         assert_eq!(material.diffuse, 0.9);
         assert_eq!(material.specular, 0.9);
         assert_eq!(material.shininess, 200.0);
+        assert_eq!(material.reflective, 0.0);
     }
 
     #[test]
@@ -224,7 +241,7 @@ mod tests {
     #[test]
     fn test_lighting_with_a_pattern_applied() {
         let pattern = StripePattern::create(WHITE, BLACK);
-        let material = Material::create_with_attributes(1.0, 0.0, 0.0, None, None, Some(Box::new(pattern)));
+        let material = Material::create_with_attributes(1.0, 0.0, 0.0, None,None, None, Some(Box::new(pattern)));
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
