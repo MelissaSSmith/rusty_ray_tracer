@@ -4,9 +4,10 @@ use crate::features::computation::Computation;
 use crate::features::intersection::Intersection;
 use crate::features::light::PointLight;
 use crate::features::material::Material;
-use crate::features::matrix::Matrix;
-use crate::features::operations::consts::EPSILON;
-use crate::features::point::Point;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::shapes::sphere::Sphere;
@@ -111,9 +112,9 @@ impl World {
         if reflective <= EPSILON || remaining <= 0 {
             return BLACK;
         }
-        //println!("Point: {} {} {}", _computations.point().value().x, _computations.point().value().y, _computations.point().value().z);
-        //println!("OverPoint: {} {} {}", _computations.over_point().value().x, _computations.over_point().value().y, _computations.over_point().value().z);
-        //println!("Reflect_v: {} {} {}", _computations.reflect_vector().value().x, _computations.reflect_vector().value().y, _computations.reflect_vector().value().z);
+        //println!("Point: {} {} {}", _computations.point().x() _computations.point().y(), _computations.point().z());
+        //println!("OverPoint: {} {} {}", _computations.over_point().x(), _computations.over_point().y(), _computations.over_point().z());
+        //println!("Reflect_v: {} {} {}", _computations.reflect_vector().x(), _computations.reflect_vector().y(), _computations.reflect_vector().z());
         //println!("Remaining: {}", remaining);
         let reflect_ray = Ray::create(_computations.over_point(), _computations.reflect_vector());
         let color = self.color_at_impl(&reflect_ray, remaining - 1);
@@ -137,14 +138,14 @@ impl World {
         return match self.light {
             None => { true }
             Some(light) => {
-                let v = light.position.subtract_point(point);
+                let v = light.position - point;
                 let distance = v.magnitude();
                 let direction = v.normalize();
 
                 let ray = Ray::create(point, direction);
                 let intersections = self.intersect(ray);
                 let hit = Intersection::hit(intersections);
-                println!("Hit: {}", hit.is_some());
+                //println!("Hit: {}", hit.is_some());
                 match hit {
                     None => { false }
                     Some(h) => {
@@ -163,14 +164,15 @@ mod tests {
     use crate::features::intersection::Intersection;
     use crate::features::light::PointLight;
     use crate::features::material::Material;
-    use crate::features::matrix::Matrix;
-    use crate::features::operations::Operations;
-    use crate::features::point::Point;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::operations::Operations;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::vector::Vector;
     use crate::features::world::World;
 
     #[test]
@@ -230,7 +232,7 @@ mod tests {
     fn test_shading_an_intersection_from_the_inside() {
         let mut world = World::create_default();
         world.light = Some(PointLight::create(WHITE, Point::create(0.0, 0.25, 0.0)));
-        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 1.0));
+        let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
         let shape = world.clone().objects()[1].clone();
         let intersection = Intersection::create(0.5, shape);
 
@@ -345,7 +347,7 @@ mod tests {
     #[test]
     fn test_reflect_color_for_a_non_reflective_material() {
         let mut world = World::create_default();
-        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 1.0));
+        let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
         let mut shape = world.clone().objects().get(1).unwrap().clone();
         shape.material().set_ambient(1.0);
         world.set_object(1, shape.clone());
@@ -403,7 +405,7 @@ mod tests {
     #[test]
     fn test_color_at_with_mutually_reflective_surfaces() {
         let mut world = World::create();
-        world.set_light(PointLight::create(WHITE, Point::create(0.0, 0.0, 0.0)));
+        world.set_light(PointLight::create(WHITE, Point::zero()));
 
         let mut material = Material::create();
         material.set_reflective(1.0);
@@ -418,7 +420,7 @@ mod tests {
         world.add_object(Box::new(lower));
         world.add_object(Box::new(upper));
 
-        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 1.0, 0.0));
+        let ray = Ray::create(Point::zero(), Vector::create(0.0, 1.0, 0.0));
 
         let _ = world.color_at(&ray);
     }

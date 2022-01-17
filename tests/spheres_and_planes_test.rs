@@ -5,7 +5,7 @@ use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::{BLACK, WHITE};
 use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
-use rusty_ray_tracer::features::matrix::Matrix;
+use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::gradient::GradientPattern;
 use rusty_ray_tracer::features::patterns::Pattern;
@@ -13,11 +13,11 @@ use rusty_ray_tracer::features::patterns::perturb::PerturbedPattern;
 use rusty_ray_tracer::features::patterns::radial_gradient::RadialGradientPattern;
 use rusty_ray_tracer::features::patterns::ring::RingPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
-use rusty_ray_tracer::features::point::Point;
+use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::shapes::plane::Plane;
 use rusty_ray_tracer::features::shapes::Shape;
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
-use rusty_ray_tracer::features::vector::Vector;
+use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::world::World;
 
 #[test]

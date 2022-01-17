@@ -1,9 +1,10 @@
 use std::any::Any;
 use crate::features::color::Color;
-use crate::features::matrix::Matrix;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 
 #[derive(Clone)]
 pub struct StripePattern {
@@ -17,7 +18,7 @@ impl StripePattern {
         StripePattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::create_identity()
+            transformation: Matrix::identity()
         }
     }
 
@@ -25,7 +26,7 @@ impl StripePattern {
         StripePattern{
             pattern_a,
             pattern_b,
-            transformation: Matrix::create_identity() }
+            transformation: Matrix::identity() }
     }
 }
 
@@ -48,9 +49,9 @@ impl Pattern for StripePattern {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse().multiply_point(point);
+        let tp = self.transformation.inverse() * point;
 
-        if tp.value().x.floor() % 2.0 == 0.0 {
+        if tp.x().floor() % 2.0 == 0.0 {
             return self.pattern_a.pattern_at(tp);
         }
 
@@ -61,10 +62,11 @@ impl Pattern for StripePattern {
 #[cfg(test)]
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
-    use crate::features::matrix::Matrix;
+    use crate::features::primitives::matrix::Matrix;
     use crate::features::patterns::Pattern;
     use crate::features::patterns::stripe::StripePattern;
-    use crate::features::point::Point;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
 
@@ -72,7 +74,7 @@ mod tests {
     fn test_stripe_pattern_is_constant_in_y() {
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.0, 1.0, 0.0)).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.0, 2.0, 0.0)).equals(WHITE));
     }
@@ -81,7 +83,7 @@ mod tests {
     fn test_stripe_pattern_is_constant_in_z() {
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.0, 0.0, 1.0)).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.0, 0.0, 2.0)).equals(WHITE));
     }
@@ -90,7 +92,7 @@ mod tests {
     fn test_stripe_pattern_alternates_in_x() {
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.9, 0.0, 0.0)).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(1.0, 0.0, 0.0)).equals(BLACK));
         assert!(pattern.pattern_at(Point::create(-0.1, 0.0, 0.0)).equals(BLACK));

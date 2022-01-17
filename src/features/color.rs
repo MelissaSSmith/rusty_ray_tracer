@@ -1,5 +1,5 @@
 use std::ops::{Add, Mul, Sub};
-use crate::features::operations::Operations;
+use crate::features::primitives::operations::Operations;
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct Color {

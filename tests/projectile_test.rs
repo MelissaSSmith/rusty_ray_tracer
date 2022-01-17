@@ -1,8 +1,9 @@
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::point::Point;
-use rusty_ray_tracer::features::vector::Vector;
+use rusty_ray_tracer::features::primitives::point::Point;
+use rusty_ray_tracer::features::primitives::tuple::Tuple;
+use rusty_ray_tracer::features::primitives::vector::Vector;
 
 mod world;
 
@@ -17,13 +18,13 @@ fn projectile_test() {
     let color = Color::create(1.0, 0.8, 0.6);
 
     let position = Point::create(0.0, 1.0, 0.0);
-    let velocity = Vector::create(1.0, 1.8, 0.0).normalize().multiply(11.25);
+    let velocity = Vector::create(1.0, 1.8, 0.0).normalize() * 11.25;
 
     let mut projectile = world::Projectile::create(position, velocity);
 
-    while projectile.position.value().y > 0.0 {
-        let x = projectile.position.value().x.round() as i32;
-        let y = canvas.height - projectile.position.value().y.round() as i32;
+    while projectile.position.y() > 0.0 {
+        let x = projectile.position.x().round() as i32;
+        let y = canvas.height - projectile.position.y().round() as i32;
         canvas.write_pixel(x,y, color);
 
         projectile = world::tick(environment, projectile);

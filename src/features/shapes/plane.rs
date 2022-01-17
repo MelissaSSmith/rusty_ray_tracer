@@ -1,12 +1,13 @@
 use std::any::Any;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
-use crate::features::matrix::Matrix;
-use crate::features::operations::consts::EPSILON;
-use crate::features::point::Point;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::point::Point;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
-use crate::features::vector::Vector;
+use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Plane {
@@ -17,7 +18,7 @@ pub struct Plane {
 impl Plane {
     pub fn create() -> Plane {
         Plane {
-            transformation: Matrix::create_identity(),
+            transformation: Matrix::identity(),
             material: Material::create()
         }
     }
@@ -53,27 +54,28 @@ impl Shape for Plane {
     }
 
     fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
-        if _ray.direction.value().y.abs() < EPSILON {
+        if _ray.direction.y().abs() < EPSILON {
             return vec![]
         }
-        let t = -_ray.origin.value().y / _ray.direction.value().y;
+        let t = -_ray.origin.y() / _ray.direction.y();
         vec![Intersection::create(t, Box::new(self.clone()))]
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::features::point::Point;
+    use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
     use crate::features::shapes::Shape;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_normal_of_a_plane_is_constant_everywhere() {
         let plane = Plane::create();
 
-        let n1 = plane.normal(Point::create(0.0, 0.0, 0.0));
+        let n1 = plane.normal(Point::zero());
         let n2 = plane.normal(Point::create(10.0, 0.0, -10.0));
         let n3 = plane.normal(Point::create(-5.0, 0.0, 150.0));
 
@@ -95,7 +97,7 @@ mod tests {
     #[test]
     fn test_intersect_with_a_coplanar_ray() {
         let plane = Plane::create();
-        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 1.0));
+        let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
 
         let intersections = plane.intersect(ray);
 

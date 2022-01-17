@@ -1,5 +1,5 @@
-use rusty_ray_tracer::features::point::Point;
-use rusty_ray_tracer::features::vector::Vector;
+use rusty_ray_tracer::features::primitives::point::Point;
+use rusty_ray_tracer::features::primitives::vector::Vector;
 
 pub struct Projectile {
     pub position: Point,
@@ -25,8 +25,8 @@ impl Environment {
 }
 
 pub fn tick(env: Environment, projectile: Projectile) -> Projectile {
-    let env_vector = env.gravity.add(env.wind);
-    let new_velocity = projectile.velocity.add(env_vector);
-    let position = projectile.position.add(projectile.velocity);
+    let env_vector = env.gravity + env.wind;
+    let new_velocity = projectile.velocity + env_vector;
+    let position = projectile.position + projectile.velocity;
     Projectile::create(position, new_velocity)
 }

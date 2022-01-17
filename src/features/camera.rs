@@ -1,6 +1,7 @@
 use crate::features::canvas::Canvas;
-use crate::features::matrix::Matrix;
-use crate::features::point::Point;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 use crate::features::ray::Ray;
 use crate::features::world::World;
 
@@ -27,7 +28,7 @@ impl Camera {
             h_size,
             v_size,
             field_of_view,
-            transform: Matrix::create_identity(),
+            transform: Matrix::identity(),
             half_width: pixel_size.half_width,
             half_height: pixel_size.half_height,
             pixel_size: pixel_size.pixel_size
@@ -42,9 +43,9 @@ impl Camera {
         let world_y = self.half_height - y_offset;
 
         let inverse_transform = self.transform.inverse();
-        let pixel = inverse_transform.multiply_point(Point::create(world_x, world_y, -1.0));
-        let origin = inverse_transform.multiply_point(Point::create(0.0, 0.0, 0.0));
-        let direction = pixel.subtract_point(origin).normalize();
+        let pixel = inverse_transform * Point::create(world_x, world_y, -1.0);
+        let origin = inverse_transform * Point::zero();
+        let direction = (pixel - origin).normalize();
 
         Ray::create(origin, direction)
     }
@@ -98,10 +99,11 @@ mod tests {
     use std::f64::consts::PI;
     use crate::features::camera::Camera;
     use crate::features::color::Color;
-    use crate::features::matrix::Matrix;
-    use crate::features::operations::Operations;
-    use crate::features::point::Point;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::operations::Operations;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
     use crate::features::world::World;
 
     #[test]
@@ -111,7 +113,7 @@ mod tests {
         assert_eq!(camera.h_size, 160);
         assert_eq!(camera.v_size, 120);
         assert_eq!(camera.field_of_view, PI/2.0);
-        assert!(camera.transform.equals(Matrix::create_identity()));
+        assert!(camera.transform.equals(Matrix::identity()));
     }
 
     #[test]
@@ -135,7 +137,7 @@ mod tests {
         let ray = camera.ray_for_pixel(100, 50);
 
         assert!(ray.direction.equals(Vector::create(0.0, 0.0, -1.0)));
-        assert!(ray.origin.equals(Point::create(0.0, 0.0, 0.0)));
+        assert!(ray.origin.equals(Point::zero()));
     }
 
     #[test]
@@ -145,7 +147,7 @@ mod tests {
         let ray = camera.ray_for_pixel(0, 0);
 
         assert!(ray.direction.equals(Vector::create(0.66519, 0.33259, -0.66851)));
-        assert!(ray.origin.equals(Point::create(0.0, 0.0, 0.0)));
+        assert!(ray.origin.equals(Point::zero()));
     }
 
     #[test]
@@ -164,7 +166,7 @@ mod tests {
         let world = World::create_default();
         let mut camera = Camera::create(11, 11, PI/2.0);
         let from = Point::create(0.0, 0.0, -5.0);
-        let to = Point::create(0.0, 0.0, 0.0);
+        let to = Point::zero();
         let up = Vector::create(0.0, 1.0, 0.0);
         camera.transform = Matrix::view_transform(from, to, up);
 

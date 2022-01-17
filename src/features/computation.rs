@@ -1,6 +1,7 @@
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
 use crate::features::shapes::Shape;
-use crate::features::vector::Vector;
+use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Computation {
@@ -19,12 +20,12 @@ impl Computation {
         Computation {
             t,
             object,
-            point: Point::create(0.0, 0.0, 0.0),
-            over_point: Point::create(0.0, 0.0, 0.0),
-            eye_vector: Vector::create(0.0, 0.0, 0.0),
-            normal_vector: Vector::create(0.0, 0.0, 0.0),
+            point: Point::zero(),
+            over_point: Point::zero(),
+            eye_vector: Vector::zero(),
+            normal_vector: Vector::zero(),
             inside: false,
-            reflect_vector: Vector::create(0.0, 0.0, 0.0)
+            reflect_vector: Vector::zero()
         }
     }
 

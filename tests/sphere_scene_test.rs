@@ -5,11 +5,11 @@ use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
-use rusty_ray_tracer::features::matrix::Matrix;
-use rusty_ray_tracer::features::point::Point;
+use rusty_ray_tracer::features::primitives::matrix::Matrix;
+use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::shapes::Shape;
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
-use rusty_ray_tracer::features::vector::Vector;
+use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::world::World;
 
 #[test]

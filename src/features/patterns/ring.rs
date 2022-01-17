@@ -1,9 +1,10 @@
 use std::any::Any;
 use crate::features::color::Color;
-use crate::features::matrix::Matrix;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 
 #[derive(Clone)]
 pub struct RingPattern {
@@ -17,7 +18,7 @@ impl RingPattern {
         RingPattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::create_identity()
+            transformation: Matrix::identity()
         }
     }
 
@@ -25,7 +26,7 @@ impl RingPattern {
         RingPattern{
             pattern_a,
             pattern_b,
-            transformation: Matrix::create_identity() }
+            transformation: Matrix::identity() }
     }
 }
 
@@ -48,8 +49,8 @@ impl Pattern for RingPattern {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse().multiply_point(point);
-        let value = (tp.value().x.powi(2) + tp.value().z.powi(2)).sqrt();
+        let tp = self.transformation.inverse() * point;
+        let value = (tp.x().powi(2) + tp.z().powi(2)).sqrt();
         if value.floor() % 2.0 == 0.0 {
             return self.pattern_a.pattern_at(tp);
         }
@@ -63,13 +64,14 @@ mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::Pattern;
     use crate::features::patterns::ring::RingPattern;
-    use crate::features::point::Point;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
 
     #[test]
     fn test_ring_should_extend_both_x_and_z() {
         let pattern = RingPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(1.0, 0.0, 0.0)).equals(BLACK));
         assert!(pattern.pattern_at(Point::create(0.0, 0.0, 1.0)).equals(BLACK));
         assert!(pattern.pattern_at(Point::create(0.708, 0.0, 0.708)).equals(BLACK));

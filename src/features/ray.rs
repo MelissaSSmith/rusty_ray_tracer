@@ -1,6 +1,6 @@
-use crate::features::matrix::Matrix;
-use crate::features::point::Point;
-use crate::features::vector::Vector;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::vector::Vector;
 
 #[derive(Clone, Copy)]
 pub struct Ray {
@@ -14,7 +14,7 @@ impl Ray {
     }
 
     pub fn position(&self, _t: f64) -> Point {
-        self.origin.add(self.direction.multiply(_t))
+        self.origin + self.direction * _t
     }
 
     pub fn direction(&self) -> Vector {
@@ -26,18 +26,19 @@ impl Ray {
     }
 
     pub fn transform(&self, _matrix: Matrix) -> Ray {
-        let new_point = _matrix.multiply_point(self.origin);
-        let new_vector = _matrix.multiply_vector(self.direction);
+        let new_point = _matrix * self.origin;
+        let new_vector = _matrix * self.direction;
         Ray::create(new_point, new_vector)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::features::matrix::Matrix;
-    use crate::features::point::Point;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_create_and_query_a_ray() {

@@ -1,8 +1,10 @@
 use array2d::Array2D;
-use crate::features::operations::Operations;
-use crate::features::point::Point;
-use crate::features::tuple::Tuple;
-use crate::features::vector::Vector;
+use crate::features::primitives::operations::Operations;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::vector::Vector;
+
+const MATRIX_SIZE: usize = 4;
 
 #[derive(Clone, PartialEq)]
 pub struct Matrix {
@@ -16,7 +18,7 @@ impl Matrix{
         }
     }
 
-    pub fn create_identity() -> Matrix {
+    pub fn identity() -> Matrix {
         let vec_1 = vec![1.0, 0.0, 0.0, 0.0];
         let vec_2 = vec![0.0, 1.0, 0.0, 0.0];
         let vec_3 = vec![0.0, 0.0, 1.0, 0.0];
@@ -51,45 +53,6 @@ impl Matrix{
         }
 
         equals
-    }
-
-    pub fn multiply(&self, _matrix: &Matrix) -> Matrix {
-        let mut vecs: Vec<Vec<f64>> = Vec::with_capacity(self.matrix.row_len());
-        for _ in 0..self.matrix.row_len() {
-            vecs.push(vec![0.0; self.matrix.row_len()]);
-        }
-        let mut new_matrix = Matrix::create(vecs);
-        let rows = self.matrix.as_rows();
-        let columns = _matrix.matrix.as_columns();
-        for row in 0..rows.len() {
-            let row_tuple = Tuple::convert_to_tuple(rows.get(row).unwrap());
-            for column in 0..columns.len() {
-                let column_tuple = Tuple::convert_to_tuple(columns.get(column).unwrap());
-                let new_value = row_tuple.dot(column_tuple);
-                new_matrix.set(row, column, new_value);
-            }
-        }
-
-        new_matrix
-    }
-
-    pub fn multiply_point(&self, _point: Point) -> Point {
-        Point::create_with_tuple(self.multiply_tuple(_point.value()))
-    }
-
-    pub fn multiply_vector(&self, _vector: Vector) -> Vector {
-        Vector::create_with_tuple(self.multiply_tuple(_vector.value()))
-    }
-
-    fn multiply_tuple(&self, _tuple: Tuple) -> Tuple {
-        let rows = self.matrix.as_rows();
-        let mut result_list = vec![];
-        for row in 0..rows.len() {
-            let row_tuple = Tuple::convert_to_tuple(rows.get(row).unwrap());
-            result_list.push(_tuple.dot(row_tuple));
-        }
-
-        Tuple::convert_to_tuple(&result_list)
     }
 
     pub fn transpose(&self) -> Matrix {
@@ -160,10 +123,56 @@ impl Matrix{
     }
 }
 
+impl std::ops::Mul for Matrix {
+    type Output = Matrix;
+
+    fn mul(self, rhs: Matrix) -> Self::Output {
+        let mut res = Matrix::new();
+
+        for row in 0..MATRIX_SIZE {
+            for col in 0..MATRIX_SIZE {
+                res[(row, col)] = self[(row, 0)] * rhs[(0, col)]
+                    + self[(row, 1)] * rhs[(1, col)]
+                    + self[(row, 2)] * rhs[(2, col)]
+                    + self[(row, 3)] * rhs[(3, col)];
+            }
+        }
+
+        res
+    }
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+
+impl<T> std::ops::Mul<T> for Matrix
+    where
+        T: Tuple,
+{
+    type Output = T;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        Self::Output::new(
+            self[(0, 0)] * rhs.x()
+                + self[(0, 1)] * rhs.y()
+                + self[(0, 2)] * rhs.z()
+                + self[(0, 3)] * rhs.w(),
+            self[(1, 0)] * rhs.x()
+                + self[(1, 1)] * rhs.y()
+                + self[(1, 2)] * rhs.z()
+                + self[(1, 3)] * rhs.w(),
+            self[(2, 0)] * rhs.x()
+                + self[(2, 1)] * rhs.y()
+                + self[(2, 2)] * rhs.z()
+                + self[(2, 3)] * rhs.w(),
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::features::matrix::Matrix;
-    use crate::features::tuple::Tuple;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
 
     #[test]
     fn test_create_matrix_4_4() {
@@ -273,16 +282,16 @@ mod tests {
         let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
         let m1 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let tuple = Tuple::create(1.0, 2.0, 3.0, 1.0);
+        let tuple = Point::create(1.0, 2.0, 3.0);
 
-        let result = m1.multiply_tuple(tuple);
+        let result = m1 * tuple;
 
-        let expected = Tuple::create(18.0, 24.0, 33.0, 1.0);
+        let expected = Point::create(18.0, 24.0, 33.0);
 
-        assert_eq!(expected.x, result.x);
-        assert_eq!(expected.y, result.y);
-        assert_eq!(expected.z, result.z);
-        assert_eq!(expected.w, result.w);
+        assert_eq!(expected.x(), result.x());
+        assert_eq!(expected.y(), result.y());
+        assert_eq!(expected.z(), result.z());
+        assert_eq!(expected.w(), result.w());
     }
 
     #[test]
@@ -312,15 +321,15 @@ mod tests {
         let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
         let m2 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let tuple = Tuple::create(1.0, 2.0, 3.0, 1.0);
+        let tuple = Point::create(1.0, 2.0, 3.0);
 
-        let result = m2.multiply_tuple(tuple);
+        let result = m2 * tuple;
 
-        let expected = Tuple::create(1.0, 2.0, 3.0, 1.0);
-        assert_eq!(expected.x, result.x);
-        assert_eq!(expected.y, result.y);
-        assert_eq!(expected.z, result.z);
-        assert_eq!(expected.w, result.w);
+        let expected = Point::create(1.0, 2.0, 3.0);
+        assert_eq!(expected.x(), result.x());
+        assert_eq!(expected.y(), result.y());
+        assert_eq!(expected.z(), result.z());
+        assert_eq!(expected.w(), result.w());
     }
 
     #[test]

@@ -1,10 +1,11 @@
-use crate::features::matrix::Matrix;
-use crate::features::point::Point;
-use crate::features::vector::Vector;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::vector::Vector;
 
 impl Matrix {
     pub fn translate(x: f64, y: f64, z: f64) -> Matrix {
-        let mut matrix = Matrix::create_identity();
+        let mut matrix = Matrix::identity();
         matrix.set(0, 3, x);
         matrix.set(1, 3, y);
         matrix.set(2, 3, z);
@@ -12,7 +13,7 @@ impl Matrix {
     }
 
     pub fn scale(x: f64, y: f64, z: f64) -> Matrix {
-        let mut matrix = Matrix::create_identity();
+        let mut matrix = Matrix::identity();
         matrix.set(0, 0, x);
         matrix.set(1, 1, y);
         matrix.set(2, 2, z);
@@ -20,7 +21,7 @@ impl Matrix {
     }
 
     pub fn rotate_x(radians: f64) -> Matrix {
-        let mut matrix = Matrix::create_identity();
+        let mut matrix = Matrix::identity();
         matrix.set(1, 1, radians.cos());
         matrix.set(1, 2, -radians.sin());
         matrix.set(2, 1, radians.sin());
@@ -29,7 +30,7 @@ impl Matrix {
     }
 
     pub fn rotate_y(radians: f64) -> Matrix {
-        let mut matrix = Matrix::create_identity();
+        let mut matrix = Matrix::identity();
         matrix.set(0, 0, radians.cos());
         matrix.set(0, 2, radians.sin());
         matrix.set(2, 0, -radians.sin());
@@ -38,7 +39,7 @@ impl Matrix {
     }
 
     pub fn rotate_z(radians: f64) -> Matrix {
-        let mut matrix = Matrix::create_identity();
+        let mut matrix = Matrix::identity();
         matrix.set(0, 0, radians.cos());
         matrix.set(0, 1, -radians.sin());
         matrix.set(1, 0, radians.sin());
@@ -47,7 +48,7 @@ impl Matrix {
     }
 
     pub fn shear(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix {
-        let mut matrix = Matrix::create_identity();
+        let mut matrix = Matrix::identity();
         matrix.set(0, 1, x_y);
         matrix.set(0, 2, x_z);
         matrix.set(1, 0, y_x);
@@ -58,15 +59,15 @@ impl Matrix {
     }
 
     pub fn view_transform(from: Point, to: Point, up: Vector) -> Matrix {
-        let forward = to.subtract_point(from).normalize();
-        let left = forward.cross(&up.normalize());
-        let true_up = left.cross(&forward);
-        let vec_1 = vec![left.value().x, left.value().y, left.value().z, 0.0];
-        let vec_2 = vec![true_up.value().x, true_up.value().y, true_up.value().z, 0.0];
-        let vec_3 = vec![-forward.value().x, -forward.value().y, -forward.value().z, 0.0];
+        let forward = (to - from).normalize();
+        let left = forward * up.normalize();
+        let true_up = left * forward;
+        let vec_1 = vec![left.x(), left.y(), left.z(), 0.0];
+        let vec_2 = vec![true_up.x(), true_up.y(), true_up.z(), 0.0];
+        let vec_3 = vec![-forward.x(), -forward.y(), -forward.z(), 0.0];
         let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
         let orientation = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
-        let translation = Matrix::translate(-from.value().x, -from.value().y, -from.value().z);
+        let translation = Matrix::translate(-from.x(), -from.y(), -from.z());
         orientation.multiply(&translation)
     }
 }
@@ -74,16 +75,17 @@ impl Matrix {
 #[cfg(test)]
 mod tests {
     use std::f64::consts::PI;
-    use crate::features::matrix::Matrix;
-    use crate::features::point::Point;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_multiply_by_a_translation_matrix() {
         let transform = Matrix::translate(5.0, -3.0, 2.0);
         let point = Point::create(-3.0, 4.0, 5.0);
 
-        let translation = transform.multiply_point(point);
+        let translation = transform * point;
 
         let expected_point = Point::create(2.0, 1.0, 7.0);
 
@@ -96,7 +98,7 @@ mod tests {
         let inverse = transform.inverse();
         let point = Point::create(-3.0, 4.0, 5.0);
 
-        let translation = inverse.multiply_point(point);
+        let translation = inverse * point;
 
         let expected_point = Point::create(-8.0, 7.0, 3.0);
 
@@ -108,7 +110,7 @@ mod tests {
         let transform = Matrix::translate(5.0, -3.0, 2.0);
         let vector = Vector::create(-3.0, 4.0, 5.0);
 
-        let translation = transform.multiply_vector(vector);
+        let translation = transform * vector;
 
         assert!(vector.equals(translation))
     }
@@ -118,7 +120,7 @@ mod tests {
         let transform = Matrix::scale(2.0, 3.0, 4.0);
         let point = Point::create(-4.0, 6.0, 8.0);
 
-        let scaled_point = transform.multiply_point(point);
+        let scaled_point = transform * point;
 
         let expected_point = Point::create(-8.0, 18.0, 32.0);
         assert!(expected_point.equals(scaled_point));
@@ -129,7 +131,7 @@ mod tests {
         let transform = Matrix::scale(2.0, 3.0, 4.0);
         let vector = Vector::create(-4.0, 6.0, 8.0);
 
-        let scaled_vector = transform.multiply_vector(vector);
+        let scaled_vector = transform * vector;
 
         let expected_vector = Vector::create(-8.0, 18.0, 32.0);
         assert!(expected_vector.equals(scaled_vector));
@@ -141,7 +143,7 @@ mod tests {
         let inverse = transform.inverse();
         let vector = Vector::create(-4.0, 6.0, 8.0);
 
-        let scaled_vector = inverse.multiply_vector(vector);
+        let scaled_vector = inverse * vector;
 
         let expected_vector = Vector::create(-2.0, 2.0, 2.0);
         assert!(expected_vector.equals(scaled_vector));
@@ -152,7 +154,7 @@ mod tests {
         let transform = Matrix::scale(-1.0, 1.0, 1.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let scaled_point = transform.multiply_point(point);
+        let scaled_point = transform * point;
 
         let expected_point = Point::create(-2.0, 3.0, 4.0);
         assert!(expected_point.equals(scaled_point));
@@ -164,7 +166,7 @@ mod tests {
         let half_quarter_radians = PI / 4.0;
         let half_quarter = Matrix::rotate_x(half_quarter_radians);
 
-        let rotated_point = half_quarter.multiply_point(point);
+        let rotated_point = half_quarter * point;
 
         let expected_half_quarter_point = Point::create(0.0, 2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0);
         assert!(expected_half_quarter_point.equals(rotated_point));
@@ -173,7 +175,7 @@ mod tests {
         let full_quarter_radians = PI / 2.0;
         let full_quarter = Matrix::rotate_x(full_quarter_radians);
 
-        let rotated_point = full_quarter.multiply_point(point);
+        let rotated_point = full_quarter * point;
 
         let expected_half_quarter_point = Point::create(0.0, 0.0, 1.0);
         assert!(expected_half_quarter_point.equals(rotated_point));
@@ -186,7 +188,7 @@ mod tests {
         let half_quarter = Matrix::rotate_x(half_quarter_radians);
         let inverse = half_quarter.inverse();
 
-        let rotated_point = inverse.multiply_point(point);
+        let rotated_point = inverse * point;
 
         let expected_half_quarter_point = Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0);
         assert!(expected_half_quarter_point.equals(rotated_point));
@@ -198,7 +200,7 @@ mod tests {
         let half_quarter_radians = PI / 4.0;
         let half_quarter = Matrix::rotate_y(half_quarter_radians);
 
-        let rotated_point = half_quarter.multiply_point(point);
+        let rotated_point = half_quarter * point;
 
         let expected_half_quarter_point = Point::create(2.0_f64.sqrt()/2.0, 0.0, 2.0_f64.sqrt()/2.0);
         assert!(expected_half_quarter_point.equals(rotated_point));
@@ -207,7 +209,7 @@ mod tests {
         let full_quarter_radians = PI / 2.0;
         let full_quarter = Matrix::rotate_y(full_quarter_radians);
 
-        let rotated_point = full_quarter.multiply_point(point);
+        let rotated_point = full_quarter * point;
 
         let expected_full_quarter_point = Point::create(1.0, 0.0, 0.0);
         assert!(expected_full_quarter_point.equals(rotated_point));
@@ -219,7 +221,7 @@ mod tests {
         let half_quarter_radians = PI / 4.0;
         let half_quarter = Matrix::rotate_z(half_quarter_radians);
 
-        let rotated_point = half_quarter.multiply_point(point);
+        let rotated_point = half_quarter * point;
 
         let expected_half_quarter_point = Point::create(-2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0, 0.0);
         assert!(expected_half_quarter_point.equals(rotated_point));
@@ -228,7 +230,7 @@ mod tests {
         let full_quarter_radians = PI / 2.0;
         let full_quarter = Matrix::rotate_z(full_quarter_radians);
 
-        let rotated_point = full_quarter.multiply_point(point);
+        let rotated_point = full_quarter * point;
 
         let expected_half_quarter_point = Point::create(-1.0, 0.0, 0.0);
         assert!(expected_half_quarter_point.equals(rotated_point));
@@ -239,7 +241,7 @@ mod tests {
         let transform = Matrix::shear(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let sheared_point = transform.multiply_point(point);
+        let sheared_point = transform * point;
 
         let expected_point = Point::create(5.0, 3.0, 4.0);
         assert!(expected_point.equals(sheared_point));
@@ -250,7 +252,7 @@ mod tests {
         let transform = Matrix::shear(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let sheared_point = transform.multiply_point(point);
+        let sheared_point = transform * point;
 
         let expected_point = Point::create(6.0, 3.0, 4.0);
         assert!(expected_point.equals(sheared_point));
@@ -261,7 +263,7 @@ mod tests {
         let transform = Matrix::shear(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let sheared_point = transform.multiply_point(point);
+        let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 5.0, 4.0);
         assert!(expected_point.equals(sheared_point));
@@ -272,7 +274,7 @@ mod tests {
         let transform = Matrix::shear(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let sheared_point = transform.multiply_point(point);
+        let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 7.0, 4.0);
         assert!(expected_point.equals(sheared_point));
@@ -283,7 +285,7 @@ mod tests {
         let transform = Matrix::shear(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let sheared_point = transform.multiply_point(point);
+        let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 3.0, 6.0);
         assert!(expected_point.equals(sheared_point));
@@ -294,7 +296,7 @@ mod tests {
         let transform = Matrix::shear(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
         let point = Point::create(2.0, 3.0, 4.0);
 
-        let sheared_point = transform.multiply_point(point);
+        let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 3.0, 7.0);
         assert!(expected_point.equals(sheared_point));
@@ -307,15 +309,15 @@ mod tests {
         let b = Matrix::scale(5.0, 5.0, 5.0);
         let c = Matrix::translate(10.0, 5.0, 7.0);
 
-        let transformed_point = a.multiply_point(point);
+        let transformed_point = a * point;
         let expected_point = Point::create(1.0, -1.0, 0.0);
         assert!(expected_point.equals(transformed_point));
 
-        let transformed_point = b.multiply_point(transformed_point);
+        let transformed_point = b * transformed_point;
         let expected_point = Point::create(5.0, -5.0, 0.0);
         assert!(expected_point.equals(transformed_point));
 
-        let transformed_point = c.multiply_point(transformed_point);
+        let transformed_point = c * transformed_point;
         let expected_point = Point::create(15.0, 0.0, 7.0);
         assert!(expected_point.equals(transformed_point));
     }
@@ -327,7 +329,7 @@ mod tests {
         let b = Matrix::scale(5.0, 5.0, 5.0);
         let c = Matrix::translate(10.0, 5.0, 7.0);
 
-        let transformed_point = c.multiply_point(b.multiply_point(a.multiply_point(point)));
+        let transformed_point = c * b * a * point; //todo fix
 
         let expected_point = Point::create(15.0, 0.0, 7.0);
         assert!(expected_point.equals(transformed_point));
@@ -335,18 +337,18 @@ mod tests {
 
     #[test]
     fn test_transformation_matrix_for_the_default_orientation() {
-        let from = Point::create(0.0, 0.0, 0.0);
+        let from = Point::zero();
         let to = Point::create(0.0, 0.0, -1.0);
         let up = Vector::create(0.0, 1.0, 0.0);
 
         let matrix = Matrix::view_transform(from, to, up);
 
-        assert!(matrix.equals(Matrix::create_identity()));
+        assert!(matrix.equals(Matrix::identity()));
     }
 
     #[test]
     fn test_transformation_matrix_looking_in_positive_z_direction() {
-        let from = Point::create(0.0, 0.0, 0.0);
+        let from = Point::zero();
         let to = Point::create(0.0, 0.0, 1.0);
         let up = Vector::create(0.0, 1.0, 0.0);
 
@@ -358,7 +360,7 @@ mod tests {
     #[test]
     fn test_transformation_matrix_moves_the_world() {
         let from = Point::create(0.0, 0.0, 8.0);
-        let to = Point::create(0.0, 0.0, 0.0);
+        let to = Point::zero();
         let up = Vector::create(0.0, 1.0, 0.0);
 
         let matrix = Matrix::view_transform(from, to, up);

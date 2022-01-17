@@ -1,9 +1,10 @@
 use std::any::Any;
 use noise::{Perlin, NoiseFn};
 use crate::features::color::Color;
-use crate::features::matrix::Matrix;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 
 #[derive(Clone)]
 pub struct PerturbedPattern {
@@ -18,7 +19,7 @@ impl PerturbedPattern {
             None => { 1.0 }
             Some(s) => { s }
         };
-        PerturbedPattern { pattern, transformation: Matrix::create_identity(), scale: s }
+        PerturbedPattern { pattern, transformation: Matrix::identity(), scale: s }
     }
 
     fn fade(&self, t: f64) -> f64 {
@@ -71,9 +72,9 @@ impl Pattern for PerturbedPattern {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        let new_x = point.value().x + (self.noise(point.value().x , point.value().y + 0.1, point.value().z) * self.scale);
-        let new_y = point.value().y + (self.noise(point.value().x , point.value().y + 0.2, point.value().z + 1.0) * self.scale);
-        let new_z = point.value().z + (self.noise(point.value().x , point.value().y + 0.3, point.value().z + 2.0) * self.scale);
+        let new_x = point.x() + (self.noise(point.x() , point.y() + 0.1, point.z()) * self.scale);
+        let new_y = point.y() + (self.noise(point.x() , point.y() + 0.2, point.z() + 1.0) * self.scale);
+        let new_z = point.z() + (self.noise(point.x() , point.y() + 0.3, point.z() + 2.0) * self.scale);
         self.pattern.pattern_at(Point::create(new_x, new_y, new_z))
     }
 }

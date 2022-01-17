@@ -1,4 +1,4 @@
-use crate::features::operations::consts::EPSILON;
+use crate::features::primitives::operations::consts::EPSILON;
 
 pub trait Operations<Rhs = Self> {
     fn equals(self, _: Rhs) -> bool;

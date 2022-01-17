@@ -2,9 +2,9 @@ use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
 use crate::features::patterns::Pattern;
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
 use crate::features::shapes::Shape;
-use crate::features::vector::Vector;
+use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Material {
@@ -102,10 +102,10 @@ impl Material {
         };
 
         let effective_color = color.multiply_colors(light.intensity);
-        let light_vector = light.position.subtract_point(position).normalize();
+        let light_vector = (light.position - position).normalize();
         let ambient = effective_color.multiply(self.ambient);
 
-        let light_dot_normal = light_vector.dot(normal_vector);
+        let light_dot_normal = light_vector ^ normal_vector;
         let diffuse = self.calculate_diffuse(light_dot_normal, &effective_color);
         let specular = self.calculate_specular(light_dot_normal, light_vector, normal_vector, eye_vector, light.intensity);
 
@@ -113,7 +113,7 @@ impl Material {
             return ambient;
         }
 
-        ambient.add(diffuse).add(specular)
+        ambient + diffuse + specular
     }
 
     fn calculate_diffuse(&self, light_dot_normal: f64, effective_color: &Color) -> Color {
@@ -127,8 +127,8 @@ impl Material {
         if light_dot_normal < 0.0 {
             return BLACK;
         }
-        let reflection_vector = light_vector.negate().reflect(normal_vector);
-        let reflection_dot_eye = reflection_vector.dot(eye_vector);
+        let reflection_vector = -light_vector.reflect(normal_vector);
+        let reflection_dot_eye = reflection_vector ^ eye_vector;
         if reflection_dot_eye <= 0.0 {
             return BLACK;
         }
@@ -144,9 +144,10 @@ mod tests {
     use crate::features::light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::stripe::StripePattern;
-    use crate::features::point::Point;
+    use crate::features::primitives::point::Point;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_default_material() {
@@ -162,7 +163,7 @@ mod tests {
     #[test]
     fn test_lighting_with_the_eye_between_the_light_and_the_surface() {
         let material = Material::create();
-        let position = Point::create(0.0, 0.0, 0.0);
+        let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
@@ -175,7 +176,7 @@ mod tests {
     #[test]
     fn test_lighting_with_the_eye_between_the_light_and_the_surface_eye_offset_45_degrees() {
         let material = Material::create();
-        let position = Point::create(0.0, 0.0, 0.0);
+        let position = Point::zero();
         let eye_vector = Vector::create(0.0, 2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
@@ -188,7 +189,7 @@ mod tests {
     #[test]
     fn test_lighting_with_the_eye_opposite_surface_light_offset_45_degrees() {
         let material = Material::create();
-        let position = Point::create(0.0, 0.0, 0.0);
+        let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
@@ -201,7 +202,7 @@ mod tests {
     #[test]
     fn test_lighting_with_the_eye_in_the_path_of_the_reflection_vector() {
         let material = Material::create();
-        let position = Point::create(0.0, 0.0, 0.0);
+        let position = Point::zero();
         let eye_vector = Vector::create(0.0, -2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
@@ -214,7 +215,7 @@ mod tests {
     #[test]
     fn test_lighting_with_the_light_behind_the_surface() {
         let material = Material::create();
-        let position = Point::create(0.0, 0.0, 0.0);
+        let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, 10.0));
@@ -227,7 +228,7 @@ mod tests {
     #[test]
     fn test_lighting_with_the_surface_in_shadow() {
         let material = Material::create();
-        let position = Point::create(0.0, 0.0, 0.0);
+        let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));

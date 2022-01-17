@@ -1,11 +1,12 @@
 use std::any::Any;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
-use crate::features::matrix::Matrix;
-use crate::features::point::Point;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
-use crate::features::vector::Vector;
+use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Sphere {
@@ -16,7 +17,7 @@ pub struct Sphere {
 impl Sphere {
     pub fn create() -> Sphere {
         Sphere {
-            transformation: Matrix::create_identity(),
+            transformation: Matrix::identity(),
             material: Material::create()
         }
     }
@@ -48,18 +49,18 @@ impl Shape for Sphere {
     }
 
     fn normal(&self, world_point: Point) -> Vector {
-        let object_point = self.clone().transformation().inverse().multiply_point(world_point);
-        let object_normal = object_point.subtract_point(Point::create(0.0, 0.0, 0.0));
-        let world_normal = self.clone().transformation().inverse().transpose().multiply_vector(object_normal);
+        let object_point = self.clone().transformation().inverse() * world_point;
+        let object_normal = object_point - Point::zero();
+        let world_normal = self.clone().transformation().inverse().transpose() * object_normal;
         world_normal.normalize()
     }
 
     fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
         let transformed_ray = _ray.transform(self.clone().transformation().inverse());
-        let sphere_to_ray = transformed_ray.origin.subtract_point(Point::create(0.0,0.0,0.0));
-        let a = transformed_ray.direction.dot(transformed_ray.direction);
-        let b = 2.0 * transformed_ray.direction.dot(sphere_to_ray);
-        let c = sphere_to_ray.dot(sphere_to_ray) - 1.0;
+        let sphere_to_ray = transformed_ray.origin - Point::create(0.0,0.0,0.0);
+        let a = transformed_ray.direction ^ transformed_ray.direction;
+        let b = 2.0 * transformed_ray.direction ^ sphere_to_ray;
+        let c = (sphere_to_ray ^ sphere_to_ray) - 1.0;
 
         let discriminant = b.powf(2.0) - 4.0 * a * c;
         if discriminant < 0.0 {
@@ -77,12 +78,13 @@ impl Shape for Sphere {
 mod tests {
     use std::f64::consts::{FRAC_1_SQRT_2, PI};
     use crate::features::material::Material;
-    use crate::features::matrix::Matrix;
-    use crate::features::point::Point;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_ray_intersects_sphere_at_two_points() {
@@ -126,7 +128,7 @@ mod tests {
 
     #[test]
     fn test_ray_originates_inside_a_sphere() {
-        let origin = Point::create(0.0, 0.0, 0.0);
+        let origin = Point::zero();
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
         let sphere = Sphere::create();
@@ -167,7 +169,7 @@ mod tests {
     #[test]
     fn test_sphere_default_transformation_is_the_identity_matrix() {
         let sphere = Sphere::create();
-        let identity_matrix = Matrix::create_identity();
+        let identity_matrix = Matrix::identity();
 
         assert!(sphere.transformation().equals(identity_matrix));
     }

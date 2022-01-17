@@ -1,7 +1,7 @@
 use std::any::Any;
 use crate::features::color::Color;
-use crate::features::matrix::Matrix;
-use crate::features::point::Point;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
 use crate::features::shapes::Shape;
 
 pub mod stripe;
@@ -21,8 +21,8 @@ pub trait Pattern: Any {
     fn pattern_at(&self, point: Point) -> Color;
 
     fn pattern_at_object(&self, object: Box<dyn Shape>, point: Point) -> Color {
-        let object_point = object.transformation().inverse().multiply_point(point);
-        let pattern_point = self.transformation().inverse().multiply_point(object_point);
+        let object_point = object.transformation().inverse() * point;
+        let pattern_point = self.transformation().inverse() * object_point;
 
         self.pattern_at(pattern_point)
     }

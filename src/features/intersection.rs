@@ -1,8 +1,8 @@
 use crate::features::computation::Computation;
-use crate::features::operations::consts::EPSILON;
+use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
-use crate::features::vector::Vector;
+use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Intersection {
@@ -34,14 +34,14 @@ impl Intersection {
         let mut computation = Computation::create(self.t, self.object.clone());
 
         computation.set_point(_ray.position(self.t));
-        computation.set_eye_vector(_ray.direction.negate());
+        computation.set_eye_vector(-_ray.direction);
         computation.set_normal_vector(self.object.normal(computation.point()));
-        if computation.normal_vector().dot(computation.eye_vector()) < 0.0 {
+        if computation.normal_vector() ^ computation.eye_vector() < 0.0 {
             computation.set_inside(true);
-            computation.set_normal_vector(computation.normal_vector().negate());
+            computation.set_normal_vector(-computation.normal_vector());
         }
         computation.set_reflect_vector(_ray.direction.reflect(computation.normal_vector()));
-        let over_point = computation.point().add(computation.normal_vector().multiply(EPSILON));
+        let over_point = computation.point() + computation.normal_vector() * EPSILON;
         computation.set_over_point(over_point);
 
         computation
@@ -56,13 +56,14 @@ impl Intersection {
 mod tests {
     use crate::features::intersection::Intersection;
     use crate::features::material::Material;
-    use crate::features::matrix::Matrix;
-    use crate::features::point::Point;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::vector::Vector;
+    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_intersection_encapsulates_t_and_object() {
@@ -165,7 +166,7 @@ mod tests {
 
     #[test]
     fn test_hit_when_an_intersection_occurs_on_the_inside() {
-        let ray = Ray::create(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 1.0));
+        let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
         let shape = Sphere::create();
         let intersection = Intersection::create(1.0, Box::new(shape.clone()));
 
@@ -187,8 +188,8 @@ mod tests {
 
         let computation = intersection.prepare_computations(ray);
 
-        assert!(computation.over_point().value().z < -f64::EPSILON/2.0);
-        assert!(computation.point().value().z > computation.over_point().value().z);
+        assert!(computation.over_point().z() < -f64::EPSILON/2.0);
+        assert!(computation.point().z() > computation.over_point().z());
     }
 
     #[test]

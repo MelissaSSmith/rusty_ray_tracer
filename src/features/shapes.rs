@@ -1,10 +1,10 @@
 use std::any::Any;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
-use crate::features::matrix::Matrix;
-use crate::features::point::Point;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
 use crate::features::ray::Ray;
-use crate::features::vector::Vector;
+use crate::features::primitives::vector::Vector;
 
 pub mod sphere;
 pub mod plane;

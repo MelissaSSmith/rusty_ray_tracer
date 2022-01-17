@@ -1,9 +1,10 @@
 use std::any::Any;
 use crate::features::color::Color;
-use crate::features::matrix::Matrix;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple::Tuple;
 
 #[derive(Clone)]
 pub struct RadialGradientPattern {
@@ -17,7 +18,7 @@ impl RadialGradientPattern {
         RadialGradientPattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::create_identity()
+            transformation: Matrix::identity()
         }
     }
 
@@ -25,7 +26,7 @@ impl RadialGradientPattern {
         RadialGradientPattern{
             pattern_a,
             pattern_b,
-            transformation: Matrix::create_identity() }
+            transformation: Matrix::identity() }
     }
 }
 
@@ -48,8 +49,8 @@ impl Pattern for RadialGradientPattern {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse().multiply_point(point);
-        let distance = (tp.value().x.powi(2) + tp.value().z.powi(2)).sqrt();
+        let tp = self.transformation.inverse() * point;
+        let distance = (tp.x().powi(2) + tp.z().powi(2)).sqrt();
         let fraction = distance - distance.floor();
 
         let color_a = self.pattern_a.pattern_at(tp);
@@ -65,13 +66,14 @@ mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::Pattern;
     use crate::features::patterns::radial_gradient::RadialGradientPattern;
-    use crate::features::point::Point;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple::Tuple;
 
     #[test]
     fn gradient_both_x_and_z_interpolates_between_colors() {
         let pattern = RadialGradientPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
         assert!(pattern.pattern_at(Point::create(0.25, 0.0, 0.0)).equals(Color::create(0.75, 0.75, 0.75)));
         assert!(pattern.pattern_at(Point::create(0.5, 0.0, 0.0)).equals(Color::create(0.5, 0.5, 0.5)));
         assert!(pattern.pattern_at(Point::create(0.75, 0.0, 0.0)).equals(Color::create(0.25, 0.25, 0.25)));

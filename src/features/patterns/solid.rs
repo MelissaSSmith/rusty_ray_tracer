@@ -1,8 +1,8 @@
 use std::any::Any;
 use crate::features::color::Color;
-use crate::features::matrix::Matrix;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
-use crate::features::point::Point;
+use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
 pub struct SolidPattern {
@@ -12,7 +12,7 @@ pub struct SolidPattern {
 
 impl SolidPattern {
     pub fn create(color: Color) -> SolidPattern {
-        SolidPattern { color, transformation: Matrix::create_identity() }
+        SolidPattern { color, transformation: Matrix::identity() }
     }
 }
 
