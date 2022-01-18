@@ -1,8 +1,7 @@
 use std::ops::{Add, Mul, Sub};
 use serde::{Deserialize, Serialize};
 use crate::features::primitives::operations::Operations;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Vector {
@@ -160,7 +159,7 @@ impl std::ops::Neg for Vector {
 #[cfg(test)]
 mod tests {
     use std::ops::Div;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 
     #[test]

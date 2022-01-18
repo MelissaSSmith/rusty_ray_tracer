@@ -4,7 +4,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct GradientPattern {
@@ -43,7 +43,7 @@ impl Pattern for GradientPattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        self.transformation = transform;
+        self.transformation = self.transformation.clone() * transform;
     }
 
     fn pattern_at(&self, point: Point) -> Color {
@@ -63,7 +63,7 @@ mod tests {
     use crate::features::patterns::gradient::GradientPattern;
     use crate::features::patterns::Pattern;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn gradient_linearly_interpolates_between_colors() {

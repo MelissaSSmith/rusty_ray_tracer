@@ -30,8 +30,7 @@ impl Pattern for SolidPattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        let new_transform = self.transformation.multiply(&transform);
-        self.transformation = new_transform;
+        self.transformation = self.transformation.clone() * transform;
     }
 
     fn pattern_at(&self, _: Point) -> Color {

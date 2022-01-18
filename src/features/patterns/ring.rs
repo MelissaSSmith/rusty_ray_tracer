@@ -4,7 +4,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct RingPattern {
@@ -44,8 +44,7 @@ impl Pattern for RingPattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        let new_transform = self.transformation.multiply(&transform);
-        self.transformation = new_transform;
+        self.transformation = self.transformation.clone() * transform;
     }
 
     fn pattern_at(&self, point: Point) -> Color {
@@ -65,7 +64,7 @@ mod tests {
     use crate::features::patterns::Pattern;
     use crate::features::patterns::ring::RingPattern;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_ring_should_extend_both_x_and_z() {

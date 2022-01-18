@@ -113,7 +113,7 @@ impl Material {
             return ambient;
         }
 
-        ambient + diffuse + specular
+        ambient.add(diffuse).add(specular)
     }
 
     fn calculate_diffuse(&self, light_dot_normal: f64, effective_color: &Color) -> Color {
@@ -146,7 +146,7 @@ mod tests {
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 
     #[test]

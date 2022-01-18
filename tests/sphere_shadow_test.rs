@@ -10,6 +10,7 @@ use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::Pattern;
 use rusty_ray_tracer::features::primitives::point::Point;
+use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::Shape;
 use rusty_ray_tracer::features::shapes::sphere::Sphere;

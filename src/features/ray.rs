@@ -26,7 +26,7 @@ impl Ray {
     }
 
     pub fn transform(&self, _matrix: Matrix) -> Ray {
-        let new_point = _matrix * self.origin;
+        let new_point = _matrix.clone() * self.origin;
         let new_vector = _matrix * self.direction;
         Ray::create(new_point, new_vector)
     }
@@ -36,8 +36,8 @@ impl Ray {
 mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::ray::Ray;
-    use crate::features::primitives::tuple::Tuple;
     use crate::features::primitives::vector::Vector;
 
     #[test]

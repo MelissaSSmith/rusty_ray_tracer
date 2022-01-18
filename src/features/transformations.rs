@@ -1,6 +1,6 @@
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 
 impl Matrix {
@@ -68,7 +68,7 @@ impl Matrix {
         let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
         let orientation = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
         let translation = Matrix::translate(-from.x(), -from.y(), -from.z());
-        orientation.multiply(&translation)
+        orientation * translation
     }
 }
 
@@ -77,7 +77,7 @@ mod tests {
     use std::f64::consts::PI;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 
     #[test]

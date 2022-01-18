@@ -1,12 +1,9 @@
 use array2d::Array2D;
 use crate::features::primitives::operations::Operations;
-use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple_trait::Tuple as TupleTrait;
 use crate::features::primitives::tuple::Tuple;
-use crate::features::primitives::vector::Vector;
 
-const MATRIX_SIZE: usize = 4;
-
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct Matrix {
     matrix: Array2D<f64>
 }
@@ -127,44 +124,36 @@ impl std::ops::Mul for Matrix {
     type Output = Matrix;
 
     fn mul(self, rhs: Matrix) -> Self::Output {
-        let mut res = Matrix::new();
-
-        for row in 0..MATRIX_SIZE {
-            for col in 0..MATRIX_SIZE {
-                res[(row, col)] = self[(row, 0)] * rhs[(0, col)]
-                    + self[(row, 1)] * rhs[(1, col)]
-                    + self[(row, 2)] * rhs[(2, col)]
-                    + self[(row, 3)] * rhs[(3, col)];
+        let mut new_matrix = Matrix::identity();
+        let rows = self.matrix.as_rows();
+        let columns = rhs.matrix.as_columns();
+        for  row in 0..rows.len() {
+            let row_tuple = Tuple::convert_to_tuple(rows.get(row).unwrap());
+            for column in 0..columns.len() {
+                let column_tuple = Tuple::convert_to_tuple(columns.get(column).unwrap());
+                let value = row_tuple ^ column_tuple;
+                new_matrix.set(row, column, value);
             }
         }
 
-        res
+        new_matrix
     }
 }
 
 /* ---------------------------------------------------------------------------------------------- */
 
-impl<T> std::ops::Mul<T> for Matrix
-    where
-        T: Tuple,
+impl<T> std::ops::Mul<T> for Matrix where T: TupleTrait,
 {
     type Output = T;
 
     fn mul(self, rhs: T) -> Self::Output {
-        Self::Output::new(
-            self[(0, 0)] * rhs.x()
-                + self[(0, 1)] * rhs.y()
-                + self[(0, 2)] * rhs.z()
-                + self[(0, 3)] * rhs.w(),
-            self[(1, 0)] * rhs.x()
-                + self[(1, 1)] * rhs.y()
-                + self[(1, 2)] * rhs.z()
-                + self[(1, 3)] * rhs.w(),
-            self[(2, 0)] * rhs.x()
-                + self[(2, 1)] * rhs.y()
-                + self[(2, 2)] * rhs.z()
-                + self[(2, 3)] * rhs.w(),
-        )
+        let x = self.get(0, 0) * rhs.x() + self.get(0, 1) * rhs.y()
+            + self.get(0, 2) * rhs.z() + self.get(0, 3) * rhs.w();
+        let y = self.get(1, 0) * rhs.x() + self.get(1, 1) * rhs.y()
+            + self.get(1, 2) * rhs.z() + self.get(1, 3) * rhs.w();
+        let z = self.get(2, 0) * rhs.x() + self.get(2, 1) * rhs.y()
+            + self.get(2, 2) * rhs.z() + self.get(2, 3) * rhs.w();
+        Self::Output::create(x, y, z)
     }
 }
 
@@ -172,7 +161,7 @@ impl<T> std::ops::Mul<T> for Matrix
 mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_create_matrix_4_4() {
@@ -263,7 +252,7 @@ mod tests {
         let vec_4 = vec![1.0, 2.0, 7.0, 8.0];
         let m2 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let result = m1.multiply(&m2);
+        let result = m1 * m2;
 
         let vec_1 = vec![20.0, 22.0, 50.0, 48.0];
         let vec_2 = vec![44.0, 54.0, 114.0, 108.0];
@@ -308,7 +297,7 @@ mod tests {
         let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
         let m2 = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let result = m1.multiply(&m2);
+        let result = m1.clone() * m2.clone();
 
         assert!(m1.equals(result));
     }
@@ -580,10 +569,9 @@ mod tests {
         let vec_4 = vec![6.0, -2.0, 0.0, 5.0];
         let b = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
 
-        let c = a.multiply(&b);
-        let inverse_b = b.inverse();
+        let c = a.clone() * b.clone();
 
-        let product = c.multiply(&inverse_b);
+        let product = c * b.inverse();
 
         assert!(a.equals(product));
     }

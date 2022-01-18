@@ -5,7 +5,7 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct CheckerPattern {
@@ -44,7 +44,7 @@ impl Pattern for CheckerPattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        self.transformation = transform;
+        self.transformation = self.transformation.clone() * transform;
     }
 
     fn pattern_at(&self, point: Point) -> Color {
@@ -66,7 +66,7 @@ mod tests {
     use crate::features::patterns::checkers::CheckerPattern;
     use crate::features::patterns::Pattern;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_checkers_should_repeat_in_x() {

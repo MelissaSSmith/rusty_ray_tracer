@@ -7,6 +7,7 @@ use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
+use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::shapes::Shape;
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
 use rusty_ray_tracer::features::primitives::vector::Vector;
@@ -25,17 +26,17 @@ fn sphere_scene_test() {
 
     let mut left_wall = Sphere::create();
     let lw_transform = Matrix::translate(0.0, 0.0, 5.0)
-        .multiply(&Matrix::rotate_y(-PI/4.0))
-        .multiply(&Matrix::rotate_x(PI/2.0))
-        .multiply(&Matrix::scale(10.0, 0.01, 10.0));
+        * Matrix::rotate_y(-PI/4.0)
+        * Matrix::rotate_x(PI/2.0)
+        * Matrix::scale(10.0, 0.01, 10.0);
     left_wall.set_transform(lw_transform);
     left_wall.set_material(material.clone());
 
     let mut right_wall = Sphere::create();
     let rw_transform = Matrix::translate(0.0, 0.0, 5.0)
-        .multiply(&Matrix::rotate_y(PI/4.0))
-        .multiply(&Matrix::rotate_x(PI/2.0))
-        .multiply(&Matrix::scale(10.0, 0.01, 10.0));
+        * Matrix::rotate_y(PI/4.0)
+        * Matrix::rotate_x(PI/2.0)
+        * Matrix::scale(10.0, 0.01, 10.0);
     right_wall.set_transform(rw_transform);
     right_wall.set_material(material);
 
@@ -48,8 +49,7 @@ fn sphere_scene_test() {
     middle.set_material(mid_material);
 
     let mut right = Sphere::create();
-    let r_transform = Matrix::translate(1.5, 0.5, -0.5)
-        .multiply(&Matrix::scale(0.5, 0.5, 0.5));
+    let r_transform = Matrix::translate(1.5, 0.5, -0.5) * Matrix::scale(0.5, 0.5, 0.5);
     right.set_transform(r_transform);
     let mut r_material = Material::create();
     r_material.set_color(Color::create(0.5, 1.0, 0.1));
@@ -58,8 +58,7 @@ fn sphere_scene_test() {
     right.set_material(r_material);
 
     let mut left = Sphere::create();
-    let l_transform = Matrix::translate(-1.5, 0.33, -0.75)
-        .multiply(&Matrix::scale(0.33, 0.33, 0.33));
+    let l_transform = Matrix::translate(-1.5, 0.33, -0.75) * Matrix::scale(0.33, 0.33, 0.33);
     left.set_transform(l_transform);
     let mut l_material = Material::create();
     l_material.set_color(Color::create(1.0, 0.8, 0.1));

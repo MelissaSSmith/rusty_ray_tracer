@@ -1,7 +1,7 @@
 use crate::features::canvas::Canvas;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::world::World;
 
@@ -43,7 +43,7 @@ impl Camera {
         let world_y = self.half_height - y_offset;
 
         let inverse_transform = self.transform.inverse();
-        let pixel = inverse_transform * Point::create(world_x, world_y, -1.0);
+        let pixel = inverse_transform.clone() * Point::create(world_x, world_y, -1.0);
         let origin = inverse_transform * Point::zero();
         let direction = (pixel - origin).normalize();
 
@@ -102,7 +102,7 @@ mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::operations::Operations;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::world::World;
 
@@ -153,7 +153,7 @@ mod tests {
     #[test]
     fn test_construct_ray_when_the_camera_is_transformed() {
         let mut camera = Camera::create(201, 101, PI/2.0);
-        camera.transform = Matrix::rotate_y(PI/4.0).multiply(&Matrix::translate(0.0, -2.0, 5.0));
+        camera.transform = Matrix::rotate_y(PI/4.0) * Matrix::translate(0.0, -2.0, 5.0);
 
         let ray = camera.ray_for_pixel(100, 50);
 

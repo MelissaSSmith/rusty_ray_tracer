@@ -2,7 +2,7 @@ use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::tuple::Tuple;
+use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::primitives::vector::Vector;
 
 mod world;

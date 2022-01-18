@@ -4,7 +4,7 @@ use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::tuple::Tuple;
+use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 
 #[test]
 #[ignore]

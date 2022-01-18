@@ -7,7 +7,7 @@ use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::shapes::sphere::Sphere;
@@ -167,7 +167,7 @@ mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::operations::Operations;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
     use crate::features::shapes::Shape;

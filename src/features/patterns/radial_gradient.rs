@@ -4,7 +4,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::Pattern;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct RadialGradientPattern {
@@ -44,8 +44,7 @@ impl Pattern for RadialGradientPattern {
     }
 
     fn transform(&mut self, transform: Matrix) {
-        let new_transform = self.transformation.multiply(&transform);
-        self.transformation = new_transform;
+        self.transformation = self.transformation.clone() * transform;
     }
 
     fn pattern_at(&self, point: Point) -> Color {
@@ -67,7 +66,7 @@ mod tests {
     use crate::features::patterns::Pattern;
     use crate::features::patterns::radial_gradient::RadialGradientPattern;
     use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn gradient_both_x_and_z_interpolates_between_colors() {

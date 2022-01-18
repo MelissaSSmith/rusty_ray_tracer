@@ -2,7 +2,6 @@ use crate::features::computation::Computation;
 use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
-use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Intersection {
@@ -48,21 +47,20 @@ impl Intersection {
     }
 
     fn equals(&self, _intersection: Intersection) -> bool {
-        self.t == _intersection.t && self.object.transformation() == _intersection.object.transformation()
+        self.t == _intersection.t && self.object.transformation().equals(_intersection.object.transformation())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::features::intersection::Intersection;
-    use crate::features::material::Material;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 
     #[test]

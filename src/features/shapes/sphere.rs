@@ -3,7 +3,7 @@ use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::primitives::vector::Vector;
@@ -83,7 +83,7 @@ mod tests {
     use crate::features::ray::Ray;
     use crate::features::shapes::Shape;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 
     #[test]
@@ -270,7 +270,7 @@ mod tests {
     #[test]
     fn test_compute_normal_on_a_transformed_sphere() {
         let mut sphere = Sphere::create();
-        let matrix = Matrix::scale(1.0, 0.5, 1.0).multiply(&Matrix::rotate_z(PI/5.0));
+        let matrix = Matrix::scale(1.0, 0.5, 1.0) * Matrix::rotate_z(PI/5.0);
         sphere.set_transform(matrix);
 
         let normal = sphere.normal(Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0));

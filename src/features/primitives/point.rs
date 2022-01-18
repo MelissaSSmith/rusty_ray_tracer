@@ -2,7 +2,7 @@ use std::ops::{Add, Mul, Sub};
 use crate::features::primitives::vector::Vector;
 use serde::{Deserialize, Serialize};
 use crate::features::primitives::operations::Operations;
-use crate::features::primitives::tuple::Tuple;
+use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Point {
@@ -28,7 +28,7 @@ impl Tuple for Point {
             x: 0.0,
             y: 0.0,
             z: 0.0,
-            w: 0.0
+            w: 1.0
         }
     }
 
@@ -93,9 +93,9 @@ impl Sub for Point {
 
     fn sub(self, rhs: Point) -> Self::Output {
         Vector::create(
-            x: self.x - rhs.x(),
-            y: self.y - rhs.y(),
-            z: self.z - rhs.z()
+            self.x - rhs.x(),
+            self.y - rhs.y(),
+            self.z - rhs.z()
         )
     }
 }
@@ -115,7 +115,7 @@ impl Mul<f64> for Point {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::primitives::tuple::Tuple;
+    use crate::features::primitives::tuple_trait::Tuple;
     use super::*;
 
     #[test]
