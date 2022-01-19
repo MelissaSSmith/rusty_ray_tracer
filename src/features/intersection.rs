@@ -1,5 +1,6 @@
 use crate::features::computation::Computation;
 use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 
@@ -18,7 +19,7 @@ impl Intersection {
         let mut hit: Option<Intersection> = None;
         for intersection in intersections {
             let h = &hit;
-            if intersection.t > 0.0 {
+            if intersection.t > 0.0001 {
                 if h.is_none() {
                     hit = Some(intersection);
                 } else if h.is_some() && intersection.t < h.as_ref().unwrap().t {
@@ -32,16 +33,21 @@ impl Intersection {
     pub(crate) fn prepare_computations(&self, _ray: Ray) -> Computation {
         let mut computation = Computation::create(self.t, self.object.clone());
 
-        computation.set_point(_ray.position(self.t));
-        computation.set_eye_vector(-_ray.direction);
-        computation.set_normal_vector(self.object.normal(computation.point()));
-        if computation.normal_vector() ^ computation.eye_vector() < 0.0 {
-            computation.set_inside(true);
-            computation.set_normal_vector(-computation.normal_vector());
-        }
-        computation.set_reflect_vector(_ray.direction.reflect(computation.normal_vector()));
-        let over_point = computation.point() + computation.normal_vector() * EPSILON;
-        computation.set_over_point(over_point);
+        let point = _ray.position(self.t);
+        let normal = self.object.normal(point);
+        let eye_vector = -_ray.direction();
+
+        computation.set_point(point);
+        computation.set_eye_vector(eye_vector);
+        let (inside, normal) = if normal ^ eye_vector < 0.0 {
+            (true, -normal)
+        } else {
+            (false, normal)
+        };
+        computation.set_normal_vector(normal);
+        computation.set_inside(inside);
+        computation.set_reflect_vector(_ray.direction.reflect(normal));
+        computation.set_over_point(point + normal * EPSILON);
 
         computation
     }

@@ -33,7 +33,7 @@ fn sphere_scene_test() {
     let mut mid_pattern = RingPattern::create(Color::create(0.0, 0.0, 1.0), Color::create(0.1, 1.0, 0.5));
     mid_pattern.transform(Matrix::scale(0.25, 0.25, 0.25));
     let mid_perturb_pattern = PerturbedPattern::create(Box::new(mid_pattern), Some(2.5));
-    let mid_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, None, Some(Box::new(mid_perturb_pattern)));
+    let mid_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, Some(0.75), None, Some(Box::new(mid_perturb_pattern)));
     middle.set_material(mid_material);
 
     let mut right = Sphere::create();
@@ -72,7 +72,7 @@ fn sphere_scene_test() {
                                             Box::new(middle), Box::new(right), Box::new(left)];
     let world = World::create_world(light_source, objects);
 
-    let mut camera = Camera::create(900, 900, PI/3.0);
+    let mut camera = Camera::create(400, 350, PI/3.0);
     camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
     let canvas = camera.render(world);

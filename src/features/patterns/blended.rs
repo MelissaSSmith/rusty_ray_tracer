@@ -36,10 +36,10 @@ impl Pattern for BlendedPattern {
 
     fn pattern_at(&self, point: Point) -> Color {
         let tp = self.transformation.inverse() * point;
-        let color_a = self.pattern_a.pattern_at(tp).multiply(0.5);
-        let color_b = self.pattern_b.pattern_at(tp).multiply(0.5);
+        let color_a = self.pattern_a.pattern_at(tp) * 0.5;
+        let color_b = self.pattern_b.pattern_at(tp) * 0.5;
 
-        color_a.add(color_b)
+        color_a + color_b
     }
 }
 

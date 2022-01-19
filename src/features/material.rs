@@ -101,9 +101,9 @@ impl Material {
             Some(p) => { p.pattern_at_object(object, position) }
         };
 
-        let effective_color = color.multiply_colors(light.intensity);
+        let effective_color = color * light.intensity;
         let light_vector = (light.position - position).normalize();
-        let ambient = effective_color.multiply(self.ambient);
+        let ambient = effective_color * self.ambient;
 
         let light_dot_normal = light_vector ^ normal_vector;
         let diffuse = self.calculate_diffuse(light_dot_normal, &effective_color);
@@ -113,14 +113,14 @@ impl Material {
             return ambient;
         }
 
-        ambient.add(diffuse).add(specular)
+        ambient + diffuse + specular
     }
 
     fn calculate_diffuse(&self, light_dot_normal: f64, effective_color: &Color) -> Color {
         if light_dot_normal < 0.0 {
             return BLACK;
         }
-        effective_color.multiply(self.diffuse * light_dot_normal)
+        *effective_color * self.diffuse * light_dot_normal
     }
 
     fn calculate_specular(&self, light_dot_normal: f64, light_vector: Vector, normal_vector: Vector, eye_vector: Vector, intensity: Color) -> Color {
@@ -133,7 +133,7 @@ impl Material {
             return BLACK;
         }
         let factor = reflection_dot_eye.powf(self.shininess);
-        intensity.multiply(self.specular).multiply(factor)
+        intensity * self.specular * factor
     }
 }
 

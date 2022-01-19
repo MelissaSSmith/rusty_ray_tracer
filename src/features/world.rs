@@ -91,7 +91,6 @@ impl World {
 
     fn shade_hit(&self, computation: &Computation, remaining: u8) -> Color {
         let shadowed = self.is_shadowed(computation.over_point());
-        //println!("Shadowed: {}", shadowed);
         let object = computation.clone().object();
 
         let lighting = computation.clone().object().material().lighting(
@@ -104,23 +103,18 @@ impl World {
         );
         let reflected = self.reflected_color(&computation, remaining);
 
-        lighting.add(reflected)
+        lighting + reflected
     }
 
     fn reflected_color(&self, _computations: &Computation, remaining: u8) -> Color {
         let reflective = _computations.clone().object().material().reflective();
-        if reflective <= EPSILON || remaining <= 0 {
+        if reflective == 0.0 || remaining <= 0 {
             return BLACK;
         }
-        //println!("Point: {} {} {}", _computations.point().x() _computations.point().y(), _computations.point().z());
-        //println!("OverPoint: {} {} {}", _computations.over_point().x(), _computations.over_point().y(), _computations.over_point().z());
-        //println!("Reflect_v: {} {} {}", _computations.reflect_vector().x(), _computations.reflect_vector().y(), _computations.reflect_vector().z());
-        //println!("Remaining: {}", remaining);
         let reflect_ray = Ray::create(_computations.over_point(), _computations.reflect_vector());
         let color = self.color_at_impl(&reflect_ray, remaining - 1);
 
-        //println!("Base Color: {} {} {}", color.red, color.green, color.blue);
-        color.multiply(reflective)
+        color * reflective
     }
 
     fn color_at_impl(&self, _ray: &Ray, remaining: u8) -> Color {
@@ -145,7 +139,6 @@ impl World {
                 let ray = Ray::create(point, direction);
                 let intersections = self.intersect(ray);
                 let hit = Intersection::hit(intersections);
-                //println!("Hit: {}", hit.is_some());
                 match hit {
                     None => { false }
                     Some(h) => {
@@ -362,8 +355,10 @@ mod tests {
 
     #[test]
     fn test_reflect_color_for_a_reflective_material() {
+        let sqrt2 = f64::sqrt(2.0);
+
         let mut world = World::create_default();
-        let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0));
+        let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
         let mut material = Material::create();
         material.set_reflective(0.5);
         let mut shape = Plane::create();
@@ -371,7 +366,7 @@ mod tests {
         shape.set_material(material);
         world.add_object(Box::new(shape.clone()));
 
-        let intersection = Intersection::create(2.0_f64.sqrt(), Box::new(shape));
+        let intersection = Intersection::create(sqrt2, Box::new(shape));
 
         let computation = intersection.prepare_computations(ray);
 
@@ -383,8 +378,10 @@ mod tests {
 
     #[test]
     fn test_shade_hit_with_a_reflective_material() {
+        let sqrt2 = f64::sqrt(2.0);
+
         let mut world = World::create_default();
-        let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0));
+        let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
         let mut shape = Plane::create();
         let mut material = Material::create();
         material.set_reflective(0.5);
@@ -392,7 +389,7 @@ mod tests {
         shape.set_material(material);
         world.add_object(Box::new(shape.clone()));
 
-        let intersection = Intersection::create(2.0_f64.sqrt(), Box::new(shape));
+        let intersection = Intersection::create(sqrt2.sqrt(), Box::new(shape));
 
         let computation = intersection.prepare_computations(ray);
 

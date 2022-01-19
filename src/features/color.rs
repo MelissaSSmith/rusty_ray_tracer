@@ -13,38 +13,6 @@ impl Color {
         Color{red, green, blue}
     }
 
-    pub fn add(&self, _color: Color) -> Color {
-        Color {
-            red: self.red.add(_color.red),
-            green: self.green.add(_color.green),
-            blue: self.blue.add(_color.blue)
-        }
-    }
-
-    pub fn subtract(&self, _color: Color) -> Color {
-        Color {
-            red: self.red.sub(_color.red),
-            green: self.green.sub(_color.green),
-            blue: self.blue.sub(_color.blue)
-        }
-    }
-
-    pub fn multiply_colors(&self, _color: Color) -> Color {
-        Color {
-            red: self.red.mul(_color.red),
-            green: self.green.mul(_color.green),
-            blue: self.blue.mul(_color.blue)
-        }
-    }
-
-    pub fn multiply(&self, _scalar: f64) -> Color {
-        Color {
-            red: self.red.mul(_scalar),
-            green: self.green.mul(_scalar),
-            blue: self.blue.mul(_scalar)
-        }
-    }
-
     pub fn scale_color(&self) -> Color {
         Color {
             red: Color::scale_number(self.red),
@@ -75,6 +43,62 @@ impl Color {
     }
 }
 
+impl Add for Color {
+    type Output = Color;
+
+    fn add(self, rhs: Color) -> Self::Output {
+        Self {
+            red: self.red + rhs.red,
+            green: self.green + rhs.green,
+            blue: self.blue + rhs.blue
+        }
+    }
+}
+
+impl Sub for Color {
+    type Output = Color;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            red: self.red - rhs.red,
+            green: self.green - rhs.green,
+            blue: self.blue - rhs.blue
+        }
+    }
+}
+
+impl Mul<f64> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            red: self.red * rhs,
+            green: self.green * rhs,
+            blue: self.blue * rhs
+        }
+    }
+}
+
+impl std::ops::Mul<Color> for f64 {
+    type Output = Color;
+
+    fn mul(self, rhs: Color) -> Self::Output {
+        rhs * self
+    }
+}
+
+impl std::ops::Mul for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color {
+            red: self.red * rhs.red,
+            green: self.green * rhs.green,
+            blue: self.blue * rhs.blue
+        }
+    }
+}
+
 pub mod consts {
     use crate::features::color::Color;
 
@@ -85,6 +109,7 @@ pub mod consts {
 #[cfg(test)]
 mod tests {
     use crate::features::color::Color;
+    use crate::features::primitives::operations::Operations;
 
     #[test]
     fn test_create_color() {
@@ -100,7 +125,7 @@ mod tests {
         let color_a = Color::create(0.9, 0.6, 0.75);
         let color_b = Color::create(0.7, 0.1, 0.25);
 
-        let new_color = color_a.add(color_b);
+        let new_color = color_a + color_b;
 
         assert_eq!(1.6, new_color.red);
         assert_eq!(0.7, new_color.green);
@@ -112,9 +137,9 @@ mod tests {
         let color_a = Color::create(0.9, 0.6, 0.75);
         let color_b = Color::create(0.7, 0.1, 0.25);
 
-        let new_color = color_a.subtract(color_b);
+        let new_color = color_a - color_b;
 
-        assert!(equals(0.2, new_color.red));
+        assert!(new_color.red.equals(0.2));
         assert_eq!(0.5, new_color.green);
         assert_eq!(0.5, new_color.blue);
     }
@@ -124,9 +149,9 @@ mod tests {
         let color_a = Color::create(0.2, 0.3, 0.4);
         let scalar = 2.0;
 
-        let new_color = color_a.multiply(scalar);
+        let new_color = color_a * scalar;
 
-        assert!(equals(0.4, new_color.red));
+        assert!(new_color.red.equals(0.4));
         assert_eq!(0.6, new_color.green);
         assert_eq!(0.8, new_color.blue);
     }
@@ -136,16 +161,10 @@ mod tests {
         let color_a = Color::create(1.0, 0.2, 0.4);
         let color_b = Color::create(0.9, 1.0, 0.1);
 
-        let new_color = color_a.multiply_colors(color_b);
+        let new_color = color_a * color_b;
 
         assert_eq!(0.9, new_color.red);
         assert_eq!(0.2, new_color.green);
-        assert!(equals(0.04, new_color.blue));
-    }
-
-    fn equals(a: f64, b: f64) -> bool {
-        let epsilon = 0.00001;
-        let diff = a - b;
-        diff.abs() < epsilon
+        assert!(new_color.blue.equals(0.04));
     }
 }

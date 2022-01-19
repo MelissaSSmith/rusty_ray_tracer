@@ -49,10 +49,10 @@ impl Pattern for GradientPattern {
     fn pattern_at(&self, point: Point) -> Color {
         let tp = self.transformation.inverse() * point;
         let color_a = self.pattern_a.pattern_at(tp);
-        let distance = self.pattern_b.pattern_at(tp).subtract(color_a);
+        let distance = self.pattern_b.pattern_at(tp) - color_a;
         let fraction = tp.x() - tp.x().floor();
 
-        color_a.add(distance.multiply(fraction))
+        color_a + distance * fraction
     }
 }
 

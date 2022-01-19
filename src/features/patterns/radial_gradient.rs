@@ -53,9 +53,9 @@ impl Pattern for RadialGradientPattern {
         let fraction = distance - distance.floor();
 
         let color_a = self.pattern_a.pattern_at(tp);
-        let color_b = self.pattern_b.pattern_at(tp).subtract(color_a);
+        let color_b = self.pattern_b.pattern_at(tp) - color_a;
 
-        color_a.add(color_b.multiply(fraction))
+        color_a + color_b * fraction
     }
 }
 
