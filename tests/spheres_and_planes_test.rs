@@ -12,6 +12,7 @@ use rusty_ray_tracer::features::patterns::Pattern;
 use rusty_ray_tracer::features::patterns::perturb::PerturbedPattern;
 use rusty_ray_tracer::features::patterns::radial_gradient::RadialGradientPattern;
 use rusty_ray_tracer::features::patterns::ring::RingPattern;
+use rusty_ray_tracer::features::patterns::solid::SolidPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -48,7 +49,7 @@ fn sphere_scene_test() {
     let mut left = Sphere::create();
     let l_transform = Matrix::translate(-1.5, 0.33, -0.75) * Matrix::scale(0.4, 0.4, 0.4);
     left.set_transform(l_transform);
-    let mut l_pattern = StripePattern::create(Color::create(0.0, 0.01, 1.0), Color::create(1.0, 0.0, 0.0));
+    let mut l_pattern = SolidPattern::create(Color::create(1.0, 0.75, 0.0));
     l_pattern.transform(Matrix::scale(0.1, 0.1, 0.1));
     let l_perturb_pattern = PerturbedPattern::create(Box::new(l_pattern), None);
     let l_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None,None, Some(Box::new(l_perturb_pattern)));
@@ -72,7 +73,7 @@ fn sphere_scene_test() {
                                             Box::new(middle), Box::new(right), Box::new(left)];
     let world = World::create_world(light_source, objects);
 
-    let mut camera = Camera::create(400, 350, PI/3.0);
+    let mut camera = Camera::create(100, 50, PI/3.0);
     camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
     let canvas = camera.render(world);

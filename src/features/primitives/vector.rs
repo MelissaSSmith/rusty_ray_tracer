@@ -148,9 +148,9 @@ impl std::ops::Neg for Vector {
 
     fn neg(self) -> Self::Output {
         Self {
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
+            x: if self.x == 0.0 {self.x} else {-self.x},
+            y: if self.y == 0.0 {self.y} else {-self.y},
+            z: if self.z == 0.0 {self.z} else {-self.z},
             w: 0.0
         }
     }

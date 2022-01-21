@@ -48,7 +48,7 @@ impl World {
         let light = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
         Self {
             light: Some(light),
-            objects: vec![Box::new(s1), Box::new(s2)],
+            objects: vec![s1.box_clone(), s2.box_clone()],
             recursion_limit: 5
         }
     }
@@ -85,7 +85,7 @@ impl World {
                 intersections.push(intersection);
             }
         }
-        intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
+        intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap()); //todo - double verify this
         intersections
     }
 
@@ -122,7 +122,7 @@ impl World {
         return match intersection {
             None => { BLACK }
             Some(i) => {
-                let computations = i.prepare_computations(*_ray);
+                let computations = i.prepare_computations(*_ray, &vec![]);
                 self.shade_hit(&computations, remaining)
             }
         }
@@ -215,7 +215,7 @@ mod tests {
         let shape = world.clone().objects()[0].clone();
         let intersection = Intersection::create(4.0, shape);
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
         let color = world.shade_hit(&computation, 1);
 
         assert!(color.equals(Color::create(0.38066, 0.47583, 0.2855)));
@@ -229,7 +229,7 @@ mod tests {
         let shape = world.clone().objects()[1].clone();
         let intersection = Intersection::create(0.5, shape);
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
         let color = world.shade_hit(&computation, 1);
 
         assert!(color.equals(Color::create(0.90498, 0.90498, 0.90498)));
@@ -330,7 +330,7 @@ mod tests {
         let world = World::create_world(light, objects);
         let ray = Ray::create(Point::create(0.0, 0.0, 5.0), Vector::create(0.0, 0.0, 1.0));
         let intersection = Intersection::create(4.0, Box::new(s2.clone()));
-        let computations = intersection.prepare_computations(ray);
+        let computations = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.shade_hit(&computations, 1);
 
@@ -346,7 +346,7 @@ mod tests {
         world.set_object(1, shape.clone());
         let intersection = Intersection::create(1.0, shape);
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.reflected_color(&computation, 1);
 
@@ -364,11 +364,11 @@ mod tests {
         let mut shape = Plane::create();
         shape.set_transform(Matrix::translate(0.0, -1.0, 0.0));
         shape.set_material(material);
-        world.add_object(Box::new(shape.clone()));
+        world.add_object(shape.box_clone());
 
-        let intersection = Intersection::create(sqrt2, Box::new(shape));
+        let intersection = Intersection::create(sqrt2, shape.box_clone());
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.reflected_color(&computation, 1);
 
@@ -387,11 +387,11 @@ mod tests {
         material.set_reflective(0.5);
         shape.set_transform(Matrix::translate(0.0, -1.0, 0.0));
         shape.set_material(material);
-        world.add_object(Box::new(shape.clone()));
+        world.add_object(shape.box_clone());
 
-        let intersection = Intersection::create(sqrt2.sqrt(), Box::new(shape));
+        let intersection = Intersection::create(sqrt2.sqrt(), shape.box_clone());
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.shade_hit(&computation, 1);
 
@@ -435,7 +435,7 @@ mod tests {
 
         let intersection = Intersection::create(2.0_f64.sqrt(), Box::new(shape));
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.reflected_color(&computation, 0);
 

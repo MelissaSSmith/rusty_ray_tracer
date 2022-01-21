@@ -3,6 +3,7 @@ use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
 use crate::features::patterns::Pattern;
 use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::shapes::Shape;
 use crate::features::primitives::vector::Vector;
 
@@ -14,7 +15,9 @@ pub struct Material {
     diffuse: f64,
     specular: f64,
     shininess: f64,
-    reflective: f64
+    reflective: f64,
+    transparency: f64,
+    refractive_index: f64
 }
 
 impl Material {
@@ -26,7 +29,9 @@ impl Material {
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0,
-            reflective: 0.0
+            reflective: 0.0,
+            transparency: 0.0,
+            refractive_index: 1.0
         }
     }
 
@@ -50,7 +55,9 @@ impl Material {
             diffuse,
             specular,
             shininess: m_shininess,
-            reflective: m_reflective
+            reflective: m_reflective,
+            transparency: 0.0,
+            refractive_index: 1.0
         }
     }
 
@@ -60,8 +67,12 @@ impl Material {
             self.specular == other_material.specular &&
             self.shininess == other_material.shininess &&
             self.reflective == other_material.reflective &&
+            self.transparency == other_material.transparency &&
+            self.refractive_index == other_material.refractive_index &&
             self.color.equals(other_material.color)
     }
+
+    //setters
 
     pub fn set_ambient(&mut self, ambient: f64) {
         self.ambient = ambient;
@@ -83,6 +94,23 @@ impl Material {
         self.reflective = reflective;
     }
 
+    pub fn set_transparency(&mut self, transparency: f64) {
+        self.transparency = transparency;
+    }
+
+    pub fn set_refractive_index(&mut self, refractive_index: f64) {
+        self.refractive_index = refractive_index;
+    }
+
+    //builders
+
+    pub fn with_refractive_index(self, refractive_index: f64) -> Material {
+        Material {
+            refractive_index,
+            ..self
+        }
+    }
+
     pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
         self.pattern = Some(pattern);
     }
@@ -95,6 +123,14 @@ impl Material {
         self.reflective
     }
 
+    pub fn transparency(&self) -> f64 {
+        self.transparency
+    }
+
+    pub fn refractive_index(&self) -> f64 {
+        self.refractive_index
+    }
+
     pub fn lighting(&self, light: PointLight, object: Box<dyn Shape>, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
         let color = match &self.pattern {
             None => { self.color }
@@ -102,38 +138,28 @@ impl Material {
         };
 
         let effective_color = color * light.intensity;
-        let light_vector = (light.position - position).normalize();
         let ambient = effective_color * self.ambient;
-
-        let light_dot_normal = light_vector ^ normal_vector;
-        let diffuse = self.calculate_diffuse(light_dot_normal, &effective_color);
-        let specular = self.calculate_specular(light_dot_normal, light_vector, normal_vector, eye_vector, light.intensity);
-
         if in_shadow {
             return ambient;
         }
 
+        let mut diffuse = BLACK;
+        let mut specular = BLACK;
+
+        let light_vector = (light.position - position).normalize();
+        let light_dot_normal = light_vector ^ normal_vector;
+        if light_dot_normal > 0.0 {
+            diffuse = effective_color * self.diffuse * light_dot_normal;
+
+            let reflection_vector = (-light_vector).reflect(normal_vector);
+            let reflection_dot_eye = reflection_vector ^ eye_vector;
+            if reflection_dot_eye > 0.0 {
+                let factor = reflection_dot_eye.powf(self.shininess);
+                specular = light.intensity * self.specular * factor
+            }
+        }
+
         ambient + diffuse + specular
-    }
-
-    fn calculate_diffuse(&self, light_dot_normal: f64, effective_color: &Color) -> Color {
-        if light_dot_normal < 0.0 {
-            return BLACK;
-        }
-        *effective_color * self.diffuse * light_dot_normal
-    }
-
-    fn calculate_specular(&self, light_dot_normal: f64, light_vector: Vector, normal_vector: Vector, eye_vector: Vector, intensity: Color) -> Color {
-        if light_dot_normal < 0.0 {
-            return BLACK;
-        }
-        let reflection_vector = -light_vector.reflect(normal_vector);
-        let reflection_dot_eye = reflection_vector ^ eye_vector;
-        if reflection_dot_eye <= 0.0 {
-            return BLACK;
-        }
-        let factor = reflection_dot_eye.powf(self.shininess);
-        intensity * self.specular * factor
     }
 }
 
@@ -158,6 +184,8 @@ mod tests {
         assert_eq!(material.specular, 0.9);
         assert_eq!(material.shininess, 200.0);
         assert_eq!(material.reflective, 0.0);
+        assert_eq!(material.transparency, 0.0);
+        assert_eq!(material.refractive_index, 1.0);
     }
 
     #[test]

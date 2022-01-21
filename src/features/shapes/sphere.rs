@@ -11,14 +11,27 @@ use crate::features::primitives::vector::Vector;
 #[derive(Clone)]
 pub struct Sphere {
     transformation: Matrix,
-    material: Material
+    material: Material,
+    shape: String
 }
 
 impl Sphere {
     pub fn create() -> Sphere {
         Sphere {
             transformation: Matrix::identity(),
-            material: Material::create()
+            material: Material::create(),
+            shape: String::from("Sphere")
+        }
+    }
+
+    pub fn glass() -> Sphere {
+        let mut material = Material::create();
+        material.set_refractive_index(1.5);
+        material.set_transparency(1.0);
+        Sphere {
+            transformation: Matrix::identity(),
+            material,
+            shape: String::from("Sphere")
         }
     }
 }
@@ -32,12 +45,22 @@ impl Shape for Sphere {
         self
     }
 
+    fn equals(&self, other: &Box<dyn Shape>) -> bool {
+        other.shape() == String::from("Sphere") &&
+            self.material.equals(other.material()) &&
+            self.transformation.equals(other.transformation())
+    }
+
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
     }
 
     fn material(&self) -> Material {
         self.material.clone()
+    }
+
+    fn shape(&self) -> String {
+        self.shape.clone()
     }
 
     fn set_transform(&mut self, _transformation: Matrix) {
@@ -296,5 +319,13 @@ mod tests {
         sphere.set_material(material.clone());
 
         assert!(material.equals(sphere.material));
+    }
+
+    #[test]
+    fn test_helper_for_producing_a_glass_sphere() {
+        let sphere = Sphere::glass();
+
+        assert_eq!(sphere.material.transparency(), 1.0);
+        assert_eq!(sphere.material.refractive_index(), 1.5);
     }
 }

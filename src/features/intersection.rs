@@ -2,7 +2,10 @@ use crate::features::computation::Computation;
 use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
+use crate::features::shapes::plane::Plane;
 use crate::features::shapes::Shape;
+use smallvec::SmallVec;
+use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub struct Intersection {
@@ -30,13 +33,17 @@ impl Intersection {
         hit
     }
 
-    pub(crate) fn prepare_computations(&self, _ray: Ray) -> Computation {
+    pub(crate) fn prepare_computations(&self, _ray: Ray, _intersections: &Vec<Intersection>) -> Computation {
         let mut computation = Computation::create(self.t, self.object.clone());
 
         let point = _ray.position(self.t);
         let normal = self.object.normal(point);
         let eye_vector = -_ray.direction();
 
+        let (n1, n2) = Intersection::calculate_n1_and_n2(_intersections, self.clone());
+
+        computation.set_n1(n1);
+        computation.set_n2(n2);
         computation.set_point(point);
         computation.set_eye_vector(eye_vector);
         let (inside, normal) = if normal ^ eye_vector < 0.0 {
@@ -52,14 +59,55 @@ impl Intersection {
         computation
     }
 
+    fn calculate_n1_and_n2(_intersections: &Vec<Intersection>, hit: Intersection) -> (f64, f64) {
+        let mut n1 = 0.0;
+        let mut n2 = 0.0;
+
+        let mut containers = SmallVec::<[&Box<dyn Shape>; 32]>::new();
+        for (index, intersection) in _intersections.iter().enumerate() {
+            let is_intersection = intersection.equals(hit.clone());
+
+            if is_intersection {
+                n1 = Intersection::grab_container_value(&containers);
+            }
+            match containers
+                .iter()
+                .position(|&object| object.equals(&intersection.object))
+            {
+                Some(pos) => {
+                    let _ = containers.remove(pos);
+                }
+                None => {
+                    containers.push(&intersection.object)
+                },
+            }
+
+            if is_intersection {
+                n2 = Intersection::grab_container_value(&containers);
+                break;
+            }
+        }
+        (n1, n2)
+    }
+
+    fn grab_container_value(containers: &SmallVec::<[&Box<dyn Shape>; 32]>) -> f64 {
+        if containers.is_empty() {
+            return 1.0;
+        }
+        containers.last().unwrap().material().refractive_index()
+    }
+
     fn equals(&self, _intersection: Intersection) -> bool {
-        self.t == _intersection.t && self.object.transformation().equals(_intersection.object.transformation())
+        self.t == _intersection.t &&
+            self.object.equals(&_intersection.object)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::features::computation::Computation;
     use crate::features::intersection::Intersection;
+    use crate::features::material::Material;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
@@ -131,10 +179,10 @@ mod tests {
     #[test]
     fn test_hit_is_always_lowest_non_negative_intersection() {
         let s = Sphere::create();
-        let i1 = Intersection::create(5.0, Box::new(s.clone()));
-        let i2 = Intersection::create(7.0, Box::new(s.clone()));
-        let i3 = Intersection::create(-3.0, Box::new(s.clone()));
-        let i4 = Intersection::create(2.0, Box::new(s.clone()));
+        let i1 = Intersection::create(5.0, s.box_clone());
+        let i2 = Intersection::create(7.0, s.box_clone());
+        let i3 = Intersection::create(-3.0, s.box_clone());
+        let i4 = Intersection::create(2.0, s.box_clone());
 
         let intersections = vec![i1, i2, i3, i4.clone()];
         let hit = Intersection::hit(intersections);
@@ -149,7 +197,7 @@ mod tests {
         let shape = Sphere::create();
         let intersection = Intersection::create(4.0, Box::new(shape.clone()));
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert_eq!(4.0, computation.t());
         assert!(computation.point().equals(Point::create(0.0, 0.0, -1.0)));
@@ -163,7 +211,7 @@ mod tests {
         let shape = Sphere::create();
         let intersection = Intersection::create(4.0, Box::new(shape.clone()));
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert_eq!(false, computation.inside());
     }
@@ -174,7 +222,7 @@ mod tests {
         let shape = Sphere::create();
         let intersection = Intersection::create(1.0, Box::new(shape.clone()));
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert_eq!(true, computation.inside());
         assert!(computation.point().equals(Point::create(0.0, 0.0, 1.0)));
@@ -188,9 +236,9 @@ mod tests {
         let mut sphere = Sphere::create();
         sphere.set_transform(Matrix::translate(0.0, 0.0, 1.0));
 
-        let intersection = Intersection::create(5.0, Box::new(sphere.clone()));
+        let intersection = Intersection::create(5.0, sphere.box_clone());
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert!(computation.over_point().z() < -f64::EPSILON/2.0);
         assert!(computation.point().z() > computation.over_point().z());
@@ -202,8 +250,55 @@ mod tests {
         let ray = Ray::create(Point::create(0.0, 1.0, -1.0), Vector::create(0.0, -2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0));
         let intersection = Intersection::create(2.0_f64.sqrt(), Box::new(shape));
 
-        let computation = intersection.prepare_computations(ray);
+        let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert!(computation.reflect_vector().equals(Vector::create(0.0, 2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0)));
+    }
+
+    #[test]
+    fn test_n1_and_n2_at_various_intersections() {
+        let mut a = Sphere::glass();
+        a.set_transform(Matrix::scale(2.0, 2.0, 2.0));
+        a.set_material(Material::create().with_refractive_index(1.5));
+        let mut b = Sphere::glass();
+        b.set_transform(Matrix::translate(0.0, 0.0, -0.25));
+        b.set_material(Material::create().with_refractive_index(2.0));
+        let mut c = Sphere::glass();
+        c.set_transform(Matrix::translate(0.0, 0.0, 0.25));
+        c.set_material(Material::create().with_refractive_index(2.5));
+
+        let ray = Ray::create(Point::create(0.0, 0.0, -4.0), Vector::create(0.0, 0.0, 1.0));
+        let intersections = vec![
+            Intersection::create(2.0, a.box_clone()),
+            Intersection::create(2.75, b.box_clone()),
+            Intersection::create(3.25, c.box_clone()),
+            Intersection::create(4.75, b.box_clone()),
+            Intersection::create(5.25, c.box_clone()),
+            Intersection::create(6.0, a.box_clone())
+        ];
+
+        let mut computations = Vec::<Computation>::new();
+        for (index, intersection) in intersections.iter().enumerate() {
+            let comp = intersection.prepare_computations(ray, &intersections);
+            computations.push(comp);
+        }
+
+        assert_eq!(1.0, computations[0].n1());
+        assert_eq!(1.5, computations[0].n2());
+
+        assert_eq!(1.5, computations[1].n1());
+        assert_eq!(2.0, computations[1].n2());
+
+        assert_eq!(2.0, computations[2].n1());
+        assert_eq!(2.5, computations[2].n2());
+
+        assert_eq!(2.5, computations[3].n1());
+        assert_eq!(2.5, computations[3].n2());
+
+        assert_eq!(2.5, computations[4].n1());
+        assert_eq!(1.5, computations[4].n2());
+
+        assert_eq!(1.5, computations[5].n1());
+        assert_eq!(1.0, computations[5].n2());
     }
 }

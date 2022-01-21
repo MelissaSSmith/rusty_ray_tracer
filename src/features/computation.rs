@@ -12,7 +12,9 @@ pub struct Computation {
     eye_vector: Vector,
     normal_vector: Vector,
     inside: bool,
-    reflect_vector: Vector
+    reflect_vector: Vector,
+    n1: f64,
+    n2: f64
 }
 
 impl Computation {
@@ -25,7 +27,9 @@ impl Computation {
             eye_vector: Vector::zero(),
             normal_vector: Vector::zero(),
             inside: false,
-            reflect_vector: Vector::zero()
+            reflect_vector: Vector::zero(),
+            n1: 0.0,
+            n2: 0.0
         }
     }
 
@@ -59,6 +63,14 @@ impl Computation {
 
     pub fn reflect_vector(&self) -> Vector { self.reflect_vector }
 
+    pub fn n1(&self) -> f64 {
+        self.n1
+    }
+
+    pub fn n2(&self) -> f64 {
+        self.n2
+    }
+
     pub fn set_point(&mut self, _point: Point) {
         self.point = _point;
     }
@@ -81,5 +93,13 @@ impl Computation {
 
     pub fn set_reflect_vector(&mut self, _reflect: Vector) {
         self.reflect_vector = _reflect;
+    }
+
+    pub fn set_n1(&mut self, _n1: f64) {
+        self.n1 = _n1;
+    }
+
+    pub fn set_n2(&mut self, _n2: f64) {
+        self.n2 = _n2;
     }
 }

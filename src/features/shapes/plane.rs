@@ -1,4 +1,5 @@
 use std::any::Any;
+use serde::__private::de::Content::String;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
@@ -8,18 +9,21 @@ use crate::features::ray::Ray;
 use crate::features::shapes::Shape;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
+use std::string::String as TypeString;
 
 #[derive(Clone)]
 pub struct Plane {
     transformation: Matrix,
-    material: Material
+    material: Material,
+    shape: TypeString
 }
 
 impl Plane {
     pub fn create() -> Plane {
         Plane {
             transformation: Matrix::identity(),
-            material: Material::create()
+            material: Material::create(),
+            shape: TypeString::from("Plane")
         }
     }
 }
@@ -33,12 +37,22 @@ impl Shape for Plane {
         self
     }
 
+    fn equals(&self, other: &Box<dyn Shape>) -> bool {
+        other.shape() == TypeString::from("Plane") &&
+            self.material.equals(other.material()) &&
+            self.transformation.equals(other.transformation())
+    }
+
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
     }
 
     fn material(&self) -> Material {
         self.material.clone()
+    }
+
+    fn shape(&self) -> TypeString {
+        self.shape.clone()
     }
 
     fn set_transform(&mut self, _transformation: Matrix) {
