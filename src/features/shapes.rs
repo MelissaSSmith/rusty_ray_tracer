@@ -12,7 +12,6 @@ pub mod plane;
 pub trait Shape: Any {
     fn box_clone(&self) -> Box<dyn Shape>;
     fn as_any(&self) -> &dyn Any;
-    fn equals(&self, other: &Box<dyn Shape>) -> bool;
     fn transformation(&self) -> Matrix;
     fn material(&self) -> Material;
     fn shape(&self) -> String;
@@ -20,6 +19,12 @@ pub trait Shape: Any {
     fn set_material(&mut self, _material: Material);
     fn normal(&self, _point: Point) -> Vector;
     fn intersect(&self, _ray: Ray) -> Vec<Intersection>;
+
+    fn equals(&self, other: &Box<dyn Shape>) -> bool {
+        self.shape == other.shape() &&
+            self.material.equals(other.material()) &&
+            self.transformation.equals(other.transformation())
+    }
 }
 
 impl Clone for Box<dyn Shape> {

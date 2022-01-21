@@ -37,12 +37,6 @@ impl Shape for Plane {
         self
     }
 
-    fn equals(&self, other: &Box<dyn Shape>) -> bool {
-        other.shape() == TypeString::from("Plane") &&
-            self.material.equals(other.material()) &&
-            self.transformation.equals(other.transformation())
-    }
-
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
     }

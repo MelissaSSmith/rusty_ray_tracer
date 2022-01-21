@@ -45,12 +45,6 @@ impl Shape for Sphere {
         self
     }
 
-    fn equals(&self, other: &Box<dyn Shape>) -> bool {
-        other.shape() == String::from("Sphere") &&
-            self.material.equals(other.material()) &&
-            self.transformation.equals(other.transformation())
-    }
-
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
     }

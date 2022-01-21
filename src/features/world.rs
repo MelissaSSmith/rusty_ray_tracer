@@ -91,11 +91,10 @@ impl World {
 
     fn shade_hit(&self, computation: &Computation, remaining: u8) -> Color {
         let shadowed = self.is_shadowed(computation.over_point());
-        let object = computation.clone().object();
 
-        let lighting = computation.clone().object().material().lighting(
+        let surface_color = computation.clone().object().material().lighting(
             self.light.unwrap(),
-            object,
+            computation.clone().object(),
             computation.over_point(),
             computation.eye_vector(),
             computation.normal_vector(),
@@ -103,12 +102,12 @@ impl World {
         );
         let reflected = self.reflected_color(&computation, remaining);
 
-        lighting + reflected
+        surface_color + reflected
     }
 
     fn reflected_color(&self, _computations: &Computation, remaining: u8) -> Color {
         let reflective = _computations.clone().object().material().reflective();
-        if reflective == 0.0 || remaining <= 0 {
+        if remaining <= 0 {
             return BLACK;
         }
         let reflect_ray = Ray::create(_computations.over_point(), _computations.reflect_vector());
@@ -370,7 +369,7 @@ mod tests {
 
         let computation = intersection.prepare_computations(ray, &vec![]);
 
-        let color = world.reflected_color(&computation, 1);
+        let color = world.reflected_color(&computation, 3);
 
         println!("{} {} {}", color.red, color.green, color.blue);
         assert!(color.equals(Color::create(0.19032, 0.2379, 0.14274)));

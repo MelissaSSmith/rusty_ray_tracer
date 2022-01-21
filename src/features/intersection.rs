@@ -64,7 +64,7 @@ impl Intersection {
         let mut n2 = 0.0;
 
         let mut containers = SmallVec::<[&Box<dyn Shape>; 32]>::new();
-        for (index, intersection) in _intersections.iter().enumerate() {
+        for intersection in _intersections {
             let is_intersection = intersection.equals(hit.clone());
 
             if is_intersection {
