@@ -42,6 +42,13 @@ impl Sphere {
             ..self
         }
     }
+
+    pub fn with_material(self, _material: Material) -> Sphere {
+        Sphere {
+            material: _material,
+            ..self
+        }
+    }
 }
 
 impl Shape for Sphere {

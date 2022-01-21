@@ -116,6 +116,14 @@ impl World {
         color * reflective
     }
 
+    fn refracted_color(&self, _computations: &Computation, remaining: u8) -> Color {
+        if _computations.clone().object().material().transparency() == 0.0 || remaining <= 0 {
+            return BLACK;
+        }
+
+        WHITE
+    }
+
     fn color_at_impl(&self, _ray: &Ray, remaining: u8) -> Color {
         let intersection = Intersection::hit(self.intersect(*_ray));
         return match intersection {
@@ -437,6 +445,36 @@ mod tests {
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.reflected_color(&computation, 0);
+
+        assert!(color.equals(BLACK));
+    }
+
+    #[test]
+    fn test_find_the_refracted_color_of_an_opaque_object() {
+        let world = World::create_default();
+        let shape = &world.clone().objects()[0];
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+        let intersections = vec![Intersection::create(4.0, shape.box_clone()), Intersection::create(6.0, shape.box_clone())];
+
+        let computations = intersections[0].prepare_computations(ray, &intersections);
+        let color = world.refracted_color(&computations, 5);
+
+        assert!(color.equals(BLACK));
+    }
+
+    #[test]
+    fn test_find_the_refracted_color_at_the_maximum_recursion_depth() {
+        let world = World::create_default();
+        let mut shape = &world.clone().objects()[0];
+        *shape.set_material(Material::create()
+                .with_refractive_index(1.5)
+                .with_transparency(1.0)
+        );
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+        let intersections = vec![Intersection::create(4.0, shape.box_clone()), Intersection::create(6.0, shape.box_clone())];
+
+        let computations = intersections[0].prepare_computations(ray, &intersections);
+        let color = world.refracted_color(&computations, 0);
 
         assert!(color.equals(BLACK));
     }

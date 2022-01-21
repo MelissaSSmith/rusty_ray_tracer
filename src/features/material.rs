@@ -111,6 +111,13 @@ impl Material {
         }
     }
 
+    pub fn with_transparency(self, transparency: f64) -> Material {
+        Material {
+            transparency,
+            ..self
+        }
+    }
+
     pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
         self.pattern = Some(pattern);
     }

@@ -34,6 +34,13 @@ impl Plane {
             ..self
         }
     }
+
+    pub fn with_material(self, _material: Material) -> Plane {
+        Plane {
+            material: _material,
+            ..self
+        }
+    }
 }
 
 impl Shape for Plane {
