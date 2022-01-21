@@ -55,6 +55,7 @@ impl Intersection {
         computation.set_inside(inside);
         computation.set_reflect_vector(_ray.direction.reflect(normal));
         computation.set_over_point(point + normal * EPSILON);
+        computation.set_under_point(point - normal * EPSILON);
 
         computation
     }
@@ -109,6 +110,7 @@ mod tests {
     use crate::features::intersection::Intersection;
     use crate::features::material::Material;
     use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::operations::consts::EPSILON;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
@@ -240,7 +242,7 @@ mod tests {
 
         let computation = intersection.prepare_computations(ray, &vec![]);
 
-        assert!(computation.over_point().z() < -f64::EPSILON/2.0);
+        assert!(computation.over_point().z() < -EPSILON/2.0);
         assert!(computation.point().z() > computation.over_point().z());
     }
 
@@ -300,5 +302,19 @@ mod tests {
 
         assert_eq!(1.5, computations[5].n1());
         assert_eq!(1.0, computations[5].n2());
+    }
+
+    #[test]
+    fn test_under_point_is_offset_below_the_surface() {
+        let ray = Ray::create(Point::create(0.0, 0.0, 0.5), Vector::create(0.0, 0.0, 1.0));
+        let shape = Sphere::glass().with_transform(Matrix::translate(0.0, 0.0, 1.0));
+
+        let intersection = Intersection::create(5.0, shape.box_clone());
+        let intersections = vec![intersection.clone()];
+
+        let computation = intersection.prepare_computations(ray, &intersections);
+
+        assert!(computation.under_point().z() > EPSILON/2.0);
+        assert!(computation.point().z() < computation.under_point().z());
     }
 }

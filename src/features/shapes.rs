@@ -21,9 +21,9 @@ pub trait Shape: Any {
     fn intersect(&self, _ray: Ray) -> Vec<Intersection>;
 
     fn equals(&self, other: &Box<dyn Shape>) -> bool {
-        self.shape == other.shape() &&
-            self.material.equals(other.material()) &&
-            self.transformation.equals(other.transformation())
+        self.shape() == other.shape() &&
+            self.material().equals(other.material()) &&
+            self.transformation().equals(other.transformation())
     }
 }
 

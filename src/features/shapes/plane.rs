@@ -26,6 +26,14 @@ impl Plane {
             shape: TypeString::from("Plane")
         }
     }
+
+    //builders
+    pub fn with_transform(self, _transformation: Matrix) -> Plane {
+        Plane {
+            transformation: _transformation,
+            ..self
+        }
+    }
 }
 
 impl Shape for Plane {

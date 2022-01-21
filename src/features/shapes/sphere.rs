@@ -34,6 +34,14 @@ impl Sphere {
             shape: String::from("Sphere")
         }
     }
+
+    //builders
+    pub fn with_transform(self, _transformation: Matrix) -> Sphere {
+        Sphere {
+            transformation: _transformation,
+            ..self
+        }
+    }
 }
 
 impl Shape for Sphere {

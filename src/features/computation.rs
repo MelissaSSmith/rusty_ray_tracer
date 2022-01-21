@@ -9,6 +9,7 @@ pub struct Computation {
     object: Box<dyn Shape>,
     point: Point,
     over_point: Point,
+    under_point: Point,
     eye_vector: Vector,
     normal_vector: Vector,
     inside: bool,
@@ -24,6 +25,7 @@ impl Computation {
             object,
             point: Point::zero(),
             over_point: Point::zero(),
+            under_point: Point::zero(),
             eye_vector: Vector::zero(),
             normal_vector: Vector::zero(),
             inside: false,
@@ -47,6 +49,10 @@ impl Computation {
 
     pub fn over_point(&self) -> Point {
         self.over_point
+    }
+
+    pub fn under_point(&self) -> Point {
+        self.under_point
     }
 
     pub fn eye_vector(&self) -> Vector {
@@ -77,6 +83,10 @@ impl Computation {
 
     pub fn set_over_point(&mut self, _point: Point) {
         self.over_point = _point;
+    }
+
+    pub fn set_under_point(&mut self, _point: Point) {
+        self.under_point = _point;
     }
 
     pub fn set_eye_vector(&mut self, _vector: Vector) {
