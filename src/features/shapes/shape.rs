@@ -6,11 +6,10 @@ use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
-use crate::features::shapes::object::Object;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
 
-//todo: derive => Debug, PartialEq, Serialize, Deserialize
+//todo: derive => Debug, PartialEq, Serialize, Deserialize (requires Matrix not using Vec in backend)
 #[derive(Clone)]
 pub enum Shape {
     Object,
@@ -21,64 +20,48 @@ pub enum Shape {
 impl Shape {
     pub fn create(&self) -> Object {
         match self {
-            Sphere => { Object::create(String::from("Sphere")) }
-            Plane => { Object::create(String::from("Plane")) }
+            Shape::Sphere => { Object::create(String::from("Sphere")) }
+            Shape::Plane => { Object::create(String::from("Plane")) }
             _ => { Object::create(String::from("Object")) }
-        }
-    }
-
-    pub fn intersect(&self, _object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        match self {
-            Sphere => { Sphere::intersect(_object, _ray) }
-            Plane => { Plane::intersect(_object, _ray) }
-            _ => { vec![] }
-        }
-    }
-
-    pub fn normal(&self, _object: &Object, _point: &Point) -> Vector {
-        match self {
-            Sphere => { Sphere::normal(_object, _point) }
-            Plane => { Plane::normal(_object, _point) }
-            _ => { Vector::zero() }
         }
     }
 
     pub fn air(&self) -> Object {
         match self {
-            Sphere => { Object::air(String::from("Sphere")) }
-            Plane => { Object::air(String::from("Plane")) }
+            Shape::Sphere => { Object::air(String::from("Sphere")) }
+            Shape::Plane => { Object::air(String::from("Plane")) }
             _ => { Object::air(String::from("Object")) }
         }
     }
 
     pub fn vacuum(&self) -> Object {
         match self {
-            Sphere => { Object::vacuum(String::from("Sphere")) }
-            Plane => { Object::vacuum(String::from("Plane")) }
+            Shape::Sphere => { Object::vacuum(String::from("Sphere")) }
+            Shape::Plane => { Object::vacuum(String::from("Plane")) }
             _ => { Object::vacuum(String::from("Object")) }
         }
     }
 
     pub fn water(&self) -> Object {
         match self {
-            Sphere => { Object::water(String::from("Sphere")) }
-            Plane => { Object::water(String::from("Plane")) }
+            Shape::Sphere => { Object::water(String::from("Sphere")) }
+            Shape::Plane => { Object::water(String::from("Plane")) }
             _ => { Object::water(String::from("Object")) }
         }
     }
 
     pub fn diamond(&self) -> Object {
         match self {
-            Sphere => { Object::diamond(String::from("Sphere")) }
-            Plane => { Object::diamond(String::from("Plane")) }
+            Shape::Sphere => { Object::diamond(String::from("Sphere")) }
+            Shape::Plane => { Object::diamond(String::from("Plane")) }
             _ => { Object::diamond(String::from("Object")) }
         }
     }
 
     pub fn glass(&self) -> Object {
         match self {
-            Sphere => { Object::glass(String::from("Sphere")) }
-            Plane => { Object::glass(String::from("Plane")) }
+            Shape::Sphere => { Object::glass(String::from("Sphere")) }
+            Shape::Plane => { Object::glass(String::from("Plane")) }
             _ => { Object::glass(String::from("Object")) }
         }
     }
@@ -155,7 +138,7 @@ impl Object {
         }
     }
 
-    pub fn equals(&self, other: &Box<dyn ShapeTrait>) -> bool {
+    pub fn equals(&self, other: &Object) -> bool {
         self.shape() == other.shape() &&
             self.material().equals(other.material()) &&
             self.transformation().equals(other.transformation())
@@ -181,17 +164,37 @@ impl Object {
         self.material = _material;
     }
 
-    pub fn with_transform(self, _transform: Matrix) -> Self::Output {
+    pub fn with_transform(self, _transform: Matrix) -> Object {
         Object {
             transformation: _transform,
             ..self
         }
     }
 
-    pub fn with_material(self, _material: Material) -> Self::Output {
+    pub fn with_material(self, _material: Material) -> Object {
         Object {
             material: _material,
             ..self
+        }
+    }
+}
+
+impl Intersect for Object {
+    fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
+        match _object.shape.as_ref() {
+            "Sphere" => { Sphere::intersect(_object, _ray) }
+            "Plane" => { Plane::intersect(_object, _ray) }
+            _ => { vec![] }
+        }
+    }
+}
+
+impl Normal for Object {
+    fn normal(_object: &Object, _point: &Point) -> Vector {
+        match _object.shape.as_ref() {
+            "Sphere" => { Sphere::normal(_object, _point) }
+            "Plane" => { Plane::normal(_object, _point) }
+            _ => { Vector::zero() }
         }
     }
 }

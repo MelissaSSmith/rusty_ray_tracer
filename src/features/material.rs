@@ -3,10 +3,8 @@ use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
 use crate::features::patterns::Pattern;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::shapes::ShapeTrait;
 use crate::features::primitives::vector::Vector;
-use crate::features::shapes::object::Object;
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
 pub struct Material {
@@ -36,6 +34,7 @@ impl Material {
         }
     }
 
+    //todo: phase out
     pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, reflective: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn Pattern>>) -> Material {
         let m_color = match color {
             None => { WHITE }
@@ -74,7 +73,6 @@ impl Material {
     }
 
     //setters
-
     pub fn set_ambient(&mut self, ambient: f64) {
         self.ambient = ambient;
     }
@@ -103,7 +101,45 @@ impl Material {
         self.refractive_index = refractive_index;
     }
 
+    pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
+        self.pattern = Some(pattern);
+    }
+
     //builders
+    pub fn with_ambient(self, ambient: f64) -> Material {
+        Material {
+            ambient,
+            ..self
+        }
+    }
+
+    pub fn with_color(self, color: Color) -> Material {
+        Material {
+            color,
+            ..self
+        }
+    }
+
+    pub fn with_diffuse(self, diffuse: f64) -> Material {
+        Material {
+            diffuse,
+            ..self
+        }
+    }
+
+    pub fn with_specular(self, specular: f64) -> Material {
+        Material {
+            specular,
+            ..self
+        }
+    }
+
+    pub fn with_reflective(self, reflective: f64) -> Material {
+        Material {
+            reflective,
+            ..self
+        }
+    }
 
     pub fn with_refractive_index(self, refractive_index: f64) -> Material {
         Material {
@@ -119,10 +155,7 @@ impl Material {
         }
     }
 
-    pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
-        self.pattern = Some(pattern);
-    }
-
+    //getters
     pub fn color(&self) -> Color {
         self.color
     }
@@ -182,6 +215,7 @@ mod tests {
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
+    use crate::features::shapes::shape::Shape;
 
     #[test]
     fn test_default_material() {
@@ -204,7 +238,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let result = material.lighting(light, Box::new(Sphere::create()), position, eye_vector, normal_vector, false);
+        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
 
         assert!(result.equals(Color::create(1.9, 1.9, 1.9)));
     }
@@ -217,7 +251,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let result = material.lighting(light, Box::new(Sphere::create()), position, eye_vector, normal_vector, false);
+        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
 
         assert!(result.equals(Color::create(1.0, 1.0, 1.0)));
     }
@@ -230,7 +264,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
 
-        let result = material.lighting(light, Box::new(Sphere::create()), position, eye_vector, normal_vector, false);
+        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
 
         assert!(result.equals(Color::create(0.7364, 0.7364, 0.7364)));
     }
@@ -243,7 +277,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
 
-        let result = material.lighting(light, Box::new(Sphere::create()), position, eye_vector, normal_vector, false);
+        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
 
         assert!(result.equals(Color::create(1.6364, 1.6364, 1.6364)));
     }
@@ -256,7 +290,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, 10.0));
 
-        let result = material.lighting(light, Box::new(Sphere::create()), position, eye_vector, normal_vector, false);
+        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
 
         assert!(result.equals(Color::create(0.1, 0.1, 0.1)));
     }
@@ -270,7 +304,7 @@ mod tests {
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
         let in_shadow = true;
 
-        let result = material.lighting(light, Box::new(Sphere::create()), position, eye_vector, normal_vector, in_shadow);
+        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, in_shadow);
 
         assert!(result.equals(Color::create(0.1, 0.1, 0.1)));
     }
@@ -283,8 +317,8 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let c1 = material.lighting(light, Box::new(Sphere::create()), Point::create(0.9, 0.0, 0.0), eye_vector, normal_vector, false);
-        let c2 = material.lighting(light, Box::new(Sphere::create()), Point::create(1.1, 0.0, 0.0), eye_vector, normal_vector, false);
+        let c1 = material.lighting(light, Shape::Sphere.create(), Point::create(0.9, 0.0, 0.0), eye_vector, normal_vector, false);
+        let c2 = material.lighting(light, Shape::Sphere.create(), Point::create(1.1, 0.0, 0.0), eye_vector, normal_vector, false);
 
         assert!(c1.equals(WHITE));
         assert!(c2.equals(BLACK));

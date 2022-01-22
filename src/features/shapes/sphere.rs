@@ -1,6 +1,4 @@
 use crate::features::intersection::Intersection;
-use crate::features::material::Material;
-use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
@@ -33,7 +31,7 @@ impl Intersect for Sphere {
 
 impl Normal for Sphere {
     fn normal(_object: &Object, _point: &Point) -> Vector {
-        let object_point = _object.transformation().inverse() * _point;
+        let object_point = _object.transformation().inverse() * *_point;
         let object_normal = object_point - Point::zero();
         let world_normal = _object.transformation().inverse().transpose() * object_normal;
         world_normal.normalize()

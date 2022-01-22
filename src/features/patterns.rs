@@ -1,10 +1,8 @@
 use std::any::Any;
-use rusty_ray_tracer::features::shapes::shape::ShapeAttributes;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
-use crate::features::shapes::object::Object;
-use crate::features::shapes::ShapeTrait;
+use crate::features::shapes::shape::Object;
 
 pub mod stripe;
 pub mod gradient;

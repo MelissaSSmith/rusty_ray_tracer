@@ -1,7 +1,7 @@
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
-use crate::features::shapes::object::Object;
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
 pub struct Computation {
@@ -19,10 +19,10 @@ pub struct Computation {
 }
 
 impl Computation {
-    pub fn create(t: f64, object: Object) -> Computation {
+    pub fn create(t: f64, object: &Object) -> Computation {
         Computation {
             t,
-            object,
+            object: object.clone(),
             point: Point::zero(),
             over_point: Point::zero(),
             under_point: Point::zero(),

@@ -1,6 +1,4 @@
 use crate::features::intersection::Intersection;
-use crate::features::material::Material;
-use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::ray::Ray;
@@ -18,7 +16,7 @@ impl Intersect for Plane {
             return vec![]
         }
         let t = -_ray.origin.y() / _ray.direction.y();
-        vec![Intersection::create(t, _object.to_shape())]
+        vec![Intersection::create(t, _object)]
     }
 }
 
