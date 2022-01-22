@@ -5,7 +5,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::shapes::Shape;
+use crate::features::shapes::{ShapeAttributes, ShapeTrait};
 use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
@@ -35,30 +35,34 @@ impl Sphere {
         }
     }
 
-    //builders
-    pub fn with_transform(self, _transformation: Matrix) -> Sphere {
-        Sphere {
-            transformation: _transformation,
-            ..self
-        }
+    pub fn normal(&self, world_point: Point) -> Vector {
+        let object_point = self.clone().transformation().inverse() * world_point;
+        let object_normal = object_point - Point::zero();
+        let world_normal = self.clone().transformation().inverse().transpose() * object_normal;
+        world_normal.normalize()
     }
 
-    pub fn with_material(self, _material: Material) -> Sphere {
-        Sphere {
-            material: _material,
-            ..self
+    pub fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
+        let transformed_ray = _ray.transform(self.clone().transformation().inverse());
+        let sphere_to_ray = transformed_ray.origin - Point::create(0.0,0.0,0.0);
+        let a = transformed_ray.direction ^ transformed_ray.direction;
+        let b = 2.0 * transformed_ray.direction ^ sphere_to_ray;
+        let c = (sphere_to_ray ^ sphere_to_ray) - 1.0;
+
+        let discriminant = b.powf(2.0) - 4.0 * a * c;
+        if discriminant < 0.0 {
+            return vec![];
         }
+
+        let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
+        let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
+
+        vec![Intersection::create(t1, Box::new(self.clone())), Intersection::create(t2, Box::new(self.clone()))]
     }
 }
 
-impl Shape for Sphere {
-    fn box_clone(&self) -> Box<dyn Shape> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
+impl ShapeAttributes for Sphere {
+    type Output = Sphere;
 
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
@@ -80,29 +84,28 @@ impl Shape for Sphere {
         self.material = _material;
     }
 
-    fn normal(&self, world_point: Point) -> Vector {
-        let object_point = self.clone().transformation().inverse() * world_point;
-        let object_normal = object_point - Point::zero();
-        let world_normal = self.clone().transformation().inverse().transpose() * object_normal;
-        world_normal.normalize()
+    fn with_transform(self, rhs: Matrix) -> Self::Output {
+        Sphere {
+            transformation: rhs,
+            ..self
+        }
     }
 
-    fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
-        let transformed_ray = _ray.transform(self.clone().transformation().inverse());
-        let sphere_to_ray = transformed_ray.origin - Point::create(0.0,0.0,0.0);
-        let a = transformed_ray.direction ^ transformed_ray.direction;
-        let b = 2.0 * transformed_ray.direction ^ sphere_to_ray;
-        let c = (sphere_to_ray ^ sphere_to_ray) - 1.0;
-
-        let discriminant = b.powf(2.0) - 4.0 * a * c;
-        if discriminant < 0.0 {
-            return vec![];
+    fn with_material(self, rhs: Material) -> Self::Output {
+        Sphere {
+            material: rhs,
+            ..self
         }
+    }
+}
 
-        let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
-        let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
+impl ShapeTrait for Sphere {
+    fn box_clone(&self) -> Box<dyn ShapeTrait> {
+        Box::new(self.clone())
+    }
 
-        vec![Intersection::create(t1, Box::new(self.clone())), Intersection::create(t2, Box::new(self.clone()))]
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
@@ -113,7 +116,7 @@ mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
-    use crate::features::shapes::Shape;
+    use crate::features::shapes::ShapeTrait;
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;

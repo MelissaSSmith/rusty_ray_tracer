@@ -6,7 +6,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::ray::Ray;
-use crate::features::shapes::Shape;
+use crate::features::shapes::{ShapeAttributes, ShapeTrait};
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use std::string::String as TypeString;
@@ -27,30 +27,21 @@ impl Plane {
         }
     }
 
-    //builders
-    pub fn with_transform(self, _transformation: Matrix) -> Plane {
-        Plane {
-            transformation: _transformation,
-            ..self
-        }
+    pub fn normal(&self, _point: Point) -> Vector {
+        Vector::create(0.0, 1.0, 0.0)
     }
 
-    pub fn with_material(self, _material: Material) -> Plane {
-        Plane {
-            material: _material,
-            ..self
+    pub fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
+        if _ray.direction.y().abs() < EPSILON {
+            return vec![]
         }
+        let t = -_ray.origin.y() / _ray.direction.y();
+        vec![Intersection::create(t, Box::new(self.clone()))]
     }
 }
 
-impl Shape for Plane {
-    fn box_clone(&self) -> Box<dyn Shape> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
+impl ShapeAttributes for Plane {
+    type Output = Plane;
 
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
@@ -72,16 +63,28 @@ impl Shape for Plane {
         self.material = _material;
     }
 
-    fn normal(&self, _point: Point) -> Vector {
-        Vector::create(0.0, 1.0, 0.0)
+    fn with_transform(self, rhs: Matrix) -> Self::Output {
+        Plane {
+            transformation: rhs,
+            ..self
+        }
     }
 
-    fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
-        if _ray.direction.y().abs() < EPSILON {
-            return vec![]
+    fn with_material(self, rhs: Material) -> Self::Output {
+        Plane {
+            material: rhs,
+            ..self
         }
-        let t = -_ray.origin.y() / _ray.direction.y();
-        vec![Intersection::create(t, Box::new(self.clone()))]
+    }
+}
+
+impl ShapeTrait for Plane {
+    fn box_clone(&self) -> Box<dyn ShapeTrait> {
+        Box::new(self.clone())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
@@ -90,7 +93,7 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
-    use crate::features::shapes::Shape;
+    use crate::features::shapes::ShapeTrait;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 

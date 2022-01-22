@@ -3,18 +3,18 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::plane::Plane;
-use crate::features::shapes::Shape;
+use crate::features::shapes::ShapeTrait;
 use smallvec::SmallVec;
 use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub struct Intersection {
     pub t: f64,
-    pub object: Box<dyn Shape>
+    pub object: Box<dyn ShapeTrait>
 }
 
 impl Intersection {
-    pub fn create(_t: f64, _shape: Box<dyn Shape>) -> Intersection {
+    pub fn create(_t: f64, _shape: Box<dyn ShapeTrait>) -> Intersection {
         Intersection{t: _t, object: _shape}
     }
 
@@ -64,7 +64,7 @@ impl Intersection {
         let mut n1 = 0.0;
         let mut n2 = 0.0;
 
-        let mut containers = SmallVec::<[&Box<dyn Shape>; 32]>::new();
+        let mut containers = SmallVec::<[&Box<dyn ShapeTrait>; 32]>::new();
         for intersection in _intersections {
             let is_intersection = intersection.equals(hit.clone());
 
@@ -91,7 +91,7 @@ impl Intersection {
         (n1, n2)
     }
 
-    fn grab_container_value(containers: &SmallVec::<[&Box<dyn Shape>; 32]>) -> f64 {
+    fn grab_container_value(containers: &SmallVec::<[&Box<dyn ShapeTrait>; 32]>) -> f64 {
         if containers.is_empty() {
             return 1.0;
         }
@@ -114,7 +114,7 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
-    use crate::features::shapes::Shape;
+    use crate::features::shapes::ShapeTrait;
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;

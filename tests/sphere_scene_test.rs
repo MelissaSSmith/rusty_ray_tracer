@@ -8,7 +8,7 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
-use rusty_ray_tracer::features::shapes::Shape;
+use rusty_ray_tracer::features::shapes::ShapeTrait;
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
 use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::world::World;
@@ -67,8 +67,8 @@ fn sphere_scene_test() {
     left.set_material(l_material);
 
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
-    let objects: Vec<Box<dyn Shape>> = vec![Box::new(floor), Box::new(left_wall), Box::new(right_wall),
-                       Box::new(middle), Box::new(right), Box::new(left)];
+    let objects: Vec<Box<dyn ShapeTrait>> = vec![Box::new(floor), Box::new(left_wall), Box::new(right_wall),
+                                                 Box::new(middle), Box::new(right), Box::new(left)];
     let world = World::create_world(light_source, objects);
 
     let mut camera = Camera::create(300, 250, PI/3.0);

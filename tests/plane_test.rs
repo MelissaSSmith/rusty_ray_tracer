@@ -13,7 +13,7 @@ use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::shapes::plane::Plane;
-use rusty_ray_tracer::features::shapes::Shape;
+use rusty_ray_tracer::features::shapes::ShapeTrait;
 use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::world::World;
 
@@ -36,7 +36,7 @@ fn sphere_scene_test() {
     floor.set_transform(Matrix::translate(0.0, 1.0, 0.0));
 
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
-    let objects: Vec<Box<dyn Shape>> = vec![Box::new(floor)];
+    let objects: Vec<Box<dyn ShapeTrait>> = vec![Box::new(floor)];
     let world = World::create_world(light_source, objects);
 
     let mut camera = Camera::create(450, 350, PI/3.0);

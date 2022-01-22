@@ -66,7 +66,7 @@ mod tests {
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::shapes::Shape;
+    use crate::features::shapes::{ShapeAttributes, ShapeTrait};
     use crate::features::shapes::sphere::Sphere;
 
     #[test]

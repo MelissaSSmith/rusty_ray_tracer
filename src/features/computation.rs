@@ -1,12 +1,12 @@
 use crate::features::primitives::point::Point;
-use crate::features::shapes::Shape;
+use crate::features::shapes::ShapeTrait;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
 pub struct Computation {
     t: f64,
-    object: Box<dyn Shape>,
+    object: Box<dyn ShapeTrait>,
     point: Point,
     over_point: Point,
     under_point: Point,
@@ -19,7 +19,7 @@ pub struct Computation {
 }
 
 impl Computation {
-    pub fn create(t: f64, object: Box<dyn Shape>) -> Computation {
+    pub fn create(t: f64, object: Box<dyn ShapeTrait>) -> Computation {
         Computation {
             t,
             object,
@@ -39,7 +39,7 @@ impl Computation {
         self.t
     }
 
-    pub fn object(self) -> Box<dyn Shape> {
+    pub fn object(self) -> Box<dyn ShapeTrait> {
         self.object
     }
 
