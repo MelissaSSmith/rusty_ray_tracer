@@ -5,7 +5,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::shapes::{ShapeAttributes, ShapeTrait};
+use crate::features::shapes::{Intersect, Normal, Object, ShapeAttributes, ShapeTrait};
 use crate::features::primitives::vector::Vector;
 
 #[derive(Clone)]
@@ -24,7 +24,7 @@ impl Sphere {
         }
     }
 
-    pub fn glass() -> Sphere {
+    pub fn glass() -> Sphere { //todo: core part of object with other types as well
         let mut material = Material::create();
         material.set_refractive_index(1.5);
         material.set_transparency(1.0);
@@ -34,16 +34,11 @@ impl Sphere {
             shape: String::from("Sphere")
         }
     }
+}
 
-    pub fn normal(&self, world_point: Point) -> Vector {
-        let object_point = self.clone().transformation().inverse() * world_point;
-        let object_normal = object_point - Point::zero();
-        let world_normal = self.clone().transformation().inverse().transpose() * object_normal;
-        world_normal.normalize()
-    }
-
-    pub fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
-        let transformed_ray = _ray.transform(self.clone().transformation().inverse());
+impl Intersect for Sphere {
+    fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
+        let transformed_ray = _ray.transform(_object.clone().transformation().inverse());
         let sphere_to_ray = transformed_ray.origin - Point::create(0.0,0.0,0.0);
         let a = transformed_ray.direction ^ transformed_ray.direction;
         let b = 2.0 * transformed_ray.direction ^ sphere_to_ray;
@@ -57,7 +52,16 @@ impl Sphere {
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
-        vec![Intersection::create(t1, Box::new(self.clone())), Intersection::create(t2, Box::new(self.clone()))]
+        vec![Intersection::create(t1, _object.to_shape()), Intersection::create(t2, _object.to_shape())]
+    }
+}
+
+impl Normal for Sphere {
+    fn normal(_object: &Object, _point: &Point) -> Vector {
+        let object_point = _object.transformation().inverse() * _point;
+        let object_normal = object_point - Point::zero();
+        let world_normal = _object.transformation().inverse().transpose() * object_normal;
+        world_normal.normalize()
     }
 }
 
@@ -84,16 +88,16 @@ impl ShapeAttributes for Sphere {
         self.material = _material;
     }
 
-    fn with_transform(self, rhs: Matrix) -> Self::Output {
+    fn with_transform(self, _transform: Matrix) -> Self::Output {
         Sphere {
-            transformation: rhs,
+            transformation: _transform,
             ..self
         }
     }
 
-    fn with_material(self, rhs: Material) -> Self::Output {
+    fn with_material(self, _material: Material) -> Self::Output {
         Sphere {
-            material: rhs,
+            material: _material,
             ..self
         }
     }
@@ -116,7 +120,7 @@ mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
-    use crate::features::shapes::ShapeTrait;
+    use crate::features::shapes::{ShapeAttributes, ShapeTrait};
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;

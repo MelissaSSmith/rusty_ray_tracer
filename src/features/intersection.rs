@@ -3,18 +3,18 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::plane::Plane;
-use crate::features::shapes::ShapeTrait;
+use crate::features::shapes::{Object, Shape, ShapeAttributes, ShapeTrait};
 use smallvec::SmallVec;
 use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub struct Intersection {
     pub t: f64,
-    pub object: Box<dyn ShapeTrait>
+    pub object: Object
 }
 
 impl Intersection {
-    pub fn create(_t: f64, _shape: Box<dyn ShapeTrait>) -> Intersection {
+    pub fn create(_t: f64, _shape: Object) -> Intersection {
         Intersection{t: _t, object: _shape}
     }
 
@@ -114,15 +114,15 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
-    use crate::features::shapes::ShapeTrait;
+    use crate::features::shapes::{Shape, ShapeTrait};
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
+    use crate::features::shapes::Shape::Sphere;
 
     #[test]
     fn test_intersection_encapsulates_t_and_object() {
-        let sphere = Sphere::create();
-        let intersection = Intersection::create(3.5, Box::new(sphere));
+        let intersection = Intersection::create(3.5, Shape::Sphere.create());
 
         assert_eq!(intersection.t, 3.5);
     }

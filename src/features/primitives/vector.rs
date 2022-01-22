@@ -34,7 +34,7 @@ impl Tuple for Vector {
         Vector{ x, y, z, w: 0.0}
     }
 
-    fn zero() -> Self {
+    fn zero() -> Self { //todo: Change to constant
         Vector{
             x: 0.0,
             y: 0.0,

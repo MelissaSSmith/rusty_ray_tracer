@@ -9,12 +9,12 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::shapes::{ShapeAttributes, ShapeTrait};
+use crate::features::shapes::{Object, Shape, ShapeAttributes, ShapeTrait};
 use crate::features::shapes::sphere::Sphere;
 
 #[derive(Clone)]
 pub struct World {
-    objects: Vec<Box<dyn ShapeTrait>>,
+    objects: Vec<Object>,
     light: Option<PointLight>,
     recursion_limit: u8
 }
@@ -28,7 +28,7 @@ impl World {
         }
     }
     
-    pub fn create_world(light: PointLight, objects: Vec<Box<dyn ShapeTrait>>) -> Self {
+    pub fn create_world(light: PointLight, objects: Vec<Object>) -> Self {
         Self {
             objects,
             light: Some(light),
@@ -41,19 +41,17 @@ impl World {
         s1_material.set_color(Color::create(0.8, 1.0, 0.6));
         s1_material.set_diffuse(0.7);
         s1_material.set_specular(0.2);
-        let mut s1 = Sphere::create();
-        s1.set_material(s1_material);
-        let mut s2 = Sphere::create();
-        s2.set_transform(Matrix::scale(0.5, 0.5, 0.5));
+        let s1 = Shape::Sphere.create().with_material(s1_material);
+        let s2 = Shape::Sphere.create().with_transform(Matrix::scale(0.5, 0.5, 0.5));
         let light = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
         Self {
             light: Some(light),
-            objects: vec![s1.box_clone(), s2.box_clone()],
+            objects: vec![s1, s2],
             recursion_limit: 5
         }
     }
 
-    pub fn objects(self) -> Vec<Box<dyn ShapeTrait>> {
+    pub fn objects(self) -> Vec<Object> {
         self.objects
     }
 
@@ -65,7 +63,7 @@ impl World {
         self.light = Some(light);
     }
 
-    pub fn set_object(&mut self, index: usize, object: Box<dyn ShapeTrait>) {
+    pub fn set_object(&mut self, index: usize, object: Object) {
         self.objects.insert(index, object);
     }
 

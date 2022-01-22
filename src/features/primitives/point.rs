@@ -23,7 +23,7 @@ impl Tuple for Point {
         Point{ x, y, z, w: 1.0 }
     }
 
-    fn zero() -> Self {
+    fn zero() -> Self { //todo change to constant
         Point{
             x: 0.0,
             y: 0.0,

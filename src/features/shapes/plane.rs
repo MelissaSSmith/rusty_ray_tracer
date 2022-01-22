@@ -6,7 +6,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::ray::Ray;
-use crate::features::shapes::{ShapeAttributes, ShapeTrait};
+use crate::features::shapes::{Intersect, Normal, Object, ShapeAttributes, ShapeTrait};
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use std::string::String as TypeString;
@@ -26,17 +26,21 @@ impl Plane {
             shape: TypeString::from("Plane")
         }
     }
+}
 
-    pub fn normal(&self, _point: Point) -> Vector {
-        Vector::create(0.0, 1.0, 0.0)
-    }
-
-    pub fn intersect(&self, _ray: Ray) -> Vec<Intersection> {
+impl Intersect for Plane {
+    fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         if _ray.direction.y().abs() < EPSILON {
             return vec![]
         }
         let t = -_ray.origin.y() / _ray.direction.y();
-        vec![Intersection::create(t, Box::new(self.clone()))]
+        vec![Intersection::create(t, _object.to_shape())]
+    }
+}
+
+impl Normal for Plane {
+    fn normal(_object: &Object, _point: &Point) -> Vector {
+        Vector::create(0.0, 1.0, 0.0)
     }
 }
 
@@ -63,16 +67,16 @@ impl ShapeAttributes for Plane {
         self.material = _material;
     }
 
-    fn with_transform(self, rhs: Matrix) -> Self::Output {
+    fn with_transform(self, _transform: Matrix) -> Self::Output {
         Plane {
-            transformation: rhs,
+            transformation: _transform,
             ..self
         }
     }
 
-    fn with_material(self, rhs: Material) -> Self::Output {
+    fn with_material(self, _material: Material) -> Self::Output {
         Plane {
-            material: rhs,
+            material: _material,
             ..self
         }
     }
