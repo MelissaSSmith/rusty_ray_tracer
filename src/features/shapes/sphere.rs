@@ -1,40 +1,15 @@
-use std::any::Any;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Intersect, Normal, Object, ShapeAttributes, ShapeTrait};
 use crate::features::primitives::vector::Vector;
+use crate::features::shapes::{Intersect, Normal};
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
-pub struct Sphere {
-    transformation: Matrix,
-    material: Material,
-    shape: String
-}
-
-impl Sphere {
-    pub fn create() -> Sphere {
-        Sphere {
-            transformation: Matrix::identity(),
-            material: Material::create(),
-            shape: String::from("Sphere")
-        }
-    }
-
-    pub fn glass() -> Sphere { //todo: core part of object with other types as well
-        let mut material = Material::create();
-        material.set_refractive_index(1.5);
-        material.set_transparency(1.0);
-        Sphere {
-            transformation: Matrix::identity(),
-            material,
-            shape: String::from("Sphere")
-        }
-    }
-}
+pub struct Sphere {}
 
 impl Intersect for Sphere {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
@@ -52,7 +27,7 @@ impl Intersect for Sphere {
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
-        vec![Intersection::create(t1, _object.to_shape()), Intersection::create(t2, _object.to_shape())]
+        vec![Intersection::create(t1, _object), Intersection::create(t2, _object)]
     }
 }
 
@@ -65,54 +40,6 @@ impl Normal for Sphere {
     }
 }
 
-impl ShapeAttributes for Sphere {
-    type Output = Sphere;
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn material(&self) -> Material {
-        self.material.clone()
-    }
-
-    fn shape(&self) -> String {
-        self.shape.clone()
-    }
-
-    fn set_transform(&mut self, _transformation: Matrix) {
-        self.transformation = _transformation;
-    }
-
-    fn set_material(&mut self, _material: Material) {
-        self.material = _material;
-    }
-
-    fn with_transform(self, _transform: Matrix) -> Self::Output {
-        Sphere {
-            transformation: _transform,
-            ..self
-        }
-    }
-
-    fn with_material(self, _material: Material) -> Self::Output {
-        Sphere {
-            material: _material,
-            ..self
-        }
-    }
-}
-
-impl ShapeTrait for Sphere {
-    fn box_clone(&self) -> Box<dyn ShapeTrait> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::f64::consts::{FRAC_1_SQRT_2, PI};
@@ -120,17 +47,17 @@ mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
-    use crate::features::shapes::{ShapeAttributes, ShapeTrait};
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
+    use crate::features::shapes::shape::Shape;
 
     #[test]
     fn test_ray_intersects_sphere_at_two_points() {
         let origin = Point::create(0.0, 0.0, -5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let intersections = sphere.intersect(ray);
 
@@ -144,7 +71,7 @@ mod tests {
         let origin = Point::create(0.0, 1.0, -5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let intersections = sphere.intersect(ray);
 
@@ -158,7 +85,7 @@ mod tests {
         let origin = Point::create(0.0, 2.0, -5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let intersections = sphere.intersect(ray);
 
@@ -170,7 +97,7 @@ mod tests {
         let origin = Point::zero();
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let intersections = sphere.intersect(ray);
 
@@ -184,7 +111,7 @@ mod tests {
         let origin = Point::create(0.0, 0.0, 5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let intersections = sphere.intersect(ray);
 
@@ -198,7 +125,7 @@ mod tests {
         let origin = Point::create(0.0, 0.0, 5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let intersections = sphere.intersect(ray);
 
@@ -207,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_sphere_default_transformation_is_the_identity_matrix() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
         let identity_matrix = Matrix::identity();
 
         assert!(sphere.transformation().equals(identity_matrix));
@@ -215,7 +142,7 @@ mod tests {
 
     #[test]
     fn test_change_transformation_in_a_sphere() {
-        let mut sphere = Sphere::create();
+        let mut sphere = Shape::Sphere.create();
         let transform = Matrix::translate(2.0, 3.0, 4.0);
 
         sphere.set_transform(transform);
@@ -228,8 +155,8 @@ mod tests {
         let origin = Point::create(0.0, 0.0, -5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let mut sphere = Sphere::create();
-        sphere.set_transform(Matrix::scale(2.0, 2.0, 2.0));
+        let sphere = Shape::Sphere.create()
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
 
         let intersections = sphere.intersect(ray);
 
@@ -243,8 +170,8 @@ mod tests {
         let origin = Point::create(0.0, 0.0, -5.0);
         let direction = Vector::create(0.0, 0.0, 1.0);
         let ray = Ray::create(origin, direction);
-        let mut sphere = Sphere::create();
-        sphere.set_transform(Matrix::translate(5.0, 0.0, 0.0));
+        let sphere = Shape::Sphere.create()
+            .with_transform(Matrix::translate(5.0, 0.0, 0.0));
 
         let intersections = sphere.intersect(ray);
 
@@ -253,7 +180,7 @@ mod tests {
 
     #[test]
     fn test_normal_on_a_sphere_at_a_point_on_the_x_axis() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let normal = sphere.normal(Point::create(1.0, 0.0, 0.0));
 
@@ -262,7 +189,7 @@ mod tests {
 
     #[test]
     fn test_normal_on_a_sphere_at_a_point_on_the_y_axis() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let normal = sphere.normal(Point::create(0.0, 1.0, 0.0));
 
@@ -271,7 +198,7 @@ mod tests {
 
     #[test]
     fn test_normal_on_a_sphere_at_a_point_on_the_z_axis() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let normal = sphere.normal(Point::create(0.0, 0.0, 1.0));
 
@@ -280,7 +207,7 @@ mod tests {
 
     #[test]
     fn test_normal_on_a_sphere_at_a_nonaxial_point() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let normal = sphere.normal(Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
 
@@ -289,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_normal_is_a_normalized_vector() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let normal = sphere.normal(Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
 
@@ -298,8 +225,8 @@ mod tests {
 
     #[test]
     fn test_compute_normal_on_a_translated_sphere() {
-        let mut sphere = Sphere::create();
-        sphere.set_transform(Matrix::translate(0.0, 1.0, 0.0));
+        let sphere = Shape::Sphere.create()
+            .with_transform(Matrix::translate(0.0, 1.0, 0.0));
 
         let normal = sphere.normal(Point::create(0.0, 1.70711, -FRAC_1_SQRT_2));
 
@@ -308,9 +235,8 @@ mod tests {
 
     #[test]
     fn test_compute_normal_on_a_transformed_sphere() {
-        let mut sphere = Sphere::create();
         let matrix = Matrix::scale(1.0, 0.5, 1.0) * Matrix::rotate_z(PI/5.0);
-        sphere.set_transform(matrix);
+        let sphere = Shape::Sphere.create().with_transform(matrix);
 
         let normal = sphere.normal(Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0));
 
@@ -319,29 +245,29 @@ mod tests {
 
     #[test]
     fn test_sphere_has_a_default_material() {
-        let sphere = Sphere::create();
+        let sphere = Shape::Sphere.create();
 
         let material = Material::create();
 
-        assert!(material.equals(sphere.material));
+        assert!(material.equals(sphere.material()));
     }
 
     #[test]
     fn test_sphere_may_be_assigned_a_material() {
-        let mut sphere = Sphere::create();
+        let mut sphere = Shape::Sphere.create();
         let mut material = Material::create();
         material.set_ambient(1.0);
 
         sphere.set_material(material.clone());
 
-        assert!(material.equals(sphere.material));
+        assert!(material.equals(sphere.material()));
     }
 
     #[test]
     fn test_helper_for_producing_a_glass_sphere() {
-        let sphere = Sphere::glass();
+        let sphere = Shape::Sphere.glass();
 
-        assert_eq!(sphere.material.transparency(), 1.0);
-        assert_eq!(sphere.material.refractive_index(), 1.5);
+        assert_eq!(sphere.material().transparency(), 1.0);
+        assert_eq!(sphere.material().refractive_index(), 1.5);
     }
 }

@@ -9,7 +9,8 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Object, Shape, ShapeAttributes, ShapeTrait};
+use crate::features::shapes::object::Object;
+use crate::features::shapes::shape::{Shape, ShapeAttributes};
 use crate::features::shapes::sphere::Sphere;
 
 #[derive(Clone)]

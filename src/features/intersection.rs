@@ -3,9 +3,9 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::plane::Plane;
-use crate::features::shapes::{Object, Shape, ShapeAttributes, ShapeTrait};
 use smallvec::SmallVec;
 use std::cmp::Ordering;
+use crate::features::shapes::object::Object;
 
 #[derive(Clone)]
 pub struct Intersection {
@@ -14,8 +14,8 @@ pub struct Intersection {
 }
 
 impl Intersection {
-    pub fn create(_t: f64, _shape: Object) -> Intersection {
-        Intersection{t: _t, object: _shape}
+    pub fn create(_t: f64, _shape: &Object) -> Intersection {
+        Intersection{t: _t, object: _shape.clone() }
     }
 
     pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {

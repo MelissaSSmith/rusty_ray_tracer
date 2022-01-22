@@ -6,6 +6,7 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::shapes::ShapeTrait;
 use crate::features::primitives::vector::Vector;
+use crate::features::shapes::object::Object;
 
 #[derive(Clone)]
 pub struct Material {
@@ -138,7 +139,7 @@ impl Material {
         self.refractive_index
     }
 
-    pub fn lighting(&self, light: PointLight, object: Box<dyn ShapeTrait>, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
+    pub fn lighting(&self, light: PointLight, object: Object, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
         let color = match &self.pattern {
             None => { self.color }
             Some(p) => { p.pattern_at_object(object, position) }

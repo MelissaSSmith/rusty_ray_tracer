@@ -1,7 +1,7 @@
 use crate::features::primitives::point::Point;
-use crate::features::shapes::{Object, Shape, ShapeTrait};
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
+use crate::features::shapes::object::Object;
 
 #[derive(Clone)]
 pub struct Computation {
@@ -39,7 +39,7 @@ impl Computation {
         self.t
     }
 
-    pub fn object(self) -> Shape {
+    pub fn object(self) -> Object {
         self.object
     }
 
