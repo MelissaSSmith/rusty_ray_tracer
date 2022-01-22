@@ -168,9 +168,6 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::ray::Ray;
-    use crate::features::shapes::plane::Plane;
-    use crate::features::shapes::{ShapeAttributes, ShapeTrait};
-    use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
     use crate::features::world::World;
@@ -219,7 +216,7 @@ mod tests {
     fn test_shading_an_intersection() {
         let world = World::create_default();
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
-        let intersection = Intersection::create(4.0, &world.objects()[0]);
+        let intersection = Intersection::create(4.0, &world.clone().objects()[0]);
 
         let computation = intersection.prepare_computations(ray, &vec![]);
         let color = world.shade_hit(&computation, 1);
@@ -232,7 +229,7 @@ mod tests {
         let mut world = World::create_default();
         world.light = Some(PointLight::create(WHITE, Point::create(0.0, 0.25, 0.0)));
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
-        let intersection = Intersection::create(0.5, &world.objects()[1]);
+        let intersection = Intersection::create(0.5, &world.clone().objects()[1]);
 
         let computation = intersection.prepare_computations(ray, &vec![]);
         let color = world.shade_hit(&computation, 1);
@@ -331,7 +328,7 @@ mod tests {
         let s1 = Shape::Sphere.create();
         let s2 = Shape::Sphere.create()
             .with_transform(Matrix::translate(0.0, 0.0, 10.0));
-        let objects = vec![s1, s2];
+        let objects = vec![s1, s2.clone()];
         let world = World::create_world(light, objects);
         let ray = Ray::create(Point::create(0.0, 0.0, 5.0), Vector::create(0.0, 0.0, 1.0));
         let intersection = Intersection::create(4.0, &s2);
@@ -346,10 +343,10 @@ mod tests {
     fn test_reflect_color_for_a_non_reflective_material() {
         let mut world = World::create_default();
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
-        let mut shape = world.clone().objects()[1].unwrap().clone();
+        let mut shape = world.clone().objects()[1].clone();
         shape.material().set_ambient(1.0);
         world.set_object(1, shape.clone());
-        let intersection = Intersection::create(1.0, shape);
+        let intersection = Intersection::create(1.0, &shape);
 
         let computation = intersection.prepare_computations(ray, &vec![]);
 
@@ -368,10 +365,10 @@ mod tests {
             .with_material(material)
             .with_transform(Matrix::translate(0.0, -1.0, 0.0));
         let mut world = World::create_default();
-        world.add_object(shape);
+        world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersection = Intersection::create(sqrt2.sqrt(), shape.box_clone());
+        let intersection = Intersection::create(sqrt2.sqrt(), &shape);
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.reflected_color(&computation, 3);
@@ -390,10 +387,10 @@ mod tests {
             .with_material(material)
             .with_transform(Matrix::translate(0.0, -1.0, 0.0));
         let mut world = World::create_default();
-        world.add_object(shape);
+        world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersection = Intersection::create(sqrt2.sqrt(), shape.box_clone());
+        let intersection = Intersection::create(sqrt2.sqrt(), &shape);
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         let color = world.shade_hit(&computation, 1);
@@ -435,7 +432,7 @@ mod tests {
             .with_transform(Matrix::translate(0.0, -1.0, 0.0));
 
         let mut world = World::create_default();
-        world.add_object(shape);
+        world.add_object(shape.clone());
 
         let intersection = Intersection::create(2.0_f64.sqrt(), &shape);
 
@@ -462,13 +459,13 @@ mod tests {
     #[test]
     fn test_find_the_refracted_color_at_the_maximum_recursion_depth() {
         let world = World::create_default();
-        let mut shape = &world.clone().objects()[0].clone();
+        let mut shape = world.clone().objects()[0].clone();
         shape.set_material(Material::create()
                 .with_refractive_index(1.5)
                 .with_transparency(1.0)
         );
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
-        let intersections = vec![Intersection::create(4.0, shape.box_clone()), Intersection::create(6.0, shape.box_clone())];
+        let intersections = vec![Intersection::create(4.0, &shape), Intersection::create(6.0, &shape)];
 
         let computations = intersections[0].prepare_computations(ray, &intersections);
         let color = world.refracted_color(&computations, 0);

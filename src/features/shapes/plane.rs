@@ -31,7 +31,7 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
-    use crate::features::shapes::ShapeTrait;
+    use crate::features::shapes::{Intersect, Normal};
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
@@ -40,9 +40,9 @@ mod tests {
     fn test_normal_of_a_plane_is_constant_everywhere() {
         let plane = Shape::Plane.create();
 
-        let n1 = plane.normal(Point::zero());
-        let n2 = plane.normal(Point::create(10.0, 0.0, -10.0));
-        let n3 = plane.normal(Point::create(-5.0, 0.0, 150.0));
+        let n1 = Plane::normal(&plane, &Point::zero());
+        let n2 = Plane::normal(&plane, &Point::create(10.0, 0.0, -10.0));
+        let n3 = Plane::normal(&plane, &Point::create(-5.0, 0.0, 150.0));
 
         assert!(n1.equals(Vector::create(0.0, 1.0, 0.0)));
         assert!(n2.equals(Vector::create(0.0, 1.0, 0.0)));
@@ -54,7 +54,7 @@ mod tests {
         let plane = Shape::Plane.create();
         let ray = Ray::create(Point::create(0.0, 10.0, 0.0), Vector::create(0.0, 0.0, 1.0));
 
-        let intersections = plane.intersect(ray);
+        let intersections = Plane::intersect(&plane, &ray);
 
         assert_eq!(0, intersections.len());
     }
@@ -64,7 +64,7 @@ mod tests {
         let plane = Shape::Plane.create();
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
 
-        let intersections = plane.intersect(ray);
+        let intersections = Plane::intersect(&plane, &ray);
 
         assert_eq!(0, intersections.len());
     }
@@ -74,7 +74,7 @@ mod tests {
         let plane = Shape::Plane.create();
         let ray = Ray::create(Point::create(0.0, 1.0, 0.0), Vector::create(0.0, -1.0, 0.0));
 
-        let intersections = plane.intersect(ray);
+        let intersections = Plane::intersect(&plane, &ray);
 
         assert_eq!(1, intersections.len());
         assert_eq!(1.0, intersections[0].t);
@@ -85,7 +85,7 @@ mod tests {
         let plane = Shape::Plane.create();
         let ray = Ray::create(Point::create(0.0, -1.0, 0.0), Vector::create(0.0, 1.0, 0.0));
 
-        let intersections = plane.intersect(ray);
+        let intersections = Plane::intersect(&plane, &ray);
 
         assert_eq!(1, intersections.len());
         assert_eq!(1.0, intersections[0].t);

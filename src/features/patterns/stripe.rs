@@ -66,8 +66,7 @@ mod tests {
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::shapes::{ShapeAttributes, ShapeTrait};
-    use crate::features::shapes::sphere::Sphere;
+    use crate::features::shapes::shape::Shape;
 
     #[test]
     fn test_stripe_pattern_is_constant_in_y() {
@@ -101,34 +100,34 @@ mod tests {
 
     #[test]
     fn test_stripes_with_an_object_transformation() {
-        let mut object = Sphere::create();
-        object.set_transform(Matrix::scale(2.0, 2.0, 2.0 ));
+        let object = Shape::Sphere.create()
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        let c = pattern.pattern_at_object(Box::new(object), Point::create(1.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(object, Point::create(1.5, 0.0, 0.0));
 
         assert!(c.equals(WHITE));
     }
 
     #[test]
     fn test_stripes_with_a_pattern_transformation() {
-        let object = Sphere::create();
+        let object = Shape::Sphere.create();
         let mut pattern = StripePattern::create(WHITE, BLACK);
         pattern.transform(Matrix::scale(2.0, 2.0, 2.0));
 
-        let c = pattern.pattern_at_object(Box::new(object), Point::create(1.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(object, Point::create(1.5, 0.0, 0.0));
 
         assert!(c.equals(WHITE));
     }
 
     #[test]
     fn test_stripes_with_both_an_object_and_a_pattern_transformation() {
-        let mut object = Sphere::create();
-        object.set_transform(Matrix::scale(2.0, 2.0, 2.0 ));
+        let object = Shape::Sphere.create()
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
         let mut pattern = StripePattern::create(WHITE, BLACK);
         pattern.transform(Matrix::translate(0.5, 0.0, 0.0));
 
-        let c = pattern.pattern_at_object(Box::new(object), Point::create(2.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(object, Point::create(2.5, 0.0, 0.0));
 
         assert!(c.equals(WHITE));
     }

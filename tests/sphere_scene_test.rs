@@ -8,67 +8,65 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
-use rusty_ray_tracer::features::shapes::ShapeTrait;
-use rusty_ray_tracer::features::shapes::sphere::Sphere;
 use rusty_ray_tracer::features::primitives::vector::Vector;
+use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
 use rusty_ray_tracer::features::world::World;
 
 #[test]
 #[ignore]
 fn sphere_scene_test() {
-    let mut material = Material::create();
-    material.set_color(Color::create(1.0, 0.9, 0.9));
-    material.set_specular(0.0);
+    let material = Material::create()
+        .with_color(Color::create(1.0, 0.9, 0.9))
+        .with_specular(0.0);
 
-    let mut floor = Sphere::create();
-    floor.set_transform(Matrix::scale(10.0, 0.01, 10.0));
-    floor.set_material(material.clone());
+    let floor = Shape::Sphere.create()
+        .with_material(material.clone())
+        .with_transform(Matrix::scale(10.0, 0.01, 10.0));
 
-    let mut left_wall = Sphere::create();
     let lw_transform = Matrix::translate(0.0, 0.0, 5.0)
         * Matrix::rotate_y(-PI/4.0)
         * Matrix::rotate_x(PI/2.0)
         * Matrix::scale(10.0, 0.01, 10.0);
-    left_wall.set_transform(lw_transform);
-    left_wall.set_material(material.clone());
+    let left_wall = Shape::Sphere.create()
+        .with_material(material.clone())
+        .with_transform(lw_transform);
 
-    let mut right_wall = Sphere::create();
     let rw_transform = Matrix::translate(0.0, 0.0, 5.0)
         * Matrix::rotate_y(PI/4.0)
         * Matrix::rotate_x(PI/2.0)
         * Matrix::scale(10.0, 0.01, 10.0);
-    right_wall.set_transform(rw_transform);
-    right_wall.set_material(material);
+    let right_wall = Shape::Sphere.create()
+        .with_material(material.clone())
+        .with_transform(rw_transform);
 
-    let mut middle = Sphere::create();
-    middle.set_transform(Matrix::translate(-0.5, 1.0, 0.5));
-    let mut mid_material = Material::create();
-    mid_material.set_color(Color::create(0.1, 1.0, 0.5));
-    mid_material.set_diffuse(0.7);
-    mid_material.set_specular(0.3);
-    middle.set_material(mid_material);
+    let mid_material = Material::create()
+        .with_color(Color::create(0.1, 1.0, 0.5))
+        .with_diffuse(0.7)
+        .with_specular(0.3);
+    let middle = Shape::Sphere.create()
+        .with_material(mid_material)
+        .with_transform(Matrix::translate(-0.5, 1.0, 0.5));
 
-    let mut right = Sphere::create();
     let r_transform = Matrix::translate(1.5, 0.5, -0.5) * Matrix::scale(0.5, 0.5, 0.5);
-    right.set_transform(r_transform);
-    let mut r_material = Material::create();
-    r_material.set_color(Color::create(0.5, 1.0, 0.1));
-    r_material.set_diffuse(0.7);
-    r_material.set_specular(0.3);
-    right.set_material(r_material);
+    let r_material = Material::create()
+        .with_color(Color::create(0.5, 1.0, 0.1))
+        .with_diffuse(0.7)
+        .with_specular(0.3);
+    let right = Shape::Sphere.create()
+        .with_material(r_material)
+        .with_transform(r_transform);
 
-    let mut left = Sphere::create();
     let l_transform = Matrix::translate(-1.5, 0.33, -0.75) * Matrix::scale(0.33, 0.33, 0.33);
-    left.set_transform(l_transform);
-    let mut l_material = Material::create();
-    l_material.set_color(Color::create(1.0, 0.8, 0.1));
-    l_material.set_diffuse(0.7);
-    l_material.set_specular(0.3);
-    left.set_material(l_material);
+    let l_material = Material::create()
+        .with_color(Color::create(1.0, 0.8, 0.1))
+        .with_diffuse(0.7)
+        .with_specular(0.3);
+    let left = Shape::Sphere.create()
+        .with_material(l_material)
+        .with_transform(l_transform);
 
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
-    let objects: Vec<Box<dyn ShapeTrait>> = vec![Box::new(floor), Box::new(left_wall), Box::new(right_wall),
-                                                 Box::new(middle), Box::new(right), Box::new(left)];
+    let objects = vec![floor, left_wall, right_wall, middle, right, left];
     let world = World::create_world(light_source, objects);
 
     let mut camera = Camera::create(300, 250, PI/3.0);
