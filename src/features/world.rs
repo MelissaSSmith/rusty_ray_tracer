@@ -368,8 +368,9 @@ mod tests {
         world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersection = Intersection::create(sqrt2.sqrt(), &shape);
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let intersection = Intersection::create(sqrt2, &shape);
+        let list = vec![intersection.clone()];
+        let computation = intersection.prepare_computations(ray, &list);
 
         let color = world.reflected_color(&computation, 3);
 
@@ -390,8 +391,9 @@ mod tests {
         world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersection = Intersection::create(sqrt2.sqrt(), &shape);
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let intersection = Intersection::create(sqrt2, &shape);
+        let list = vec![intersection.clone()];
+        let computation = intersection.prepare_computations(ray, &list);
 
         let color = world.shade_hit(&computation, 1);
 

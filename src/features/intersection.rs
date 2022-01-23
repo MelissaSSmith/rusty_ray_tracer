@@ -245,14 +245,13 @@ mod tests {
     #[test]
     fn test_precompute_the_reflection_vector() {
         let sqrt_2 = f64::sqrt(2.0);
-        let shape = Shape::Sphere.create();
+        let shape = Shape::Plane.create();
         let ray = Ray::create(Point::create(0.0, 1.0, -1.0), Vector::create(0.0, -sqrt_2/2.0, sqrt_2/2.0));
         let intersection = Intersection::create(sqrt_2, &shape);
 
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         let reflect = computation.reflect_vector();
-        println!("Reflection Vector: {}, {}, {}", reflect.x(), reflect.y(), reflect.z());
         assert!(reflect.equals(Vector::create(0.0, sqrt_2/2.0, sqrt_2/2.0)));
     }
 
