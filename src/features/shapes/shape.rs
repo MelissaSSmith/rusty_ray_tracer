@@ -191,10 +191,13 @@ impl Intersect for Object {
 
 impl Normal for Object {
     fn normal(_object: &Object, _point: &Point) -> Vector {
-        match _object.shape.as_ref() {
-            "Sphere" => { Sphere::normal(_object, _point) }
-            "Plane" => { Plane::normal(_object, _point) }
+        let object_point = _object.transformation().inverse() * *_point;
+        let object_normal = match _object.shape.as_ref() {
+            "Sphere" => { Sphere::normal(_object, &object_point) }
+            "Plane" => { Plane::normal(_object, &object_point) }
             _ => { Vector::zero() }
-        }
+        };
+        let world_normal = _object.transformation().inverse().transpose() * object_normal;
+        world_normal.normalize()
     }
 }

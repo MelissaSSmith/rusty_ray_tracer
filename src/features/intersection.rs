@@ -40,15 +40,16 @@ impl Intersection {
 
         let (n1, n2) = Intersection::calculate_n1_and_n2(_intersections, self.clone());
 
-        computation.set_n1(n1);
-        computation.set_n2(n2);
-        computation.set_point(point);
-        computation.set_eye_vector(eye_vector);
         let (inside, normal) = if normal ^ eye_vector < 0.0 {
             (true, -normal)
         } else {
             (false, normal)
         };
+
+        computation.set_n1(n1);
+        computation.set_n2(n2);
+        computation.set_point(point);
+        computation.set_eye_vector(eye_vector);
         computation.set_normal_vector(normal);
         computation.set_inside(inside);
         computation.set_reflect_vector(_ray.direction.reflect(normal));
@@ -250,7 +251,9 @@ mod tests {
 
         let computation = intersection.prepare_computations(ray, &vec![]);
 
-        assert!(computation.reflect_vector().equals(Vector::create(0.0, sqrt_2/2.0, sqrt_2/2.0)));
+        let reflect = computation.reflect_vector();
+        println!("Reflection Vector: {}, {}, {}", reflect.x(), reflect.y(), reflect.z());
+        assert!(reflect.equals(Vector::create(0.0, sqrt_2/2.0, sqrt_2/2.0)));
     }
 
     #[test]
