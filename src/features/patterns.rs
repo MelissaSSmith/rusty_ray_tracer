@@ -12,6 +12,7 @@ pub mod radial_gradient;
 pub mod blended;
 pub mod solid;
 pub mod perturb;
+pub mod test;
 
 pub trait Pattern: Any {
     fn box_clone(&self) -> Box<dyn Pattern>;
