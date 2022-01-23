@@ -16,61 +16,56 @@ use rusty_ray_tracer::features::patterns::solid::SolidPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
-use rusty_ray_tracer::features::shapes::plane::Plane;
-use rusty_ray_tracer::features::shapes::Shape;
-use rusty_ray_tracer::features::shapes::sphere::Sphere;
 use rusty_ray_tracer::features::primitives::vector::Vector;
+use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
 #[ignore]
 fn sphere_scene_test() {
-    let mut material = Material::create();
-    material.set_color(Color::create(1.0, 0.9, 0.9));
-    material.set_specular(0.0);
+    let material = Material::create()
+        .with_color(Color::create(1.0, 0.9, 0.9))
+        .with_specular(0.0);
 
-    let mut middle = Sphere::create();
-    middle.set_transform(Matrix::translate(-0.5, 1.0, 0.5) * Matrix::rotate_x(PI/2.0));
     let mut mid_pattern = RingPattern::create(Color::create(0.0, 0.0, 1.0), Color::create(0.1, 1.0, 0.5));
     mid_pattern.transform(Matrix::scale(0.25, 0.25, 0.25));
     let mid_perturb_pattern = PerturbedPattern::create(Box::new(mid_pattern), Some(2.5));
-    let mid_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, Some(0.75), None, Some(Box::new(mid_perturb_pattern)));
-    middle.set_material(mid_material);
+    let mid_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, Some(0.75), None, Some(Box::new(mid_perturb_pattern))); //todo: change
+    let middle = Shape::Sphere.create()
+        .with_transform(Matrix::translate(-0.5, 1.0, 0.5) * Matrix::rotate_x(PI/2.0))
+        .with_material(mid_material);
 
-    let mut right = Sphere::create();
     let r_transform = Matrix::translate(1.5, 0.5, -0.5) * Matrix::scale(0.5, 0.5, 0.5);
-    right.set_transform(r_transform.clone());
     let mut r_pattern = RadialGradientPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(0.5, 1.0, 0.1));
     r_pattern.transform(Matrix::translate(-1.5, -0.5, 0.5) * Matrix::scale(0.5, 0.5, 0.5));
     let r_perturb_pattern = PerturbedPattern::create(Box::new(r_pattern), Some(4.0));
-    let r_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, None, Some(Box::new(r_perturb_pattern)));
-    right.set_material(r_material);
+    let r_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None, None, Some(Box::new(r_perturb_pattern))); //todo: change
+    let right = Shape::Sphere.create()
+        .with_transform(r_transform)
+        .with_material(r_material);
 
-    let mut left = Sphere::create();
     let l_transform = Matrix::translate(-1.5, 0.33, -0.75) * Matrix::scale(0.4, 0.4, 0.4);
-    left.set_transform(l_transform);
     let mut l_pattern = SolidPattern::create(Color::create(1.0, 0.75, 0.0));
     l_pattern.transform(Matrix::scale(0.1, 0.1, 0.1));
     let l_perturb_pattern = PerturbedPattern::create(Box::new(l_pattern), None);
     let l_material = Material::create_with_attributes(0.1, 0.7, 0.3, None, None,None, Some(Box::new(l_perturb_pattern)));
-    left.set_material(l_material);
+    let left = Shape::Sphere.create()
+        .with_transform(l_transform)
+        .with_material(l_material);
 
     let pattern = CheckerPattern::create(Color::create(0.906, 0.329, 0.502), WHITE);
     let perturb_pattern = PerturbedPattern::create(Box::new(pattern), Some(4.0));
     let mut floor_material = material.clone();
     floor_material.set_pattern(Box::new(perturb_pattern));
 
-    let mut backdrop = Plane::create();
-    let backdrop_transform = Matrix::rotate_x(PI/2.0) * Matrix::translate(0.0, 0.0, 4.0);
-    backdrop.set_transform(backdrop_transform);
-    backdrop.set_material(floor_material.clone());
+    let backdrop = Shape::Plane.create()
+        .with_material(floor_material.clone())
+        .with_transform(Matrix::rotate_x(PI/2.0) * Matrix::translate(0.0, 0.0, 4.0));
 
-    let mut floor = Plane::create();
-    floor.set_material(floor_material);
+    let floor = Shape::Plane.create().with_material(floor_material);
 
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
-    let objects: Vec<Box<dyn Shape>> = vec![Box::new(floor), Box::new(backdrop),
-                                            Box::new(middle), Box::new(right), Box::new(left)];
+    let objects = vec![floor, backdrop, middle, right, left];
     let world = World::create_world(light_source, objects);
 
     let mut camera = Camera::create(100, 50, PI/3.0);

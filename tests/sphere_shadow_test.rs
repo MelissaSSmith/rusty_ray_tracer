@@ -12,7 +12,8 @@ use rusty_ray_tracer::features::patterns::Pattern;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::ray::Ray;
-use rusty_ray_tracer::features::shapes::Shape;
+use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
+use rusty_ray_tracer::features::shapes::{Intersect, Normal};
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
 
 #[test]
@@ -26,12 +27,12 @@ fn sphere_shadow_test() {
     let half = wall_size / 2.0;
 
     let mut canvas = Canvas::create(canvas_pixels, canvas_pixels);
-    let mut shape = Sphere::create();
     let pattern = CheckerPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
     let mut material = Material::create();
     material.set_pattern(Box::new(pattern));
-    shape.set_material(material);
-    shape.set_transform(Matrix::scale(2.0, 2.0, 2.0));
+    let shape = Shape::Sphere.create()
+        .with_material(material)
+        .with_transform(Matrix::scale(2.0, 2.0, 2.0));
 
     //light source
     let light_position = Point::create(-10.0, 10.0, -10.0);
@@ -45,11 +46,11 @@ fn sphere_shadow_test() {
             let direction = (position - ray_origin).normalize();
             let ray = Ray::create(ray_origin, direction);
 
-            match Intersection::hit(shape.intersect(ray)) {
+            match Intersection::hit(Object::intersect(&shape, &ray)) {
                 None => {}
                 Some(hit) => {
                     let point = ray.position(hit.t);
-                    let normal = hit.object.normal(point);
+                    let normal = Object::normal(&hit.object, &point);
                     let eye = -ray.direction();
                     let color = hit.object.material().lighting(light, hit.object, point, eye, normal, false);
                     canvas.write_pixel(x, y, color);
