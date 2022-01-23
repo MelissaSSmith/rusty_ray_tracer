@@ -91,7 +91,7 @@ impl World {
     fn shade_hit(&self, computation: &Computation, remaining: u8) -> Color {
         let shadowed = self.is_shadowed(computation.over_point());
 
-        let surface_color = computation.clone().object().material().lighting(
+        let surface_color = computation.clone().object().material().lighting( //todo: verify light vector
             self.light.unwrap(),
             computation.clone().object(),
             computation.over_point(),
@@ -116,7 +116,8 @@ impl World {
     }
 
     fn refracted_color(&self, _computations: &Computation, remaining: u8) -> Color {
-        if _computations.clone().object().material().transparency() == 0.0 || remaining <= 0 {
+        let transparency = _computations.clone().object().material().transparency();
+        if transparency == 0.0 || remaining <= 0 || _computations.sin2_t() > 1.0 {
             return BLACK;
         }
 
@@ -426,7 +427,6 @@ mod tests {
 
     #[test]
     fn test_reflected_color_at_maximum_recursive_depth() {
-
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0));
         let material = Material::create().with_reflective(0.5);
         let shape = Shape::Plane.create()
@@ -473,5 +473,29 @@ mod tests {
         let color = world.refracted_color(&computations, 0);
 
         assert!(color.equals(BLACK));
+    }
+
+    #[test]
+    fn test_refracted_color_when_under_total_internal_reflection() {
+        let sqrt2 = f64::sqrt(2.0);
+        let mut world = World::create_default();
+        let mut shape = world.clone().objects()[0].clone();
+        shape.set_material(Material::create()
+            .with_refractive_index(1.5)
+            .with_transparency(1.0)
+        );
+        world.set_object(0, shape.clone());
+        let ray = Ray::create(Point::create(0.0, 0.0, sqrt2/2.0), Vector::create(0.0, 1.0, 0.0));
+        let intersections = vec![Intersection::create(-sqrt2/2.0, &shape), Intersection::create(sqrt2/2.0, &shape)];
+
+        let computations = intersections[1].prepare_computations(ray, &intersections);
+        let color = world.refracted_color(&computations, 5);
+
+        assert!(color.equals(BLACK));
+    }
+
+    #[test]
+    fn test_refracted_color_with_a_refracted_ray() {
+
     }
 }

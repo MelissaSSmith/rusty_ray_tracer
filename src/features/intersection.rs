@@ -37,8 +37,11 @@ impl Intersection {
         let point = _ray.position(self.t);
         let normal = Object::normal(&self.object, &point);
         let eye_vector = -_ray.direction();
+        let cos_i = eye_vector ^ normal;
 
         let (n1, n2) = Intersection::calculate_n1_and_n2(_intersections, self.clone());
+        let n_ratio = n1 / n2;
+        let sin2_t = n_ratio.powf(2.0) * (1.0 - cos_i.powf(2.0));
 
         let (inside, normal) = if normal ^ eye_vector < 0.0 {
             (true, -normal)
@@ -46,8 +49,11 @@ impl Intersection {
             (false, normal)
         };
 
+        computation.set_cos_i(cos_i);
+        computation.set_sin2_t(sin2_t);
         computation.set_n1(n1);
         computation.set_n2(n2);
+        computation.set_n_ratio(n_ratio);
         computation.set_point(point);
         computation.set_eye_vector(eye_vector);
         computation.set_normal_vector(normal);

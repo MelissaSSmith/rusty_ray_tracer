@@ -15,7 +15,10 @@ pub struct Computation {
     inside: bool,
     reflect_vector: Vector,
     n1: f64,
-    n2: f64
+    n2: f64,
+    n_ratio: f64,
+    cos_i: f64,
+    sin2_t: f64
 }
 
 impl Computation {
@@ -31,7 +34,10 @@ impl Computation {
             inside: false,
             reflect_vector: Vector::zero(),
             n1: 0.0,
-            n2: 0.0
+            n2: 0.0,
+            n_ratio: 0.0,
+            cos_i: 0.0,
+            sin2_t: 0.0
         }
     }
 
@@ -77,6 +83,18 @@ impl Computation {
         self.n2
     }
 
+    pub fn n_ratio(&self) -> f64 {
+        self.n_ratio
+    }
+
+    pub fn cos_i(&self) -> f64 {
+        self.cos_i
+    }
+
+    pub fn sin2_t(&self) -> f64 {
+        self.sin2_t
+    }
+
     pub fn set_point(&mut self, _point: Point) {
         self.point = _point;
     }
@@ -111,5 +129,17 @@ impl Computation {
 
     pub fn set_n2(&mut self, _n2: f64) {
         self.n2 = _n2;
+    }
+
+    pub fn set_n_ratio(&mut self, _n_ratio:f64) {
+        self.n_ratio = _n_ratio;
+    }
+
+    pub fn set_cos_i(&mut self, _cos_i: f64) {
+        self.cos_i = _cos_i;
+    }
+
+    pub fn set_sin2_t(&mut self, _sin2_t: f64) {
+        self.sin2_t = _sin2_t;
     }
 }
