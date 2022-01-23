@@ -46,10 +46,10 @@ impl Pattern for GradientPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse() * point;
-        let color_a = self.pattern_a.pattern_at(tp);
-        let distance = self.pattern_b.pattern_at(tp) - color_a;
+    fn pattern_at(&self, point: &Point) -> Color {
+        let tp = self.transformation.inverse() * *point;
+        let color_a = self.pattern_a.pattern_at(&tp);
+        let distance = self.pattern_b.pattern_at(&tp) - color_a;
         let fraction = tp.x() - tp.x().floor();
 
         color_a + distance * fraction
@@ -69,9 +69,9 @@ mod tests {
     fn gradient_linearly_interpolates_between_colors() {
         let pattern = GradientPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.25, 0.0, 0.0)).equals(Color::create(0.75, 0.75, 0.75)));
-        assert!(pattern.pattern_at(Point::create(0.5, 0.0, 0.0)).equals(Color::create(0.5, 0.5, 0.5)));
-        assert!(pattern.pattern_at(Point::create(0.75, 0.0, 0.0)).equals(Color::create(0.25, 0.25, 0.25)));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.25, 0.0, 0.0)).equals(Color::create(0.75, 0.75, 0.75)));
+        assert!(pattern.pattern_at(&Point::create(0.5, 0.0, 0.0)).equals(Color::create(0.5, 0.5, 0.5)));
+        assert!(pattern.pattern_at(&Point::create(0.75, 0.0, 0.0)).equals(Color::create(0.25, 0.25, 0.25)));
     }
 }

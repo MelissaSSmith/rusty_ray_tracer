@@ -70,11 +70,11 @@ impl Pattern for PerturbedPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
+    fn pattern_at(&self, point: &Point) -> Color {
         let new_x = point.x() + (self.noise(point.x() , point.y() + 0.1, point.z()) * self.scale);
         let new_y = point.y() + (self.noise(point.x() , point.y() + 0.2, point.z() + 1.0) * self.scale);
         let new_z = point.z() + (self.noise(point.x() , point.y() + 0.3, point.z() + 2.0) * self.scale);
-        self.pattern.pattern_at(Point::create(new_x, new_y, new_z))
+        self.pattern.pattern_at(&Point::create(new_x, new_y, new_z))
     }
 }
 

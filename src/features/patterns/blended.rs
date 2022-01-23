@@ -34,10 +34,10 @@ impl Pattern for BlendedPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse() * point;
-        let color_a = self.pattern_a.pattern_at(tp) * 0.5;
-        let color_b = self.pattern_b.pattern_at(tp) * 0.5;
+    fn pattern_at(&self, point: &Point) -> Color {
+        let tp = self.transformation.inverse() * *point;
+        let color_a = self.pattern_a.pattern_at(&tp) * 0.5;
+        let color_b = self.pattern_b.pattern_at(&tp) * 0.5;
 
         color_a + color_b
     }
@@ -61,11 +61,11 @@ mod tests {
         let pattern = BlendedPattern::create(Box::new(pattern_a), Box::new(pattern_b));
 
         let color = Color::create(0.5, 0.5, 0.5);
-        assert!(pattern.pattern_at(Point::zero()).equals(color));
-        assert!(pattern.pattern_at(Point::create(0.9, 0.0, 0.0)).equals(color));
-        assert!(pattern.pattern_at(Point::create(1.0, 0.0, 0.0)).equals(color));
-        assert!(pattern.pattern_at(Point::create(-0.1, 0.0, 0.0)).equals(color));
-        assert!(pattern.pattern_at(Point::create(-1.0, 0.0, 0.0)).equals(color));
-        assert!(pattern.pattern_at(Point::create(-1.1, 0.0, 0.0)).equals(color));
+        assert!(pattern.pattern_at(&Point::zero()).equals(color));
+        assert!(pattern.pattern_at(&Point::create(0.9, 0.0, 0.0)).equals(color));
+        assert!(pattern.pattern_at(&Point::create(1.0, 0.0, 0.0)).equals(color));
+        assert!(pattern.pattern_at(&Point::create(-0.1, 0.0, 0.0)).equals(color));
+        assert!(pattern.pattern_at(&Point::create(-1.0, 0.0, 0.0)).equals(color));
+        assert!(pattern.pattern_at(&Point::create(-1.1, 0.0, 0.0)).equals(color));
     }
 }

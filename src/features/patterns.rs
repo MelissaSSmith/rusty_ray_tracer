@@ -18,13 +18,13 @@ pub trait Pattern: Any {
     fn as_any(&self) -> &dyn Any;
     fn transformation(&self) -> Matrix;
     fn transform(&mut self, transform: Matrix);
-    fn pattern_at(&self, point: Point) -> Color;
+    fn pattern_at(&self, point: &Point) -> Color;
 
-    fn pattern_at_object(&self, object: Object, point: Point) -> Color {
-        let object_point = object.transformation().inverse() * point;
+    fn pattern_at_object(&self, object: &Object, point: &Point) -> Color {
+        let object_point = object.transformation().inverse() * *point;
         let pattern_point = self.transformation().inverse() * object_point;
 
-        self.pattern_at(pattern_point)
+        self.pattern_at(&pattern_point)
     }
 }
 

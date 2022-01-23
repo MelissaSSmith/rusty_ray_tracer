@@ -47,13 +47,13 @@ impl Pattern for RadialGradientPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse() * point;
+    fn pattern_at(&self, point: &Point) -> Color {
+        let tp = self.transformation.inverse() * *point;
         let distance = (tp.x().powi(2) + tp.z().powi(2)).sqrt();
         let fraction = distance - distance.floor();
 
-        let color_a = self.pattern_a.pattern_at(tp);
-        let color_b = self.pattern_b.pattern_at(tp) - color_a;
+        let color_a = self.pattern_a.pattern_at(&tp);
+        let color_b = self.pattern_b.pattern_at(&tp) - color_a;
 
         color_a + color_b * fraction
     }
@@ -72,12 +72,12 @@ mod tests {
     fn gradient_both_x_and_z_interpolates_between_colors() {
         let pattern = RadialGradientPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.25, 0.0, 0.0)).equals(Color::create(0.75, 0.75, 0.75)));
-        assert!(pattern.pattern_at(Point::create(0.5, 0.0, 0.0)).equals(Color::create(0.5, 0.5, 0.5)));
-        assert!(pattern.pattern_at(Point::create(0.75, 0.0, 0.0)).equals(Color::create(0.25, 0.25, 0.25)));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.25)).equals(Color::create(0.75, 0.75, 0.75)));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.5)).equals(Color::create(0.5, 0.5, 0.5)));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.75)).equals(Color::create(0.25, 0.25, 0.25)));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.25, 0.0, 0.0)).equals(Color::create(0.75, 0.75, 0.75)));
+        assert!(pattern.pattern_at(&Point::create(0.5, 0.0, 0.0)).equals(Color::create(0.5, 0.5, 0.5)));
+        assert!(pattern.pattern_at(&Point::create(0.75, 0.0, 0.0)).equals(Color::create(0.25, 0.25, 0.25)));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 0.25)).equals(Color::create(0.75, 0.75, 0.75)));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 0.5)).equals(Color::create(0.5, 0.5, 0.5)));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 0.75)).equals(Color::create(0.25, 0.25, 0.25)));
     }
 }

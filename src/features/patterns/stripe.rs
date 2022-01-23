@@ -47,14 +47,14 @@ impl Pattern for StripePattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse() * point;
+    fn pattern_at(&self, point: &Point) -> Color {
+        let tp = self.transformation.inverse() * *point;
 
         if tp.x().floor() % 2.0 == 0.0 {
-            return self.pattern_a.pattern_at(tp);
+            return self.pattern_a.pattern_at(&tp);
         }
 
-        self.pattern_b.pattern_at(tp)
+        self.pattern_b.pattern_at(&tp)
     }
 }
 
@@ -72,30 +72,30 @@ mod tests {
     fn test_stripe_pattern_is_constant_in_y() {
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 1.0, 0.0)).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 2.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 1.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 2.0, 0.0)).equals(WHITE));
     }
 
     #[test]
     fn test_stripe_pattern_is_constant_in_z() {
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 1.0)).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 2.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 1.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 2.0)).equals(WHITE));
     }
 
     #[test]
     fn test_stripe_pattern_alternates_in_x() {
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.9, 0.0, 0.0)).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(1.0, 0.0, 0.0)).equals(BLACK));
-        assert!(pattern.pattern_at(Point::create(-0.1, 0.0, 0.0)).equals(BLACK));
-        assert!(pattern.pattern_at(Point::create(-1.0, 0.0, 0.0)).equals(BLACK));
-        assert!(pattern.pattern_at(Point::create(-1.1, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.9, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(1.0, 0.0, 0.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::create(-0.1, 0.0, 0.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::create(-1.0, 0.0, 0.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::create(-1.1, 0.0, 0.0)).equals(WHITE));
     }
 
     #[test]
@@ -104,7 +104,7 @@ mod tests {
             .with_transform(Matrix::scale(2.0, 2.0, 2.0));
         let pattern = StripePattern::create(WHITE, BLACK);
 
-        let c = pattern.pattern_at_object(object, Point::create(1.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(&object, &Point::create(1.5, 0.0, 0.0));
 
         assert!(c.equals(WHITE));
     }
@@ -115,7 +115,7 @@ mod tests {
         let mut pattern = StripePattern::create(WHITE, BLACK);
         pattern.transform(Matrix::scale(2.0, 2.0, 2.0));
 
-        let c = pattern.pattern_at_object(object, Point::create(1.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(&object, &Point::create(1.5, 0.0, 0.0));
 
         assert!(c.equals(WHITE));
     }
@@ -127,7 +127,7 @@ mod tests {
         let mut pattern = StripePattern::create(WHITE, BLACK);
         pattern.transform(Matrix::translate(0.5, 0.0, 0.0));
 
-        let c = pattern.pattern_at_object(object, Point::create(2.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(&object, &Point::create(2.5, 0.0, 0.0));
 
         assert!(c.equals(WHITE));
     }

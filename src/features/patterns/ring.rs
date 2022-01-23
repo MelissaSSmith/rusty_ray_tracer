@@ -47,14 +47,14 @@ impl Pattern for RingPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse() * point;
+    fn pattern_at(&self, point: &Point) -> Color {
+        let tp = self.transformation.inverse() * *point;
         let value = (tp.x().powi(2) + tp.z().powi(2)).sqrt();
         if value.floor() % 2.0 == 0.0 {
-            return self.pattern_a.pattern_at(tp);
+            return self.pattern_a.pattern_at(&tp);
         }
 
-        self.pattern_b.pattern_at(tp)
+        self.pattern_b.pattern_at(&tp)
     }
 }
 
@@ -70,9 +70,9 @@ mod tests {
     fn test_ring_should_extend_both_x_and_z() {
         let pattern = RingPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(1.0, 0.0, 0.0)).equals(BLACK));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 1.0)).equals(BLACK));
-        assert!(pattern.pattern_at(Point::create(0.708, 0.0, 0.708)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(1.0, 0.0, 0.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 1.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::create(0.708, 0.0, 0.708)).equals(BLACK));
     }
 }

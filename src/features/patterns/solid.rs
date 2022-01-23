@@ -33,7 +33,7 @@ impl Pattern for SolidPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, _: Point) -> Color {
+    fn pattern_at(&self, _: &Point) -> Color {
         self.color
     }
 }

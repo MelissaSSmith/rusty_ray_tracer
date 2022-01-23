@@ -172,7 +172,7 @@ impl Material {
         self.refractive_index
     }
 
-    pub fn lighting(&self, light: PointLight, object: Object, position: Point, eye_vector: Vector, normal_vector: Vector, in_shadow: bool) -> Color {
+    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, in_shadow: bool) -> Color {
         let color = match &self.pattern {
             None => { self.color }
             Some(p) => { p.pattern_at_object(object, position) }
@@ -187,13 +187,13 @@ impl Material {
         let mut diffuse = BLACK;
         let mut specular = BLACK;
 
-        let light_vector = (light.position - position).normalize();
-        let light_dot_normal = light_vector ^ normal_vector;
+        let light_vector = (light.position - *position).normalize();
+        let light_dot_normal = light_vector ^ *normal_vector;
         if light_dot_normal > 0.0 {
             diffuse = effective_color * self.diffuse * light_dot_normal;
 
-            let reflection_vector = (-light_vector).reflect(normal_vector);
-            let reflection_dot_eye = reflection_vector ^ eye_vector;
+            let reflection_vector = (-light_vector).reflect(*normal_vector);
+            let reflection_dot_eye = reflection_vector ^ *eye_vector;
             if reflection_dot_eye > 0.0 {
                 let factor = reflection_dot_eye.powf(self.shininess);
                 specular = light.intensity * self.specular * factor
@@ -238,7 +238,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
 
         assert!(result.equals(Color::create(1.9, 1.9, 1.9)));
     }
@@ -251,7 +251,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
 
         assert!(result.equals(Color::create(1.0, 1.0, 1.0)));
     }
@@ -264,7 +264,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
 
-        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
 
         assert!(result.equals(Color::create(0.7364, 0.7364, 0.7364)));
     }
@@ -277,7 +277,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
 
-        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
 
         assert!(result.equals(Color::create(1.6364, 1.6364, 1.6364)));
     }
@@ -290,7 +290,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, 10.0));
 
-        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
 
         assert!(result.equals(Color::create(0.1, 0.1, 0.1)));
     }
@@ -304,7 +304,7 @@ mod tests {
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
         let in_shadow = true;
 
-        let result = material.lighting(light, Shape::Sphere.create(), position, eye_vector, normal_vector, in_shadow);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, in_shadow);
 
         assert!(result.equals(Color::create(0.1, 0.1, 0.1)));
     }
@@ -317,8 +317,8 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let c1 = material.lighting(light, Shape::Sphere.create(), Point::create(0.9, 0.0, 0.0), eye_vector, normal_vector, false);
-        let c2 = material.lighting(light, Shape::Sphere.create(), Point::create(1.1, 0.0, 0.0), eye_vector, normal_vector, false);
+        let c1 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(0.9, 0.0, 0.0), &eye_vector, &normal_vector, false);
+        let c2 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(1.1, 0.0, 0.0), &eye_vector, &normal_vector, false);
 
         assert!(c1.equals(WHITE));
         assert!(c2.equals(BLACK));

@@ -47,16 +47,16 @@ impl Pattern for CheckerPattern {
         self.transformation = self.transformation.clone() * transform;
     }
 
-    fn pattern_at(&self, point: Point) -> Color {
-        let tp = self.transformation.inverse() * point;
+    fn pattern_at(&self, point: &Point) -> Color {
+        let tp = self.transformation.inverse() * *point;
         let value = (tp.x() + EPSILON).floor()
             + (tp.y() + EPSILON).floor()
             + (tp.z() + EPSILON).floor();
         if value % 2.0 == 0.0 {
-            return self.pattern_a.pattern_at(tp);
+            return self.pattern_a.pattern_at(&tp);
         }
 
-        self.pattern_b.pattern_at(tp)
+        self.pattern_b.pattern_at(&tp)
     }
 }
 
@@ -72,26 +72,26 @@ mod tests {
     fn test_checkers_should_repeat_in_x() {
         let pattern = CheckerPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.99, 0.0, 0.0)).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(1.01, 0.0, 0.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.99, 0.0, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(1.01, 0.0, 0.0)).equals(BLACK));
     }
 
     #[test]
     fn test_checkers_should_repeat_in_y() {
         let pattern = CheckerPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.99, 0.0)).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 1.01, 0.0)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.99, 0.0)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 1.01, 0.0)).equals(BLACK));
     }
 
     #[test]
     fn test_checkers_should_repeat_in_z() {
         let pattern = CheckerPattern::create(WHITE, BLACK);
 
-        assert!(pattern.pattern_at(Point::zero()).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 0.99)).equals(WHITE));
-        assert!(pattern.pattern_at(Point::create(0.0, 0.0, 1.01)).equals(BLACK));
+        assert!(pattern.pattern_at(&Point::zero()).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 0.99)).equals(WHITE));
+        assert!(pattern.pattern_at(&Point::create(0.0, 0.0, 1.01)).equals(BLACK));
     }
 }

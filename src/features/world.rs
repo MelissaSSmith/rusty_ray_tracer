@@ -64,7 +64,8 @@ impl World {
         self.light = Some(light);
     }
 
-    pub fn set_object(&mut self, index: usize, object: Object) { //todo: make more of a replace
+    pub fn set_object(&mut self, index: usize, object: Object) {
+        let _ = self.objects.remove(index);
         self.objects.insert(index, object);
     }
 
@@ -92,11 +93,11 @@ impl World {
         let shadowed = self.is_shadowed(computation.over_point());
 
         let surface_color = computation.clone().object().material().lighting( //todo: verify light vector
-            self.light.unwrap(),
-            computation.clone().object(),
-            computation.over_point(),
-            computation.eye_vector(),
-            computation.normal_vector(),
+            &self.light.unwrap(),
+            &computation.clone().object(),
+            &computation.over_point(),
+            &computation.eye_vector(),
+            &computation.normal_vector(),
             shadowed
         );
         let reflected = self.reflected_color(&computation, remaining);
@@ -125,11 +126,12 @@ impl World {
     }
 
     fn color_at_impl(&self, _ray: &Ray, remaining: u8) -> Color {
-        let intersection = Intersection::hit(self.intersect(*_ray));
+        let intersections = self.intersect(*_ray);
+        let intersection = Intersection::hit(intersections.clone());
         return match intersection {
             None => { BLACK }
             Some(i) => {
-                let computations = i.prepare_computations(*_ray, &vec![]);
+                let computations = i.prepare_computations(*_ray, &intersections);
                 self.shade_hit(&computations, remaining)
             }
         }
@@ -165,7 +167,6 @@ mod tests {
     use crate::features::light::PointLight;
     use crate::features::material::Material;
     use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::operations::Operations;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::ray::Ray;
