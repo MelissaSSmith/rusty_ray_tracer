@@ -18,11 +18,12 @@ pub trait Pattern: Any {
     fn box_clone(&self) -> Box<dyn Pattern>;
     fn as_any(&self) -> &dyn Any;
     fn transformation(&self) -> Matrix;
+    fn inverse_transformation(&self) -> Matrix;
     fn transform(&mut self, transform: Matrix);
     fn pattern_at(&self, point: &Point) -> Color;
 
     fn pattern_at_object(&self, object: &Object, point: &Point) -> Color {
-        let object_point = object.transformation().inverse() * *point;
+        let object_point = object.inverse_transformation() * *point;
         let pattern_point = self.transformation().inverse() * object_point;
 
         self.pattern_at(&pattern_point)

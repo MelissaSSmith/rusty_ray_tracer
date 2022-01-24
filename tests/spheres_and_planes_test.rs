@@ -59,16 +59,16 @@ fn sphere_scene_test() {
     floor_material.set_pattern(Box::new(perturb_pattern));
 
     let backdrop = Shape::Plane.create()
-        .with_material(floor_material.clone())
+        .with_material(Material::create().with_ambient(1.0).with_pattern(Box::new(StripePattern::create(Color::create(0.5, 0.5, 0.5), Color::create(0.1, 0.1, 0.1)))))
         .with_transform(Matrix::rotate_x(PI/2.0) * Matrix::translate(0.0, 0.0, 4.0));
 
     let floor = Shape::Plane.create().with_material(floor_material);
 
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
-    let objects = vec![floor, backdrop, middle, right, left];
+    let objects = vec![floor, middle, right, left];
     let world = World::create_world(light_source, objects);
 
-    let mut camera = Camera::create(100, 50, PI/3.0);
+    let mut camera = Camera::create(400, 350, PI/3.0);
     camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
     let canvas = camera.render(world);

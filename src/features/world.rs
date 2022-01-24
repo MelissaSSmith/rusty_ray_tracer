@@ -398,7 +398,6 @@ mod tests {
 
         let color = world.reflected_color(&computation, 3);
 
-        println!("{} {} {}", color.red, color.green, color.blue);
         assert!(color.equals(Color::create(0.19032, 0.2379, 0.14274)));
     }
 
@@ -420,7 +419,6 @@ mod tests {
 
         let color = world.shade_hit(&computation, 1);
 
-        println!("{} {} {}", color.red, color.green, color.blue);
         assert!(color.equals(Color::create(0.87677, 0.92436, 0.82918)));
     }
 
@@ -571,7 +569,6 @@ mod tests {
 
         let color = world.shade_hit(&computations, 5);
 
-        println!("{} {} {}", color.red, color.green, color.blue);
         assert!(color.equals(Color::create(0.93642, 00.68642, 0.68642)));
     }
 }

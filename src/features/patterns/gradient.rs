@@ -10,22 +10,29 @@ use crate::features::primitives::tuple_trait::Tuple;
 pub struct GradientPattern {
     pattern_a: Box<dyn Pattern>,
     pattern_b: Box<dyn Pattern>,
-    transformation: Matrix
+    transformation: Matrix,
+    inverse_transformation: Matrix
 }
 
 impl GradientPattern {
     pub fn create(color_a: Color, color_b: Color) -> GradientPattern {
+        let transform = Matrix::identity();
         GradientPattern{
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::identity()  }
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
 
     pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> GradientPattern {
+        let transform = Matrix::identity();
         GradientPattern{
             pattern_a,
             pattern_b,
-            transformation: Matrix::identity() }
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
 }
 
@@ -42,12 +49,17 @@ impl Pattern for GradientPattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.transformation.inverse() * *point;
+        let tp = self.inverse_transformation() * *point;
         let color_a = self.pattern_a.pattern_at(&tp);
         let distance = self.pattern_b.pattern_at(&tp) - color_a;
         let fraction = tp.x() - tp.x().floor();

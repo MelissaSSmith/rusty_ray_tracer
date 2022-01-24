@@ -7,12 +7,18 @@ use crate::features::primitives::point::Point;
 #[derive(Clone)]
 pub struct SolidPattern {
     color: Color,
-    transformation: Matrix
+    transformation: Matrix,
+    inverse_transformation: Matrix
 }
 
 impl SolidPattern {
     pub fn create(color: Color) -> SolidPattern {
-        SolidPattern { color, transformation: Matrix::identity() }
+        let transform = Matrix::identity();
+        SolidPattern {
+            color,
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
 }
 
@@ -29,8 +35,13 @@ impl Pattern for SolidPattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, _: &Point) -> Color {

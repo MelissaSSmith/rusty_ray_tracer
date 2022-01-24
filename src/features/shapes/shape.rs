@@ -70,69 +70,82 @@ impl Shape {
 #[derive(Clone)]
 pub struct Object {
     transformation: Matrix,
+    inverse_transformation: Matrix,
     material: Material,
     shape: String
 }
 
 impl Object {
     fn create(shape_type: String) -> Object {
+        let transform = Matrix::identity();
         Object {
-            transformation: Matrix::identity(),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
             material: Material::create(),
             shape: shape_type
         }
     }
 
     fn glass(shape_type: String) -> Object {
+        let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
             .with_refractive_index(1.5);
         Object {
-            transformation: Matrix::identity(),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
             material,
             shape: shape_type
         }
     }
 
     fn air(shape_type: String) -> Object {
+        let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
             .with_refractive_index(1.00029);
         Object {
-            transformation: Matrix::identity(),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
             material,
             shape: shape_type
         }
     }
 
     fn vacuum(shape_type: String) -> Object {
+        let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
             .with_refractive_index(1.0);
         Object {
-            transformation: Matrix::identity(),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
             material,
             shape: shape_type
         }
     }
 
     fn water(shape_type: String) -> Object {
+        let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
             .with_refractive_index(1.33);
         Object {
-            transformation: Matrix::identity(),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
             material,
             shape: shape_type
         }
     }
 
     fn diamond(shape_type: String) -> Object {
+        let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
             .with_refractive_index(2.417);
         Object {
-            transformation: Matrix::identity(),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
             material,
             shape: shape_type
         }
@@ -148,6 +161,10 @@ impl Object {
         self.transformation.clone()
     }
 
+    pub fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     pub fn material(&self) -> Material {
         self.material.clone()
     }
@@ -157,7 +174,8 @@ impl Object {
     }
 
     pub fn set_transform(&mut self, _transformation: Matrix) {
-        self.transformation = _transformation;
+        self.transformation = _transformation.clone();
+        self.inverse_transformation = _transformation.inverse();
     }
 
     pub fn set_material(&mut self, _material: Material) {
@@ -166,7 +184,8 @@ impl Object {
 
     pub fn with_transform(self, _transform: Matrix) -> Object {
         Object {
-            transformation: _transform,
+            transformation: _transform.clone(),
+            inverse_transformation: _transform.inverse(),
             ..self
         }
     }
@@ -181,7 +200,7 @@ impl Object {
 
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        let transformed_ray = _ray.transform(_object.clone().transformation().inverse());
+        let transformed_ray = _ray.transform(_object.clone().inverse_transformation());
         match _object.shape.as_ref() {
             "Sphere" => { Sphere::intersect(_object, &transformed_ray) }
             "Plane" => { Plane::intersect(_object, &transformed_ray) }
@@ -192,13 +211,13 @@ impl Intersect for Object {
 
 impl Normal for Object {
     fn normal(_object: &Object, _point: &Point) -> Vector {
-        let object_point = _object.transformation().inverse() * *_point;
+        let object_point = _object.inverse_transformation() * *_point;
         let object_normal = match _object.shape.as_ref() {
             "Sphere" => { Sphere::normal(_object, &object_point) }
             "Plane" => { Plane::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
-        let world_normal = _object.transformation().inverse().transpose() * object_normal;
+        let world_normal = _object.inverse_transformation().transpose() * object_normal;
         world_normal.normalize()
     }
 }

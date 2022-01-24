@@ -10,23 +10,29 @@ use crate::features::primitives::tuple_trait::Tuple;
 pub struct StripePattern {
     pattern_a: Box<dyn Pattern>,
     pattern_b: Box<dyn Pattern>,
-    transformation: Matrix
+    transformation: Matrix,
+    inverse_transformation: Matrix
 }
 
 impl StripePattern {
     pub fn create(color_a: Color, color_b: Color) -> StripePattern {
+        let transform = Matrix::identity();
         StripePattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::identity()
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
         }
     }
 
     pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> StripePattern {
+        let transform = Matrix::identity();
         StripePattern{
             pattern_a,
             pattern_b,
-            transformation: Matrix::identity() }
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
 }
 
@@ -43,12 +49,17 @@ impl Pattern for StripePattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.transformation.inverse() * *point;
+        let tp = self.inverse_transformation() * *point;
 
         if tp.x().floor() % 2.0 == 0.0 {
             return self.pattern_a.pattern_at(&tp);

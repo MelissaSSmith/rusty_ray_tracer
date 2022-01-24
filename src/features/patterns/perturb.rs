@@ -10,6 +10,7 @@ use crate::features::primitives::tuple_trait::Tuple;
 pub struct PerturbedPattern {
     pattern: Box<dyn Pattern>,
     transformation: Matrix,
+    inverse_transformation: Matrix,
     scale: f64
 }
 
@@ -19,7 +20,13 @@ impl PerturbedPattern {
             None => { 1.0 }
             Some(s) => { s }
         };
-        PerturbedPattern { pattern, transformation: Matrix::identity(), scale: s }
+        let transform = Matrix::identity();
+        PerturbedPattern {
+            pattern,
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse(),
+            scale: s
+        }
     }
 
     fn fade(&self, t: f64) -> f64 {
@@ -66,8 +73,13 @@ impl Pattern for PerturbedPattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, point: &Point) -> Color {

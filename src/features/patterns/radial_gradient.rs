@@ -10,23 +10,29 @@ use crate::features::primitives::tuple_trait::Tuple;
 pub struct RadialGradientPattern {
     pattern_a: Box<dyn Pattern>,
     pattern_b: Box<dyn Pattern>,
-    transformation: Matrix
+    transformation: Matrix,
+    inverse_transformation: Matrix
 }
 
 impl RadialGradientPattern {
     pub fn create(color_a: Color, color_b: Color) -> RadialGradientPattern {
+        let transform = Matrix::identity();
         RadialGradientPattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: Matrix::identity()
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
         }
     }
 
     pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> RadialGradientPattern {
+        let transform = Matrix::identity();
         RadialGradientPattern{
             pattern_a,
             pattern_b,
-            transformation: Matrix::identity() }
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
 }
 
@@ -43,12 +49,17 @@ impl Pattern for RadialGradientPattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.transformation.inverse() * *point;
+        let tp = self.inverse_transformation() * *point;
         let distance = (tp.x().powi(2) + tp.z().powi(2)).sqrt();
         let fraction = distance - distance.floor();
 

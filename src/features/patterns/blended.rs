@@ -8,12 +8,14 @@ use crate::features::primitives::point::Point;
 pub struct BlendedPattern {
     pattern_a: Box<dyn Pattern>,
     pattern_b: Box<dyn Pattern>,
-    transformation: Matrix
+    transformation: Matrix,
+    inverse_transformation: Matrix
 }
 
 impl BlendedPattern {
     pub fn create(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> BlendedPattern {
-        BlendedPattern { pattern_a, pattern_b, transformation: Matrix::identity() }
+        let transform = Matrix::identity();
+        BlendedPattern { pattern_a, pattern_b, transformation: transform.clone(), inverse_transformation: transform.inverse() }
     }
 }
 
@@ -30,12 +32,17 @@ impl Pattern for BlendedPattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.transformation.inverse() * *point;
+        let tp = self.inverse_transformation() * *point;
         let color_a = self.pattern_a.pattern_at(&tp) * 0.5;
         let color_b = self.pattern_b.pattern_at(&tp) * 0.5;
 

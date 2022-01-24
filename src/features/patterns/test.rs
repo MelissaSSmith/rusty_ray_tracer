@@ -7,13 +7,15 @@ use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct TestPattern {
-    transformation: Matrix
+    transformation: Matrix,
+    inverse_transformation: Matrix
 }
 
 impl TestPattern {
     pub fn create() -> TestPattern {
         TestPattern {
-            transformation: Matrix::identity()
+            transformation: Matrix::identity(),
+            inverse_transformation: Matrix::identity().inverse()
         }
     }
 }
@@ -31,8 +33,13 @@ impl Pattern for TestPattern {
         self.transformation.clone()
     }
 
+    fn inverse_transformation(&self) -> Matrix {
+        self.inverse_transformation.clone()
+    }
+
     fn transform(&mut self, transform: Matrix) {
         self.transformation = self.transformation.clone() * transform;
+        self.inverse_transformation = self.transformation.inverse();
     }
 
     fn pattern_at(&self, point: &Point) -> Color {
