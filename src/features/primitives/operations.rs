@@ -1,7 +1,8 @@
-use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
 
 pub trait Operations<Rhs = Self> {
     fn equals(self, _: Rhs) -> bool;
+    fn equals_low_epsilon(self, _: Rhs) -> bool;
 }
 
 impl Operations for f64 {
@@ -9,8 +10,14 @@ impl Operations for f64 {
         let diff = self - b;
         diff.abs() < EPSILON
     }
+
+    fn equals_low_epsilon(self, b: f64) -> bool {
+        let diff = self - b;
+        diff.abs() < LOW_EPSILON
+    }
 }
 
 pub mod consts {
     pub const EPSILON: f64 = 0.00001;
+    pub const LOW_EPSILON: f64 = 0.0001;
 }

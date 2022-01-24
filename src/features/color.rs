@@ -37,9 +37,9 @@ impl Color {
     }
 
     pub fn equals(&self, other_color: Color) -> bool {
-        self.red.equals(other_color.red) &&
-            self.green.equals(other_color.green) &&
-            self.blue.equals(other_color.blue)
+        self.red.equals_low_epsilon(other_color.red) &&
+            self.green.equals_low_epsilon(other_color.green) &&
+            self.blue.equals_low_epsilon(other_color.blue)
     }
 }
 

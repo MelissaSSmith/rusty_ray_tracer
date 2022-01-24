@@ -8,7 +8,7 @@ use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
 pub struct Material {
-    pattern: Option<Box<dyn Pattern>>,
+    pattern: Option<Box<dyn Pattern>>, //todo: phase out color to use only pattern
     color: Color,
     ambient: f64,
     diffuse: f64,
@@ -151,6 +151,13 @@ impl Material {
     pub fn with_transparency(self, transparency: f64) -> Material {
         Material {
             transparency,
+            ..self
+        }
+    }
+
+    pub fn with_pattern(self, pattern: Box<dyn Pattern>) -> Material {
+        Material {
+            pattern: Some(pattern),
             ..self
         }
     }
