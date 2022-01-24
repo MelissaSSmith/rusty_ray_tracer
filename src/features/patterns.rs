@@ -24,7 +24,7 @@ pub trait Pattern: Any {
 
     fn pattern_at_object(&self, object: &Object, point: &Point) -> Color {
         let object_point = object.inverse_transformation() * *point;
-        let pattern_point = self.transformation().inverse() * object_point;
+        let pattern_point = self.inverse_transformation() * object_point;
 
         self.pattern_at(&pattern_point)
     }

@@ -10,6 +10,7 @@ pub struct Camera {
     v_size: i32,
     field_of_view: f64,
     transform: Matrix,
+    inverse_transform: Matrix,
     half_width: f64,
     half_height: f64,
     pixel_size: f64
@@ -29,6 +30,7 @@ impl Camera {
             v_size,
             field_of_view,
             transform: Matrix::identity(),
+            inverse_transform: Matrix::identity().inverse(),
             half_width: pixel_size.half_width,
             half_height: pixel_size.half_height,
             pixel_size: pixel_size.pixel_size
@@ -42,7 +44,7 @@ impl Camera {
         let world_x = self.half_width - x_offset;
         let world_y = self.half_height - y_offset;
 
-        let inverse_transform = self.transform.inverse();
+        let inverse_transform = self.inverse_transform.clone();
         let pixel = inverse_transform.clone() * Point::create(world_x, world_y, -1.0);
         let origin = inverse_transform * Point::zero();
         let direction = (pixel - origin).normalize();
@@ -66,6 +68,7 @@ impl Camera {
 
     pub fn set_transform(&mut self, transform: Matrix) {
         self.transform = transform;
+        self.inverse_transform = self.transform.inverse();
     }
 
     fn calculate_pixel_size(h_size: i32, v_size: i32, field_of_view: f64) -> PixelSize {
@@ -153,7 +156,7 @@ mod tests {
     #[test]
     fn test_construct_ray_when_the_camera_is_transformed() {
         let mut camera = Camera::create(201, 101, PI/2.0);
-        camera.transform = Matrix::rotate_y(PI/4.0) * Matrix::translate(0.0, -2.0, 5.0);
+        camera.set_transform(Matrix::rotate_y(PI/4.0) * Matrix::translate(0.0, -2.0, 5.0));
 
         let ray = camera.ray_for_pixel(100, 50);
 
@@ -168,7 +171,7 @@ mod tests {
         let from = Point::create(0.0, 0.0, -5.0);
         let to = Point::zero();
         let up = Vector::create(0.0, 1.0, 0.0);
-        camera.transform = Matrix::view_transform(from, to, up);
+        camera.set_transform(Matrix::view_transform(from, to, up));
 
         let image = camera.render(world);
 
