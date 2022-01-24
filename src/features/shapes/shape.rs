@@ -181,9 +181,10 @@ impl Object {
 
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
+        let transformed_ray = _ray.transform(_object.clone().transformation().inverse());
         match _object.shape.as_ref() {
-            "Sphere" => { Sphere::intersect(_object, _ray) }
-            "Plane" => { Plane::intersect(_object, _ray) }
+            "Sphere" => { Sphere::intersect(_object, &transformed_ray) }
+            "Plane" => { Plane::intersect(_object, &transformed_ray) }
             _ => { vec![] }
         }
     }

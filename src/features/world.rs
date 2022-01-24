@@ -116,7 +116,7 @@ impl World {
 
     fn reflected_color(&self, _computations: &Computation, remaining: u8) -> Color {
         let reflective = _computations.clone().object().material().reflective();
-        if remaining <= 0 {
+        if remaining == 0 {
             return BLACK;
         }
         let reflect_ray = Ray::create(_computations.over_point(), _computations.reflect_vector());
@@ -127,7 +127,7 @@ impl World {
 
     fn refracted_color(&self, _computations: &Computation, remaining: u8) -> Color {
         let transparency = _computations.clone().object().material().transparency();
-        if transparency == 0.0 || remaining <= 0 {
+        if transparency == 0.0 || remaining == 0 {
             return BLACK;
         }
 
@@ -393,9 +393,8 @@ mod tests {
         world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersection = Intersection::create(sqrt2, &shape);
-        let list = vec![intersection.clone()];
-        let computation = intersection.prepare_computations(ray, &list);
+        let list = vec![Intersection::create(sqrt2, &shape)];
+        let computation = list[0].prepare_computations(ray, &list);
 
         let color = world.reflected_color(&computation, 3);
 
@@ -416,9 +415,8 @@ mod tests {
         world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersection = Intersection::create(sqrt2, &shape);
-        let list = vec![intersection.clone()];
-        let computation = intersection.prepare_computations(ray, &list);
+        let list = vec![Intersection::create(sqrt2, &shape)];
+        let computation = list[0].prepare_computations(ray, &list);
 
         let color = world.shade_hit(&computation, 1);
 

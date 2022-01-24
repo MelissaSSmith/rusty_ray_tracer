@@ -1,5 +1,5 @@
 use crate::features::computation::Computation;
-use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
 use crate::features::ray::Ray;
 use smallvec::SmallVec;
 use crate::features::shapes::Normal;
