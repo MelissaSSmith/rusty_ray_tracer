@@ -1,5 +1,14 @@
 use std::any::Any;
 use crate::features::color::Color;
+use crate::features::patterns::blended::BlendedPattern;
+use crate::features::patterns::checkers::CheckerPattern;
+use crate::features::patterns::gradient::GradientPattern;
+use crate::features::patterns::perturb::PerturbedPattern;
+use crate::features::patterns::radial_gradient::RadialGradientPattern;
+use crate::features::patterns::ring::RingPattern;
+use crate::features::patterns::solid::SolidPattern;
+use crate::features::patterns::stripe::StripePattern;
+use crate::features::patterns::test::TestPattern;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::shapes::shape::Object;
@@ -16,15 +25,15 @@ pub mod test;
 
 #[derive(Clone)]
 pub enum Patterns {
-    Blended,
-    Checkers,
-    Gradient,
-    Perturb,
-    RadialGradient,
-    Ring,
-    Solid,
-    Stripe,
-    Test
+    Blended(BlendedPattern),
+    Checkers(CheckerPattern),
+    Gradient(GradientPattern),
+    Perturb(PerturbedPattern),
+    RadialGradient(RadialGradientPattern),
+    Ring(RingPattern),
+    Solid(SolidPattern),
+    Stripe(StripePattern),
+    Test(TestPattern)
 }
 
 #[derive(Clone)]
@@ -56,13 +65,26 @@ impl Pattern {
         let object_point = object.inverse_transformation() * *point;
         let pattern_point = self.inverse_transformation() * object_point;
 
-        //self.pattern_at(&pattern_point)
-        todo!() //need to delegate to the pattern
+        match &self.pattern {
+            Patterns::Blended(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Checkers(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Gradient(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Perturb(p) => { p.pattern_at(&pattern_point) }
+            Patterns::RadialGradient(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Ring(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Solid(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Stripe(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Test(p) => { p.pattern_at(&pattern_point) }
+        }
     }
 }
 
 pub trait PatternAt {
     fn pattern_at(&self, point: &Point) -> Color;
+}
+
+pub trait EmptyCreate {
+    fn create() -> Pattern;
 }
 
 pub trait OneColorCreate {
@@ -74,11 +96,15 @@ pub trait TwoColorCreate {
 }
 
 pub trait OnePatternCreate {
-    fn create(pattern: Pattern) -> Pattern;
+    fn create(pattern: Patterns) -> Pattern;
 }
 
 pub trait TwoPatternCreate {
-    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern;
+    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern;
+}
+
+pub trait OnePatternWithScale {
+    fn create(pattern: Patterns, scale: Option<f64>) -> Pattern;
 }
 
 pub trait PatternTrait: Any { //todo: phase out

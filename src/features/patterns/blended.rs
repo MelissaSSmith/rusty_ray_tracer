@@ -1,20 +1,23 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{Pattern, PatternAt, Patterns, PatternTrait, TwoPatternCreate};
+use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoPatternCreate};
 use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
 pub struct BlendedPattern {
-    pattern_a: Pattern,
-    pattern_b: Pattern
+    pattern_a: Patterns,
+    pattern_b: Patterns
 }
 
 impl TwoPatternCreate for BlendedPattern {
-    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
+    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
         let transform = Matrix::identity();
+        let pattern = BlendedPattern {
+            pattern_a,
+            pattern_b
+        };
         Pattern {
-            pattern: Patterns::Blended,
+            pattern: Patterns::Blended(pattern),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
@@ -36,17 +39,17 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::blended::BlendedPattern;
-    use crate::features::patterns::{PatternTrait, TwoPatternCreate};
+    use crate::features::patterns::{TwoPatternCreate, TwoColorCreate, Patterns};
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_blended_pattern() {
-        let pattern_a = StripePattern::create(BLACK, WHITE);
-        let pattern_b = StripePattern::create(WHITE, BLACK);
+        let pattern_a = Patterns::Stripe(StripePattern::create(BLACK, WHITE));
+        let pattern_b = Patterns::Stripe(StripePattern::create(WHITE, BLACK));
 
-        let pattern = BlendedPattern::create(Box::new(pattern_a), Box::new(pattern_b));
+        let pattern = BlendedPattern::create(pattern_a, pattern_b);
 
         let color = Color::create(0.5, 0.5, 0.5);
         assert!(pattern.pattern_at(&Point::zero()).equals(color));

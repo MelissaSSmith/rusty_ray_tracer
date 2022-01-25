@@ -2,63 +2,57 @@ use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
-use crate::features::patterns::PatternTrait;
+use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct CheckerPattern {
-    pattern_a: Box<dyn PatternTrait>,
-    pattern_b: Box<dyn PatternTrait>,
-    transformation: Matrix,
-    inverse_transformation: Matrix
+    pattern_a: Patterns,
+    pattern_b: Patterns
 }
 
 impl CheckerPattern {
     pub fn create(color_a: Color, color_b: Color) -> CheckerPattern {
-        let transform = Matrix::identity();
         CheckerPattern{
-            pattern_a: Box::new(SolidPattern::create(color_a)),
-            pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
+            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
+            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
         }
     }
+}
 
-    pub fn create_with_patterns(pattern_a: Box<dyn PatternTrait>, pattern_b: Box<dyn PatternTrait>) -> CheckerPattern {
+impl TwoColorCreate for CheckerPattern {
+    fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
-        CheckerPattern{
-            pattern_a,
-            pattern_b,
+        let pattern = CheckerPattern {
+            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
+            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
+        };
+        Pattern {
+            pattern: Patterns::Checkers(pattern),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
     }
 }
 
-impl PatternTrait for CheckerPattern {
-    fn box_clone(&self) -> Box<dyn PatternTrait> {
-        Box::new(self.clone())
+impl TwoPatternCreate for CheckerPattern {
+    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+        let transform = Matrix::identity();
+        let pattern = CheckerPattern {
+            pattern_a,
+            pattern_b
+        };
+        Pattern {
+            pattern: Patterns::Checkers(pattern),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
+}
 
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
-    }
-
-    fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
-        self.inverse_transformation = self.transformation.inverse();
-    }
-
+impl PatternAt for CheckerPattern {
     fn pattern_at(&self, point: &Point) -> Color {
         let tp = self.inverse_transformation() * *point;
         let value = (tp.x() + EPSILON).floor()
@@ -76,7 +70,7 @@ impl PatternTrait for CheckerPattern {
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::checkers::CheckerPattern;
-    use crate::features::patterns::PatternTrait;
+    use crate::features::patterns::PatternAt;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 

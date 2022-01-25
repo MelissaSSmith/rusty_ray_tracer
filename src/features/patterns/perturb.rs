@@ -2,29 +2,24 @@ use std::any::Any;
 use noise::{Perlin, NoiseFn};
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::PatternTrait;
+use crate::features::patterns::{OnePatternWithScale, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct PerturbedPattern {
-    pattern: Box<dyn PatternTrait>,
-    transformation: Matrix,
-    inverse_transformation: Matrix,
+    pattern: Patterns,
     scale: f64
 }
 
 impl PerturbedPattern {
-    pub fn create(pattern: Box<dyn PatternTrait>, scale: Option<f64>) -> PerturbedPattern {
+    pub fn create(pattern: Patterns, scale: Option<f64>) -> PerturbedPattern {
         let s = match scale {
             None => { 1.0 }
             Some(s) => { s }
         };
-        let transform = Matrix::identity();
         PerturbedPattern {
             pattern,
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse(),
             scale: s
         }
     }
@@ -60,28 +55,19 @@ impl PerturbedPattern {
     }
 }
 
-impl PatternTrait for PerturbedPattern {
-    fn box_clone(&self) -> Box<dyn PatternTrait> {
-        Box::new(self.clone())
+impl OnePatternWithScale for PerturbedPattern {
+    fn create(pattern: Patterns, scale: Option<f64>) -> Pattern {
+        let transform = Matrix::identity();
+        let pattern = PerturbedPattern::create(pattern, scale);
+        Pattern {
+            pattern: Patterns::Perturb(pattern),
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
+}
 
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
-    }
-
-    fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
-        self.inverse_transformation = self.transformation.inverse();
-    }
-
+impl PatternAt for PerturbedPattern {
     fn pattern_at(&self, point: &Point) -> Color {
         let new_x = point.x() + (self.noise(point.x() , point.y() + 0.1, point.z()) * self.scale);
         let new_y = point.y() + (self.noise(point.x() , point.y() + 0.2, point.z() + 1.0) * self.scale);
@@ -93,12 +79,13 @@ impl PatternTrait for PerturbedPattern {
 #[cfg(test)]
 mod tests {
     use crate::features::color::consts::WHITE;
+    use crate::features::patterns::Patterns;
     use crate::features::patterns::perturb::PerturbedPattern;
     use crate::features::patterns::solid::SolidPattern;
 
     #[test]
     fn test_fade() {
-        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)), None);
+        let pattern = PerturbedPattern::create(Patterns::Solid(SolidPattern::create(WHITE)), None);
 
         let fade = pattern.fade(1.0);
 
@@ -107,7 +94,7 @@ mod tests {
 
     #[test]
     fn test_lerp() {
-        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)), None);
+        let pattern = PerturbedPattern::create(Patterns::Solid(SolidPattern::create(WHITE)), None);
 
         let fade = pattern.lerp(1.0, 2.0, 3.0);
 
@@ -116,7 +103,7 @@ mod tests {
 
     #[test]
     fn test_grad() {
-        let pattern = PerturbedPattern::create(Box::new(SolidPattern::create(WHITE)), None);
+        let pattern = PerturbedPattern::create(Patterns::Solid(SolidPattern::create(WHITE)), None);
 
         let grad = pattern.grad(0, 1.0, 1.0, 1.0);
 
