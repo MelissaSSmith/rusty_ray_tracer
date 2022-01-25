@@ -1,30 +1,24 @@
 use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{Pattern, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct RingPattern {
-    pattern_a: Patterns,
-    pattern_b: Patterns
-}
-
-impl RingPattern {
-    pub fn create(color_a: Color, color_b: Color) -> RingPattern {
-        RingPattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
-        }
-    }
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
 impl TwoColorCreate for RingPattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
-        let pattern = RingPattern::create(color_a, color_b);
+        let pattern = RingPattern {
+            pattern_a: SolidPattern::create(color_a),
+            pattern_b: SolidPattern::create(color_b)
+        };
         Pattern {
             pattern: Patterns::Ring(pattern),
             transformation: transform.clone(),
@@ -34,7 +28,7 @@ impl TwoColorCreate for RingPattern {
 }
 
 impl TwoPatternCreate for RingPattern {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = RingPattern {
             pattern_a,
@@ -52,6 +46,7 @@ impl TwoPatternCreate for RingPattern {
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::ring::RingPattern;
+    use crate::features::patterns::TwoColorCreate;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 

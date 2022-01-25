@@ -1,33 +1,26 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
-use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct CheckerPattern {
-    pattern_a: Patterns,
-    pattern_b: Patterns
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
 impl CheckerPattern {
-    pub fn create(color_a: Color, color_b: Color) -> CheckerPattern {
-        CheckerPattern{
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
-        }
-    }
 }
 
 impl TwoColorCreate for CheckerPattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
         let pattern = CheckerPattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
+            pattern_a: SolidPattern::create(color_a),
+            pattern_b: SolidPattern::create(color_b)
         };
         Pattern {
             pattern: Patterns::Checkers(pattern),
@@ -38,7 +31,7 @@ impl TwoColorCreate for CheckerPattern {
 }
 
 impl TwoPatternCreate for CheckerPattern {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = CheckerPattern {
             pattern_a,
@@ -70,7 +63,7 @@ impl PatternAt for CheckerPattern {
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::checkers::CheckerPattern;
-    use crate::features::patterns::PatternAt;
+    use crate::features::patterns::{PatternAt, TwoColorCreate};
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 

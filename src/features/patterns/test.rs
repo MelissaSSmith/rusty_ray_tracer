@@ -1,4 +1,3 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::patterns::{EmptyCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::matrix::Matrix;
@@ -8,17 +7,11 @@ use crate::features::primitives::tuple_trait::Tuple;
 #[derive(Clone)]
 pub struct TestPattern {}
 
-impl TestPattern {
-    pub fn create() -> TestPattern {
-        TestPattern {}
-    }
-}
-
 impl EmptyCreate for TestPattern {
     fn create() -> Pattern {
         let transform = Matrix::identity();
         Pattern {
-            pattern: Patterns::Test(TestPattern::create()),
+            pattern: Patterns::Test(TestPattern {}),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
@@ -34,6 +27,7 @@ impl PatternAt for TestPattern {
 #[cfg(test)]
 mod tests {
     use crate::features::color::Color;
+    use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;

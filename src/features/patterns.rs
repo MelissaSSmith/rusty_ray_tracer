@@ -96,15 +96,15 @@ pub trait TwoColorCreate {
 }
 
 pub trait OnePatternCreate {
-    fn create(pattern: Patterns) -> Pattern;
+    fn create(pattern: Pattern) -> Pattern;
 }
 
 pub trait TwoPatternCreate {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern;
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern;
 }
 
 pub trait OnePatternWithScale {
-    fn create(pattern: Patterns, scale: Option<f64>) -> Pattern;
+    fn create(pattern: Pattern, scale: Option<f64>) -> Pattern;
 }
 
 pub trait PatternTrait: Any { //todo: phase out

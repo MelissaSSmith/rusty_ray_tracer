@@ -1,4 +1,3 @@
-use std::any::Any;
 use noise::{Perlin, NoiseFn};
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
@@ -8,22 +7,11 @@ use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct PerturbedPattern {
-    pattern: Patterns,
+    pattern: Pattern,
     scale: f64
 }
 
 impl PerturbedPattern {
-    pub fn create(pattern: Patterns, scale: Option<f64>) -> PerturbedPattern {
-        let s = match scale {
-            None => { 1.0 }
-            Some(s) => { s }
-        };
-        PerturbedPattern {
-            pattern,
-            scale: s
-        }
-    }
-
     fn fade(&self, t: f64) -> f64 {
         ((6.0 * t - 15.0) * t + 10.0) * t * t * t
     }
@@ -56,9 +44,16 @@ impl PerturbedPattern {
 }
 
 impl OnePatternWithScale for PerturbedPattern {
-    fn create(pattern: Patterns, scale: Option<f64>) -> Pattern {
+    fn create(pattern: Pattern, scale: Option<f64>) -> Pattern {
         let transform = Matrix::identity();
-        let pattern = PerturbedPattern::create(pattern, scale);
+        let s = match scale {
+            None => { 1.0 }
+            Some(s) => { s }
+        };
+        let pattern = PerturbedPattern {
+            pattern,
+            scale: s
+        };
         Pattern {
             pattern: Patterns::Perturb(pattern),
             transformation: transform.clone(),
@@ -79,13 +74,13 @@ impl PatternAt for PerturbedPattern {
 #[cfg(test)]
 mod tests {
     use crate::features::color::consts::WHITE;
-    use crate::features::patterns::Patterns;
+    use crate::features::patterns::{OneColorCreate, OnePatternWithScale, Patterns};
     use crate::features::patterns::perturb::PerturbedPattern;
     use crate::features::patterns::solid::SolidPattern;
 
     #[test]
     fn test_fade() {
-        let pattern = PerturbedPattern::create(Patterns::Solid(SolidPattern::create(WHITE)), None);
+        let pattern = PerturbedPattern::create(SolidPattern::create(WHITE), None);
 
         let fade = pattern.fade(1.0);
 
@@ -94,7 +89,7 @@ mod tests {
 
     #[test]
     fn test_lerp() {
-        let pattern = PerturbedPattern::create(Patterns::Solid(SolidPattern::create(WHITE)), None);
+        let pattern = PerturbedPattern::create(SolidPattern::create(WHITE), None);
 
         let fade = pattern.lerp(1.0, 2.0, 3.0);
 
@@ -103,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_grad() {
-        let pattern = PerturbedPattern::create(Patterns::Solid(SolidPattern::create(WHITE)), None);
+        let pattern = PerturbedPattern::create(SolidPattern::create(WHITE), None);
 
         let grad = pattern.grad(0, 1.0, 1.0, 1.0);
 

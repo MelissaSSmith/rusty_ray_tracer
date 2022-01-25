@@ -1,7 +1,8 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::{OneColorCreate, Pattern, Patterns};
+use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
@@ -22,40 +23,13 @@ pub struct Material {
 impl Material {
     pub fn create() -> Material {
         Material {
-            pattern: todo!(),
+            pattern: SolidPattern::create(WHITE),
             color: WHITE,
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0,
             reflective: 0.0,
-            transparency: 0.0,
-            refractive_index: 1.0
-        }
-    }
-
-    //todo: phase out
-    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, reflective: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn PatternTrait>>) -> Material {
-        let m_color = match color {
-            None => { WHITE }
-            Some(c) => { c }
-        };
-        let m_shininess = match shininess {
-            None => { 200.0 }
-            Some(s) => { s }
-        };
-        let m_reflective = match reflective {
-            None => { 0.0 }
-            Some(r) => { r }
-        };
-        Material{
-            pattern: todo!(),
-            color: m_color,
-            ambient,
-            diffuse,
-            specular,
-            shininess: m_shininess,
-            reflective: m_reflective,
             transparency: 0.0,
             refractive_index: 1.0
         }
@@ -78,7 +52,7 @@ impl Material {
     }
 
     pub fn set_color(&mut self, color: Color) {
-        self.color = color;
+        self.pattern = SolidPattern::create(color);
     }
 
     pub fn set_diffuse(&mut self, diffuse: f64) {
@@ -114,8 +88,9 @@ impl Material {
     }
 
     pub fn with_color(self, color: Color) -> Material {
+        let pattern: Pattern = SolidPattern::create(color);
         Material {
-            color,
+            pattern,
             ..self
         }
     }
@@ -179,7 +154,7 @@ impl Material {
         self.refractive_index
     }
 
-    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, in_shadow: bool) -> Color { //todo: use pattern
+    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, in_shadow: bool) -> Color {
         let color = self.pattern.pattern_at_object(object, position);
 
         let effective_color = color * light.intensity;
@@ -215,6 +190,7 @@ mod tests {
     use crate::features::light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::stripe::StripePattern;
+    use crate::features::patterns::TwoColorCreate;
     use crate::features::primitives::point::Point;
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
@@ -315,8 +291,11 @@ mod tests {
 
     #[test]
     fn test_lighting_with_a_pattern_applied() {
-        let pattern = StripePattern::create(WHITE, BLACK);
-        let material = Material::create_with_attributes(1.0, 0.0, 0.0, None,None, None, Some(Box::new(pattern)));
+        let material = Material::create()
+            .with_ambient(1.0)
+            .with_diffuse(0.0)
+            .with_specular(0.0)
+            .with_pattern(StripePattern::create(WHITE, BLACK));
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));

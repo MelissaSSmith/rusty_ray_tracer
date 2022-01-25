@@ -1,31 +1,22 @@
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct GradientPattern {
-    pattern_a: Patterns,
-    pattern_b: Patterns
-}
-
-impl GradientPattern {
-    pub fn create(color_a: Color, color_b: Color) -> GradientPattern {
-        GradientPattern{
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
-        }
-    }
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
 impl TwoColorCreate for GradientPattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
         let pattern = GradientPattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
+            pattern_a: SolidPattern::create(color_a),
+            pattern_b: SolidPattern::create(color_b)
         };
         Pattern {
             pattern: Patterns::Gradient(pattern),
@@ -36,7 +27,7 @@ impl TwoColorCreate for GradientPattern {
 }
 
 impl TwoPatternCreate for GradientPattern {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = GradientPattern {
             pattern_a,
@@ -66,7 +57,7 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::gradient::GradientPattern;
-    use crate::features::patterns::PatternAt;
+    use crate::features::patterns::{PatternAt, TwoColorCreate};
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 

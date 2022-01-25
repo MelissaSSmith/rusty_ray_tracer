@@ -1,32 +1,22 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct StripePattern {
-    pattern_a: Patterns,
-    pattern_b: Patterns
-}
-
-impl StripePattern {
-    pub fn create(color_a: Color, color_b: Color) -> StripePattern {
-        StripePattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
-        }
-    }
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
 impl TwoColorCreate for StripePattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
         let pattern = StripePattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
+            pattern_a: SolidPattern::create(color_a),
+            pattern_b: SolidPattern::create(color_b)
         };
         Pattern {
             pattern: Patterns::Stripe(pattern),
@@ -37,7 +27,7 @@ impl TwoColorCreate for StripePattern {
 }
 
 impl TwoPatternCreate for StripePattern {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = StripePattern {
             pattern_a,

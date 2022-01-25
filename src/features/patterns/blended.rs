@@ -5,12 +5,12 @@ use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
 pub struct BlendedPattern {
-    pattern_a: Patterns,
-    pattern_b: Patterns
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
 impl TwoPatternCreate for BlendedPattern {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = BlendedPattern {
             pattern_a,
@@ -46,8 +46,8 @@ mod tests {
 
     #[test]
     fn test_blended_pattern() {
-        let pattern_a = Patterns::Stripe(StripePattern::create(BLACK, WHITE));
-        let pattern_b = Patterns::Stripe(StripePattern::create(WHITE, BLACK));
+        let pattern_a = StripePattern::create(BLACK, WHITE);
+        let pattern_b = PStripePattern::create(WHITE, BLACK);
 
         let pattern = BlendedPattern::create(pattern_a, pattern_b);
 

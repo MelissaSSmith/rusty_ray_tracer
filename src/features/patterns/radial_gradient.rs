@@ -1,32 +1,22 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct RadialGradientPattern {
-    pattern_a: Patterns,
-    pattern_b: Patterns
-}
-
-impl RadialGradientPattern {
-    pub fn create(color_a: Color, color_b: Color) -> RadialGradientPattern {
-        RadialGradientPattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
-        }
-    }
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
 impl TwoColorCreate for RadialGradientPattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
         let pattern = RadialGradientPattern {
-            pattern_a: Patterns::Solid(SolidPattern::create(color_a)),
-            pattern_b: Patterns::Solid(SolidPattern::create(color_b))
+            pattern_a: SolidPattern::create(color_a),
+            pattern_b: SolidPattern::create(color_b)
         };
         Pattern {
             pattern: Patterns::RadialGradient(pattern),
@@ -37,7 +27,7 @@ impl TwoColorCreate for RadialGradientPattern {
 }
 
 impl TwoPatternCreate for RadialGradientPattern {
-    fn create(pattern_a: Patterns, pattern_b: Patterns) -> Pattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = RadialGradientPattern {
             pattern_a,
@@ -68,7 +58,7 @@ impl PatternAt for RadialGradientPattern {
 mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
-    use crate::features::patterns::PatternAt;
+    use crate::features::patterns::{PatternAt, TwoColorCreate};
     use crate::features::patterns::radial_gradient::RadialGradientPattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
