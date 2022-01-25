@@ -10,6 +10,8 @@ array2d = "0.2.1"
 noise = "0.7.0"
 serde = {version="1.0", features = ["derive", "rc"]}
 smallvec = "1.6"
+rayon = "1.5.1"
+dashmap = {version="5.0.0", features = ["rayon"]}
 
 [profile.test] # fixed
 opt-level = 2

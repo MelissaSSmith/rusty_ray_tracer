@@ -21,7 +21,7 @@ use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-#[ignore]
+//#[ignore]
 fn sphere_scene_test() {
     let material = Material::create()
         .with_color(Color::create(1.0, 0.9, 0.9))

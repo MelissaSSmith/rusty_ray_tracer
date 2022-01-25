@@ -5,6 +5,8 @@ use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::world::World;
 
+use rayon::prelude::*;
+
 pub struct Camera {
     h_size: i32,
     v_size: i32,
@@ -53,15 +55,19 @@ impl Camera {
     }
 
     pub fn render(&self, world: World) -> Canvas {
+        const BAND_SIZE: i32 = 10;
         let mut canvas = Canvas::create(self.h_size, self.v_size);
 
-        for y in 0..self.v_size {
-            for x in 0..self.h_size {
+        canvas.pixels
+            .par_iter_mut()
+            .for_each(|mut map_value| {
+                let x_y = canvas.get_x_y(map_value.key());
+                let x = x_y.0;
+                let y = x_y.1;
+
                 let ray = self.ray_for_pixel(x, y);
-                let color = world.color_at(&ray);
-                canvas.write_pixel(x, y, color);
-            }
-        }
+                *map_value = world.color_at(&ray);
+            });
 
         canvas
     }

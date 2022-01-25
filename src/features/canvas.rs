@@ -1,17 +1,18 @@
 use std::collections::HashMap;
 use std::ops::Div;
+use dashmap::DashMap;
 use crate::features::color::Color;
 use crate::features::color::consts::BLACK;
 
 pub struct Canvas {
     pub width: i32,
     pub height: i32,
-    pub(crate) pixels: HashMap<String, Color>
+    pub(crate) pixels: DashMap<String, Color>
 }
 
 impl Canvas {
     pub fn create(_width: i32, _height: i32) -> Canvas {
-        let mut default_pixels = HashMap::<String, Color>::new();
+        let default_pixels = DashMap::<String, Color>::new();
         for x in 0.._width {
             for y in 0.._height {
                 let key = Canvas::create_key(x, y);
@@ -34,14 +35,23 @@ impl Canvas {
         let pixel = self.pixels.get_mut(&key);
         match pixel {
             None => (),
-            Some(color) => {*color = _color}
+            Some(mut color) => {*color = _color}
         }
     }
 
     pub fn get_pixel(&self, _x: i32, _y: i32) -> &Color {
         let key = Canvas::create_key(_x, _y);
-        let pixel = &self.pixels.get(&key);
-        pixel.unwrap()
+        let pixel = self.pixels.get(&key).unwrap();
+        pixel.value()
+    }
+
+    pub fn pixels(&self) -> DashMap<String, Color> {
+        self.pixels.clone()
+    }
+
+    pub fn get_x_y(&self, key: &String) -> (i32, i32) {
+        let x_y: Vec<&str> = key.split(".").collect();
+        (x_y[0].parse().unwrap(), x_y[1].parse().unwrap())
     }
 
     pub fn format_pixel_line(line_array: Vec<String>) -> String {
