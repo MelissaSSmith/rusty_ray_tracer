@@ -1,7 +1,7 @@
 use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::PatternTrait;
 use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
@@ -22,8 +22,8 @@ impl SolidPattern {
     }
 }
 
-impl Pattern for SolidPattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
+impl PatternTrait for SolidPattern {
+    fn box_clone(&self) -> Box<dyn PatternTrait> {
         Box::new(self.clone())
     }
 

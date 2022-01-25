@@ -8,7 +8,7 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::blended::BlendedPattern;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
-use rusty_ray_tracer::features::patterns::Pattern;
+use rusty_ray_tracer::features::patterns::PatternTrait;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -28,7 +28,7 @@ fn sphere_scene_test() {
 
     let pattern = CheckerPattern::create_with_patterns(Box::new(pattern_a), Box::new(pattern_b));
     let mut floor_material = Material::create();
-    floor_material.set_pattern(Box::new(pattern));
+    floor_material.set_pattern_box(Box::new(pattern));
 
     let floor = Shape::Plane.create()
         .with_material(floor_material)

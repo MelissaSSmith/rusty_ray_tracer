@@ -2,20 +2,20 @@ use std::any::Any;
 use noise::{Perlin, NoiseFn};
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::PatternTrait;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct PerturbedPattern {
-    pattern: Box<dyn Pattern>,
+    pattern: Box<dyn PatternTrait>,
     transformation: Matrix,
     inverse_transformation: Matrix,
     scale: f64
 }
 
 impl PerturbedPattern {
-    pub fn create(pattern: Box<dyn Pattern>, scale: Option<f64>) -> PerturbedPattern {
+    pub fn create(pattern: Box<dyn PatternTrait>, scale: Option<f64>) -> PerturbedPattern {
         let s = match scale {
             None => { 1.0 }
             Some(s) => { s }
@@ -60,8 +60,8 @@ impl PerturbedPattern {
     }
 }
 
-impl Pattern for PerturbedPattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
+impl PatternTrait for PerturbedPattern {
+    fn box_clone(&self) -> Box<dyn PatternTrait> {
         Box::new(self.clone())
     }
 

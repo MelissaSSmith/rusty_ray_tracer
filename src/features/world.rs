@@ -520,7 +520,7 @@ mod tests {
         let mut a = world.clone().objects()[0].clone();
         a.set_material(Material::create()
             .with_ambient(1.0)
-            .with_pattern(Box::new(TestPattern::create()))
+            .with_pattern_box(Box::new(TestPattern::create()))
         );
         let mut b = world.clone().objects()[1].clone();
         b.set_material(Material::create()

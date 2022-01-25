@@ -1,46 +1,27 @@
 use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::{Pattern, PatternAt, Patterns, PatternTrait, TwoPatternCreate};
 use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
 pub struct BlendedPattern {
-    pattern_a: Box<dyn Pattern>,
-    pattern_b: Box<dyn Pattern>,
-    transformation: Matrix,
-    inverse_transformation: Matrix
+    pattern_a: Pattern,
+    pattern_b: Pattern
 }
 
-impl BlendedPattern {
-    pub fn create(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> BlendedPattern {
+impl TwoPatternCreate for BlendedPattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
-        BlendedPattern { pattern_a, pattern_b, transformation: transform.clone(), inverse_transformation: transform.inverse() }
+        Pattern {
+            pattern: Patterns::Blended,
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
     }
 }
 
-impl Pattern for BlendedPattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
-    }
-
-    fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
-        self.inverse_transformation = self.transformation.inverse();
-    }
-
+impl PatternAt for BlendedPattern {
     fn pattern_at(&self, point: &Point) -> Color {
         let tp = self.inverse_transformation() * *point;
         let color_a = self.pattern_a.pattern_at(&tp) * 0.5;
@@ -55,7 +36,7 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::blended::BlendedPattern;
-    use crate::features::patterns::Pattern;
+    use crate::features::patterns::{PatternTrait, TwoPatternCreate};
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;

@@ -8,7 +8,7 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::gradient::GradientPattern;
-use rusty_ray_tracer::features::patterns::Pattern;
+use rusty_ray_tracer::features::patterns::PatternTrait;
 use rusty_ray_tracer::features::patterns::perturb::PerturbedPattern;
 use rusty_ray_tracer::features::patterns::radial_gradient::RadialGradientPattern;
 use rusty_ray_tracer::features::patterns::ring::RingPattern;
@@ -56,10 +56,10 @@ fn sphere_scene_test() {
     let pattern = CheckerPattern::create(Color::create(0.906, 0.329, 0.502), WHITE);
     let perturb_pattern = PerturbedPattern::create(Box::new(pattern), Some(4.0));
     let mut floor_material = material.clone();
-    floor_material.set_pattern(Box::new(perturb_pattern));
+    floor_material.set_pattern_box(Box::new(perturb_pattern));
 
     let backdrop = Shape::Plane.create()
-        .with_material(Material::create().with_ambient(1.0).with_pattern(Box::new(StripePattern::create(Color::create(0.5, 0.5, 0.5), Color::create(0.1, 0.1, 0.1)))))
+        .with_material(Material::create().with_ambient(1.0).with_pattern_box(Box::new(StripePattern::create(Color::create(0.5, 0.5, 0.5), Color::create(0.1, 0.1, 0.1)))))
         .with_transform(Matrix::rotate_x(PI/2.0) * Matrix::translate(0.0, 0.0, 4.0));
 
     let floor = Shape::Plane.create().with_material(floor_material);

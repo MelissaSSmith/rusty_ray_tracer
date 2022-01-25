@@ -1,15 +1,15 @@
 use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::PatternTrait;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct RingPattern {
-    pattern_a: Box<dyn Pattern>,
-    pattern_b: Box<dyn Pattern>,
+    pattern_a: Box<dyn PatternTrait>,
+    pattern_b: Box<dyn PatternTrait>,
     transformation: Matrix,
     inverse_transformation: Matrix
 }
@@ -25,7 +25,7 @@ impl RingPattern {
         }
     }
 
-    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> RingPattern {
+    pub fn create_with_patterns(pattern_a: Box<dyn PatternTrait>, pattern_b: Box<dyn PatternTrait>) -> RingPattern {
         let transform = Matrix::identity();
         RingPattern{
             pattern_a,
@@ -36,8 +36,8 @@ impl RingPattern {
     }
 }
 
-impl Pattern for RingPattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
+impl PatternTrait for RingPattern {
+    fn box_clone(&self) -> Box<dyn PatternTrait> {
         Box::new(self.clone())
     }
 
@@ -72,7 +72,7 @@ impl Pattern for RingPattern {
 #[cfg(test)]
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
-    use crate::features::patterns::Pattern;
+    use crate::features::patterns::PatternTrait;
     use crate::features::patterns::ring::RingPattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;

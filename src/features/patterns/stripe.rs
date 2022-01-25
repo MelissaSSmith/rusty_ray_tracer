@@ -1,15 +1,15 @@
 use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::PatternTrait;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct StripePattern {
-    pattern_a: Box<dyn Pattern>,
-    pattern_b: Box<dyn Pattern>,
+    pattern_a: Box<dyn PatternTrait>,
+    pattern_b: Box<dyn PatternTrait>,
     transformation: Matrix,
     inverse_transformation: Matrix
 }
@@ -25,7 +25,7 @@ impl StripePattern {
         }
     }
 
-    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> StripePattern {
+    pub fn create_with_patterns(pattern_a: Box<dyn PatternTrait>, pattern_b: Box<dyn PatternTrait>) -> StripePattern {
         let transform = Matrix::identity();
         StripePattern{
             pattern_a,
@@ -36,8 +36,8 @@ impl StripePattern {
     }
 }
 
-impl Pattern for StripePattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
+impl PatternTrait for StripePattern {
+    fn box_clone(&self) -> Box<dyn PatternTrait> {
         Box::new(self.clone())
     }
 
@@ -73,7 +73,7 @@ impl Pattern for StripePattern {
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::primitives::matrix::Matrix;
-    use crate::features::patterns::Pattern;
+    use crate::features::patterns::PatternTrait;
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;

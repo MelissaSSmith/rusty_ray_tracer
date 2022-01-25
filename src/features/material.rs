@@ -1,14 +1,14 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::{Pattern, PatternTrait};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
 pub struct Material {
-    pattern: Option<Box<dyn Pattern>>, //todo: phase out color to use only pattern
+    pattern: Pattern,
     color: Color,
     ambient: f64,
     diffuse: f64,
@@ -22,7 +22,7 @@ pub struct Material {
 impl Material {
     pub fn create() -> Material {
         Material {
-            pattern: None,
+            pattern: todo!(),
             color: WHITE,
             ambient: 0.1,
             diffuse: 0.9,
@@ -35,7 +35,7 @@ impl Material {
     }
 
     //todo: phase out
-    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, reflective: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn Pattern>>) -> Material {
+    pub fn create_with_attributes(ambient: f64, diffuse: f64, specular: f64, shininess: Option<f64>, reflective: Option<f64>, color: Option<Color>, pattern: Option<Box<dyn PatternTrait>>) -> Material {
         let m_color = match color {
             None => { WHITE }
             Some(c) => { c }
@@ -49,7 +49,7 @@ impl Material {
             Some(r) => { r }
         };
         Material{
-            pattern,
+            pattern: todo!(),
             color: m_color,
             ambient,
             diffuse,
@@ -69,7 +69,7 @@ impl Material {
             self.reflective == other_material.reflective &&
             self.transparency == other_material.transparency &&
             self.refractive_index == other_material.refractive_index &&
-            self.color.equals(other_material.color)
+            self.color.equals(other_material.color) //todo: add pattern
     }
 
     //setters
@@ -101,8 +101,8 @@ impl Material {
         self.refractive_index = refractive_index;
     }
 
-    pub fn set_pattern(&mut self, pattern: Box<dyn Pattern>) {
-        self.pattern = Some(pattern);
+    pub fn set_pattern(&mut self, pattern: Pattern) {
+        self.pattern = pattern;
     }
 
     //builders
@@ -155,9 +155,9 @@ impl Material {
         }
     }
 
-    pub fn with_pattern(self, pattern: Box<dyn Pattern>) -> Material {
+    pub fn with_pattern(self, pattern: Pattern) -> Material {
         Material {
-            pattern: Some(pattern),
+            pattern,
             ..self
         }
     }
@@ -179,11 +179,8 @@ impl Material {
         self.refractive_index
     }
 
-    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, in_shadow: bool) -> Color {
-        let color = match &self.pattern {
-            None => { self.color }
-            Some(p) => { p.pattern_at_object(object, position) }
-        };
+    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, in_shadow: bool) -> Color { //todo: use pattern
+        let color = self.pattern.pattern_at_object(object, position);
 
         let effective_color = color * light.intensity;
         let ambient = effective_color * self.ambient;
