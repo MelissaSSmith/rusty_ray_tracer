@@ -1,65 +1,44 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct StripePattern {
-    pattern_a: Box<dyn Pattern>,
-    pattern_b: Box<dyn Pattern>,
-    transformation: Matrix,
-    inverse_transformation: Matrix
+    pattern_a: Box<Pattern>,
+    pattern_b: Box<Pattern>
 }
 
-impl StripePattern {
-    pub fn create(color_a: Color, color_b: Color) -> StripePattern {
-        let transform = Matrix::identity();
-        StripePattern {
+impl TwoColorCreate for StripePattern {
+    fn create(color_a: Color, color_b: Color) -> Pattern {
+        let pattern = StripePattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
-            pattern_b: Box::new(SolidPattern::create(color_b)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+            pattern_b: Box::new(SolidPattern::create(color_b))
+        };
+        Pattern::create(Box::new(Patterns::Stripe(pattern)))
     }
+}
 
-    pub fn create_with_patterns(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> StripePattern {
+impl TwoPatternCreate for StripePattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
-        StripePattern{
-            pattern_a,
-            pattern_b,
+        let pattern = StripePattern {
+            pattern_a: Box::new(pattern_a),
+            pattern_b: Box::new(pattern_b)
+        };
+        Pattern {
+            pattern: Box::new(Patterns::Stripe(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
     }
 }
 
-impl Pattern for StripePattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
-    }
-
-    fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
-        self.inverse_transformation = self.transformation.inverse();
-    }
-
-    fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.inverse_transformation() * *point;
+impl PatternAtWithInverse for StripePattern {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
+        let tp = inverse.clone() * *point;
 
         if tp.x().floor() % 2.0 == 0.0 {
             return self.pattern_a.pattern_at(&tp);
@@ -73,7 +52,7 @@ impl Pattern for StripePattern {
 mod tests {
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::primitives::matrix::Matrix;
-    use crate::features::patterns::Pattern;
+    use crate::features::patterns::{PatternAt, TwoColorCreate};
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;

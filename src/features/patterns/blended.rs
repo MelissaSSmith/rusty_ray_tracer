@@ -1,48 +1,27 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::{Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoPatternCreate};
 use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
 pub struct BlendedPattern {
-    pattern_a: Box<dyn Pattern>,
-    pattern_b: Box<dyn Pattern>,
-    transformation: Matrix,
-    inverse_transformation: Matrix
+    pattern_a: Box<Pattern>,
+    pattern_b: Box<Pattern>
 }
 
-impl BlendedPattern {
-    pub fn create(pattern_a: Box<dyn Pattern>, pattern_b: Box<dyn Pattern>) -> BlendedPattern {
-        let transform = Matrix::identity();
-        BlendedPattern { pattern_a, pattern_b, transformation: transform.clone(), inverse_transformation: transform.inverse() }
+impl TwoPatternCreate for BlendedPattern {
+    fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
+        let pattern = BlendedPattern {
+            pattern_a: Box::new(pattern_a),
+            pattern_b: Box::new(pattern_b)
+        };
+        Pattern::create(Box::new(Patterns::Blended(pattern)))
     }
 }
 
-impl Pattern for BlendedPattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
-    }
-
-    fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
-        self.inverse_transformation = self.transformation.inverse();
-    }
-
-    fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.inverse_transformation() * *point;
+impl PatternAtWithInverse for BlendedPattern {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
+        let tp = inverse.clone() * *point;
         let color_a = self.pattern_a.pattern_at(&tp) * 0.5;
         let color_b = self.pattern_b.pattern_at(&tp) * 0.5;
 
@@ -55,17 +34,18 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::blended::BlendedPattern;
-    use crate::features::patterns::Pattern;
+    use crate::features::patterns::{TwoPatternCreate, Patterns, PatternAt, OneColorCreate};
+    use crate::features::patterns::solid::SolidPattern;
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_blended_pattern() {
-        let pattern_a = StripePattern::create(BLACK, WHITE);
-        let pattern_b = StripePattern::create(WHITE, BLACK);
+        let pattern_a = StripePattern::create(SolidPattern::create(BLACK), SolidPattern::create(WHITE));
+        let pattern_b = StripePattern::create(SolidPattern::create(WHITE), SolidPattern::create(BLACK));
 
-        let pattern = BlendedPattern::create(Box::new(pattern_a), Box::new(pattern_b));
+        let pattern = BlendedPattern::create(pattern_a, pattern_b);
 
         let color = Color::create(0.5, 0.5, 0.5);
         assert!(pattern.pattern_at(&Point::zero()).equals(color));

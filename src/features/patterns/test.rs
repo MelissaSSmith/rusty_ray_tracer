@@ -1,47 +1,19 @@
-use std::any::Any;
 use crate::features::color::Color;
-use crate::features::patterns::Pattern;
+use crate::features::patterns::{EmptyCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
-pub struct TestPattern {
-    transformation: Matrix,
-    inverse_transformation: Matrix
-}
+pub struct TestPattern {}
 
-impl TestPattern {
-    pub fn create() -> TestPattern {
-        TestPattern {
-            transformation: Matrix::identity(),
-            inverse_transformation: Matrix::identity().inverse()
-        }
+impl EmptyCreate for TestPattern {
+    fn create() -> Pattern {
+        Pattern::create(Box::new(Patterns::Test(TestPattern {})))
     }
 }
 
-impl Pattern for TestPattern {
-    fn box_clone(&self) -> Box<dyn Pattern> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn transformation(&self) -> Matrix {
-        self.transformation.clone()
-    }
-
-    fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
-    }
-
-    fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
-        self.inverse_transformation = self.transformation.inverse();
-    }
-
+impl PatternAt for TestPattern {
     fn pattern_at(&self, point: &Point) -> Color {
         Color::create(point.x(), point.y(), point.z())
     }
@@ -50,7 +22,7 @@ impl Pattern for TestPattern {
 #[cfg(test)]
 mod tests {
     use crate::features::color::Color;
-    use crate::features::patterns::Pattern;
+    use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
