@@ -70,38 +70,3 @@ impl PatternAt for PerturbedPattern {
         self.pattern.pattern_at(&Point::create(new_x, new_y, new_z))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::features::color::consts::WHITE;
-    use crate::features::patterns::{OneColorCreate, OnePatternWithScale, Patterns};
-    use crate::features::patterns::perturb::PerturbedPattern;
-    use crate::features::patterns::solid::SolidPattern;
-
-    #[test]
-    fn test_fade() {
-        let pattern = PerturbedPattern::create(SolidPattern::create(WHITE), None);
-
-        let fade = pattern.fade(1.0);
-
-        assert_eq!(fade, 1.0);
-    }
-
-    #[test]
-    fn test_lerp() {
-        let pattern = PerturbedPattern::create(SolidPattern::create(WHITE), None);
-
-        let fade = pattern.lerp(1.0, 2.0, 3.0);
-
-        assert_eq!(fade, 3.0);
-    }
-
-    #[test]
-    fn test_grad() {
-        let pattern = PerturbedPattern::create(SolidPattern::create(WHITE), None);
-
-        let grad = pattern.grad(0, 1.0, 1.0, 1.0);
-
-        assert_eq!(grad, 2.0);
-    }
-}

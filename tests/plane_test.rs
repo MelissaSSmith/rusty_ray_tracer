@@ -8,8 +8,9 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::blended::BlendedPattern;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
+use rusty_ray_tracer::features::patterns::solid::SolidPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
-use rusty_ray_tracer::features::patterns::TwoColorCreate;
+use rusty_ray_tracer::features::patterns::{OneColorCreate, TwoPatternCreate};
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::primitives::vector::Vector;
@@ -19,16 +20,15 @@ use rusty_ray_tracer::features::world::World;
 #[test]
 #[ignore]
 fn sphere_scene_test() {
-    let mut pattern_a = StripePattern::create(Color::create(1.0, 0.7529, 0.7961), Color::create(0.906, 0.329, 0.502));
+    let mut pattern_a = StripePattern::create(SolidPattern::create(Color::create(1.0, 0.7529, 0.7961)), SolidPattern::create(Color::create(0.906, 0.329, 0.502)));
     let transform_a = Matrix::rotate_y(FRAC_PI_4) * Matrix::scale(0.25, 0.25, 0.25);
     pattern_a.transform(transform_a);
-    let mut pattern_b = StripePattern::create(Color::create(0.0, 0.0, 0.3921), Color::create(0.0, 0.0, 0.967));
+    let mut pattern_b = StripePattern::create(SolidPattern::create(Color::create(0.0, 0.0, 0.3921)), SolidPattern::create(Color::create(0.0, 0.0, 0.967)));
     let transform_b = Matrix::rotate_y(-FRAC_PI_4) * Matrix::scale(0.25, 0.25, 0.25);
     pattern_b.transform(transform_b);
 
-    let pattern = CheckerPattern::create_with_patterns(Box::new(pattern_a), Box::new(pattern_b));
-    let mut floor_material = Material::create();
-    floor_material.set_pattern_box(Box::new(pattern));
+    let pattern = CheckerPattern::create(pattern_a, pattern_b);
+    let floor_material = Material::create().with_pattern(pattern);
 
     let floor = Shape::Plane.create()
         .with_material(floor_material)

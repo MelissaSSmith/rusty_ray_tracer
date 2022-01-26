@@ -28,8 +28,7 @@ fn sphere_shadow_test() {
 
     let mut canvas = Canvas::create(canvas_pixels, canvas_pixels);
     let pattern = CheckerPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
-    let mut material = Material::create();
-    material.set_pattern_box(Box::new(pattern));
+    let material = Material::create().with_pattern(pattern);
     let shape = Shape::Sphere.create()
         .with_material(material)
         .with_transform(Matrix::scale(2.0, 2.0, 2.0));

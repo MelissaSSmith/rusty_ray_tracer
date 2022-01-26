@@ -1,7 +1,7 @@
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::operations::consts::EPSILON;
-use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
@@ -42,9 +42,9 @@ impl TwoPatternCreate for CheckerPattern {
     }
 }
 
-impl PatternAt for CheckerPattern {
-    fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.inverse_transformation() * *point;
+impl PatternAtWithInverse for CheckerPattern {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
+        let tp = inverse.clone() * *point;
         let value = (tp.x() + EPSILON).floor()
             + (tp.y() + EPSILON).floor()
             + (tp.z() + EPSILON).floor();

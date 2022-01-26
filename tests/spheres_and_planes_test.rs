@@ -67,11 +67,10 @@ fn sphere_scene_test() {
 
     let pattern = CheckerPattern::create(Color::create(0.906, 0.329, 0.502), WHITE);
     let perturb_pattern = PerturbedPattern::create(pattern, Some(4.0));
-    let mut floor_material = material.clone();
-    floor_material.set_pattern_box(Box::new(perturb_pattern));
+    let floor_material = material.clone().with_pattern(perturb_pattern);
 
     let backdrop = Shape::Plane.create()
-        .with_material(Material::create().with_ambient(1.0).with_pattern_box(Box::new(StripePattern::create(Color::create(0.5, 0.5, 0.5), Color::create(0.1, 0.1, 0.1)))))
+        .with_material(Material::create().with_ambient(1.0).with_pattern(StripePattern::create(Color::create(0.5, 0.5, 0.5), Color::create(0.1, 0.1, 0.1))))
         .with_transform(Matrix::rotate_x(PI/2.0) * Matrix::translate(0.0, 0.0, 4.0));
 
     let floor = Shape::Plane.create().with_material(floor_material);

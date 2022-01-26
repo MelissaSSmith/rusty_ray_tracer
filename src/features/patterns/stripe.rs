@@ -1,6 +1,6 @@
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
@@ -34,16 +34,16 @@ impl TwoPatternCreate for StripePattern {
             pattern_b: Box::new(pattern_b)
         };
         Pattern {
-            pattern: Box::new(Patterns::Stripe(pattern),)
+            pattern: Box::new(Patterns::Stripe(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
     }
 }
 
-impl PatternAt for StripePattern {
-    fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.inverse_transformation() * *point;
+impl PatternAtWithInverse for StripePattern {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
+        let tp = inverse.clone() * *point;
 
         if tp.x().floor() % 2.0 == 0.0 {
             return self.pattern_a.pattern_at(&tp);

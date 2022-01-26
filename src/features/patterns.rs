@@ -1,4 +1,3 @@
-use std::any::Any;
 use crate::features::color::Color;
 use crate::features::patterns::blended::BlendedPattern;
 use crate::features::patterns::checkers::CheckerPattern;
@@ -47,14 +46,14 @@ impl Pattern {
     fn call_pattern_at(&self, pattern_point: & Point) -> Color {
         let pattern = self.pattern.as_ref();
         match &pattern {
-            Patterns::Blended(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Checkers(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Gradient(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Blended(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
+            Patterns::Checkers(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
+            Patterns::Gradient(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
             Patterns::Perturb(p) => { p.pattern_at(&pattern_point) }
-            Patterns::RadialGradient(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Ring(p) => { p.pattern_at(&pattern_point) }
+            Patterns::RadialGradient(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
+            Patterns::Ring(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
             Patterns::Solid(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Stripe(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Stripe(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
             Patterns::Test(p) => { p.pattern_at(&pattern_point) }
         }
     }
@@ -94,6 +93,10 @@ impl PatternAt for Pattern {
 
 pub trait PatternAt {
     fn pattern_at(&self, point: &Point) -> Color;
+}
+
+pub trait PatternAtWithInverse {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color;
 }
 
 pub trait EmptyCreate {

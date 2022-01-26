@@ -1,6 +1,6 @@
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{Pattern, PatternAt, Patterns, TwoPatternCreate};
+use crate::features::patterns::{Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoPatternCreate};
 use crate::features::primitives::point::Point;
 
 #[derive(Clone)]
@@ -24,9 +24,9 @@ impl TwoPatternCreate for BlendedPattern {
     }
 }
 
-impl PatternAt for BlendedPattern {
-    fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.inverse_transformation() * *point; // todo: need correct to get the inverse for given functions
+impl PatternAtWithInverse for BlendedPattern {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
+        let tp = inverse.clone() * *point;
         let color_a = self.pattern_a.pattern_at(&tp) * 0.5;
         let color_b = self.pattern_b.pattern_at(&tp) * 0.5;
 
@@ -39,15 +39,16 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::blended::BlendedPattern;
-    use crate::features::patterns::{TwoPatternCreate, TwoColorCreate, Patterns, PatternAt};
+    use crate::features::patterns::{TwoPatternCreate, Patterns, PatternAt, OneColorCreate};
+    use crate::features::patterns::solid::SolidPattern;
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_blended_pattern() {
-        let pattern_a = StripePattern::create(BLACK, WHITE);
-        let pattern_b = PStripePattern::create(WHITE, BLACK);
+        let pattern_a = StripePattern::create(SolidPattern::create(BLACK), SolidPattern::create(WHITE));
+        let pattern_b = StripePattern::create(SolidPattern::create(WHITE), SolidPattern::create(BLACK));
 
         let pattern = BlendedPattern::create(pattern_a, pattern_b);
 

@@ -1,6 +1,6 @@
 use crate::features::color::Color;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns, TwoColorCreate, TwoPatternCreate};
+use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
@@ -41,9 +41,9 @@ impl TwoPatternCreate for GradientPattern {
     }
 }
 
-impl PatternAt for GradientPattern {
-    fn pattern_at(&self, point: &Point) -> Color {
-        let tp = pattern.inverse_transformation() * *point;
+impl PatternAtWithInverse for GradientPattern {
+    fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
+        let tp = inverse.clone() * *point;
         let color_a = self.pattern_a.pattern_at(&tp);
         let distance = self.pattern_b.pattern_at(&tp) - color_a;
         let fraction = tp.x() - tp.x().floor();

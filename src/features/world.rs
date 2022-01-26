@@ -188,6 +188,7 @@ mod tests {
     use crate::features::intersection::Intersection;
     use crate::features::light::PointLight;
     use crate::features::material::Material;
+    use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
@@ -520,7 +521,7 @@ mod tests {
         let mut a = world.clone().objects()[0].clone();
         a.set_material(Material::create()
             .with_ambient(1.0)
-            .with_pattern_box(Box::new(TestPattern::create()))
+            .with_pattern(TestPattern::create())
         );
         let mut b = world.clone().objects()[1].clone();
         b.set_material(Material::create()
