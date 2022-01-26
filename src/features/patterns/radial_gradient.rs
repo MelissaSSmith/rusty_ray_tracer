@@ -7,19 +7,19 @@ use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct RadialGradientPattern {
-    pattern_a: Pattern,
-    pattern_b: Pattern
+    pattern_a: Box<Pattern>,
+    pattern_b: Box<Pattern>
 }
 
 impl TwoColorCreate for RadialGradientPattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
         let pattern = RadialGradientPattern {
-            pattern_a: SolidPattern::create(color_a),
-            pattern_b: SolidPattern::create(color_b)
+            pattern_a: Box::new(SolidPattern::create(color_a)),
+            pattern_b: Box::new(SolidPattern::create(color_b))
         };
         Pattern {
-            pattern: Patterns::RadialGradient(pattern),
+            pattern: Box::new(Patterns::RadialGradient(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
@@ -30,11 +30,11 @@ impl TwoPatternCreate for RadialGradientPattern {
     fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = RadialGradientPattern {
-            pattern_a,
-            pattern_b
+            pattern_a: Box::new(pattern_a),
+            pattern_b: Box::new(pattern_b)
         };
         Pattern {
-            pattern: Patterns::RadialGradient(pattern),
+            pattern: Box::new(Patterns::RadialGradient(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
@@ -43,7 +43,7 @@ impl TwoPatternCreate for RadialGradientPattern {
 
 impl PatternAt for RadialGradientPattern {
     fn pattern_at(&self, point: &Point) -> Color {
-        let tp = self.inverse_transformation() * *point;
+        let tp = pattern.inverse_transformation() * *point;
         let distance = (tp.x().powi(2) + tp.z().powi(2)).sqrt();
         let fraction = distance - distance.floor();
 

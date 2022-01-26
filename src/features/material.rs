@@ -1,7 +1,7 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::light::PointLight;
-use crate::features::patterns::{OneColorCreate, Pattern, Patterns};
+use crate::features::patterns::{OneColorCreate, Pattern};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;

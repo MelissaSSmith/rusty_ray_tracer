@@ -13,7 +13,7 @@ impl OneColorCreate for SolidPattern {
         let transform = Matrix::identity();
         let pattern = SolidPattern { color };
         Pattern {
-            pattern: Patterns::Solid(pattern),
+            pattern: Box::new(Patterns::Solid(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }

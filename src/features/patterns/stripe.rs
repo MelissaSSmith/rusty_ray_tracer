@@ -7,19 +7,19 @@ use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct StripePattern {
-    pattern_a: Pattern,
-    pattern_b: Pattern
+    pattern_a: Box<Pattern>,
+    pattern_b: Box<Pattern>
 }
 
 impl TwoColorCreate for StripePattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();
         let pattern = StripePattern {
-            pattern_a: SolidPattern::create(color_a),
-            pattern_b: SolidPattern::create(color_b)
+            pattern_a: Box::new(SolidPattern::create(color_a)),
+            pattern_b: Box::new(SolidPattern::create(color_b))
         };
         Pattern {
-            pattern: Patterns::Stripe(pattern),
+            pattern: Box::new(Patterns::Stripe(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
@@ -30,11 +30,11 @@ impl TwoPatternCreate for StripePattern {
     fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
         let transform = Matrix::identity();
         let pattern = StripePattern {
-            pattern_a,
-            pattern_b
+            pattern_a: Box::new(pattern_a),
+            pattern_b: Box::new(pattern_b)
         };
         Pattern {
-            pattern: Patterns::Stripe(pattern),
+            pattern: Box::new(Patterns::Stripe(pattern),)
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }

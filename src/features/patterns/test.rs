@@ -11,7 +11,7 @@ impl EmptyCreate for TestPattern {
     fn create() -> Pattern {
         let transform = Matrix::identity();
         Pattern {
-            pattern: Patterns::Test(TestPattern {}),
+            pattern: Box::new(Patterns::Test(TestPattern {})),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }

@@ -38,9 +38,26 @@ pub enum Patterns {
 
 #[derive(Clone)]
 pub struct Pattern {
-    pattern: Patterns,
+    pattern: Box<Patterns>,
     transformation: Matrix,
     inverse_transformation: Matrix
+}
+
+impl Pattern {
+    fn call_pattern_at(&self, pattern_point: & Point) -> Color {
+        let pattern = self.pattern.as_ref();
+        match &pattern {
+            Patterns::Blended(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Checkers(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Gradient(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Perturb(p) => { p.pattern_at(&pattern_point) }
+            Patterns::RadialGradient(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Ring(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Solid(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Stripe(p) => { p.pattern_at(&pattern_point) }
+            Patterns::Test(p) => { p.pattern_at(&pattern_point) }
+        }
+    }
 }
 
 impl Pattern {
@@ -53,7 +70,7 @@ impl Pattern {
     }
 
     pub fn pattern(&self) -> Patterns {
-        self.pattern.clone()
+        self.pattern.as_ref().clone()
     }
 
     pub fn transform(&mut self, transform: Matrix) {
@@ -65,17 +82,13 @@ impl Pattern {
         let object_point = object.inverse_transformation() * *point;
         let pattern_point = self.inverse_transformation() * object_point;
 
-        match &self.pattern {
-            Patterns::Blended(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Checkers(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Gradient(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Perturb(p) => { p.pattern_at(&pattern_point) }
-            Patterns::RadialGradient(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Ring(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Solid(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Stripe(p) => { p.pattern_at(&pattern_point) }
-            Patterns::Test(p) => { p.pattern_at(&pattern_point) }
-        }
+        self.call_pattern_at(&pattern_point)
+    }
+}
+
+impl PatternAt for Pattern {
+    fn pattern_at(&self, point: &Point) -> Color {
+        Pattern::call_pattern_at(self, point)
     }
 }
 

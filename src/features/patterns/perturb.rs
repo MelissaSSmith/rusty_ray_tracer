@@ -7,7 +7,7 @@ use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone)]
 pub struct PerturbedPattern {
-    pattern: Pattern,
+    pattern: Box<Pattern>,
     scale: f64
 }
 
@@ -51,11 +51,11 @@ impl OnePatternWithScale for PerturbedPattern {
             Some(s) => { s }
         };
         let pattern = PerturbedPattern {
-            pattern,
+            pattern: Box::new(pattern),
             scale: s
         };
         Pattern {
-            pattern: Patterns::Perturb(pattern),
+            pattern: Box::new(Patterns::Perturb(pattern)),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse()
         }
