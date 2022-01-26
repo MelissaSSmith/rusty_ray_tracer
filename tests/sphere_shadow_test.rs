@@ -8,7 +8,7 @@ use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
-use rusty_ray_tracer::features::patterns::PatternTrait;
+use rusty_ray_tracer::features::patterns::TwoColorCreate;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::ray::Ray;

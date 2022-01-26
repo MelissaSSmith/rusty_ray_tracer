@@ -12,9 +12,6 @@ pub struct CheckerPattern {
     pattern_b: Box<Pattern>
 }
 
-impl CheckerPattern {
-}
-
 impl TwoColorCreate for CheckerPattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
         let transform = Matrix::identity();

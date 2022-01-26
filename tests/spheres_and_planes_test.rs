@@ -8,7 +8,7 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::gradient::GradientPattern;
-use rusty_ray_tracer::features::patterns::{OneColorCreate, OnePatternWithScale, PatternTrait, TwoColorCreate};
+use rusty_ray_tracer::features::patterns::{OneColorCreate, OnePatternWithScale, TwoColorCreate};
 use rusty_ray_tracer::features::patterns::perturb::PerturbedPattern;
 use rusty_ray_tracer::features::patterns::radial_gradient::RadialGradientPattern;
 use rusty_ray_tracer::features::patterns::ring::RingPattern;

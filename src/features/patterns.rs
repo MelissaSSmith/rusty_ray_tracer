@@ -119,25 +119,3 @@ pub trait TwoPatternCreate {
 pub trait OnePatternWithScale {
     fn create(pattern: Pattern, scale: Option<f64>) -> Pattern;
 }
-
-pub trait PatternTrait: Any { //todo: phase out
-    fn box_clone(&self) -> Box<dyn PatternTrait>;
-    fn as_any(&self) -> &dyn Any;
-    fn transformation(&self) -> Matrix;
-    fn inverse_transformation(&self) -> Matrix;
-    fn transform(&mut self, transform: Matrix);
-    fn pattern_at(&self, point: &Point) -> Color;
-
-    fn pattern_at_object(&self, object: &Object, point: &Point) -> Color {
-        let object_point = object.inverse_transformation() * *point;
-        let pattern_point = self.inverse_transformation() * object_point;
-
-        self.pattern_at(&pattern_point)
-    }
-}
-
-impl Clone for Box<dyn PatternTrait> {
-    fn clone(&self) -> Self {
-        self.box_clone()
-    }
-}
