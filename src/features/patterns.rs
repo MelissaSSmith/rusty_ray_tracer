@@ -43,6 +43,15 @@ pub struct Pattern {
 }
 
 impl Pattern {
+    pub fn create(pattern: Box<Patterns>) -> Pattern {
+        let transform = Matrix::identity();
+        Pattern {
+            pattern,
+            transformation: transform.clone(),
+            inverse_transformation: transform.inverse()
+        }
+    }
+
     fn call_pattern_at(&self, pattern_point: & Point) -> Color {
         let pattern = self.pattern.as_ref();
         match &pattern {

@@ -28,16 +28,11 @@ impl TwoColorCreate for GradientPattern {
 
 impl TwoPatternCreate for GradientPattern {
     fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
-        let transform = Matrix::identity();
         let pattern = GradientPattern {
             pattern_a: Box::new(pattern_a),
             pattern_b: Box::new(pattern_b)
         };
-        Pattern {
-            pattern: Box::new(Patterns::Gradient(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Gradient(pattern)))
     }
 }
 

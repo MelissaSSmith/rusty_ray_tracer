@@ -11,16 +11,11 @@ pub struct BlendedPattern {
 
 impl TwoPatternCreate for BlendedPattern {
     fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
-        let transform = Matrix::identity();
         let pattern = BlendedPattern {
             pattern_a: Box::new(pattern_a),
             pattern_b: Box::new(pattern_b)
         };
-        Pattern {
-            pattern: Box::new(Patterns::Blended(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Blended(pattern)))
     }
 }
 

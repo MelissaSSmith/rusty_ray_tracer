@@ -1,6 +1,5 @@
 use noise::{Perlin, NoiseFn};
 use crate::features::color::Color;
-use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::{OnePatternWithScale, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
@@ -45,7 +44,6 @@ impl PerturbedPattern {
 
 impl OnePatternWithScale for PerturbedPattern {
     fn create(pattern: Pattern, scale: Option<f64>) -> Pattern {
-        let transform = Matrix::identity();
         let s = match scale {
             None => { 1.0 }
             Some(s) => { s }
@@ -54,11 +52,7 @@ impl OnePatternWithScale for PerturbedPattern {
             pattern: Box::new(pattern),
             scale: s
         };
-        Pattern {
-            pattern: Box::new(Patterns::Perturb(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Perturb(pattern)))
     }
 }
 

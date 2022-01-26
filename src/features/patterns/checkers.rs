@@ -29,16 +29,11 @@ impl TwoColorCreate for CheckerPattern {
 
 impl TwoPatternCreate for CheckerPattern {
     fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
-        let transform = Matrix::identity();
         let pattern = CheckerPattern {
             pattern_a: Box::new(pattern_a),
             pattern_b: Box::new(pattern_b)
         };
-        Pattern {
-            pattern: Box::new(Patterns::Checkers(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Checkers(pattern)))
     }
 }
 

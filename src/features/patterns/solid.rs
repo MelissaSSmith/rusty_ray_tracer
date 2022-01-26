@@ -10,13 +10,8 @@ pub struct SolidPattern {
 
 impl OneColorCreate for SolidPattern {
     fn create(color: Color) -> Pattern {
-        let transform = Matrix::identity();
         let pattern = SolidPattern { color };
-        Pattern {
-            pattern: Box::new(Patterns::Solid(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Solid(pattern)))
     }
 }
 

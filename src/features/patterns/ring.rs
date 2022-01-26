@@ -28,16 +28,11 @@ impl TwoColorCreate for RingPattern {
 
 impl TwoPatternCreate for RingPattern {
     fn create(pattern_a: Pattern, pattern_b: Pattern) -> Pattern {
-        let transform = Matrix::identity();
         let pattern = RingPattern {
             pattern_a: Box::new(pattern_a),
             pattern_b: Box::new(pattern_b)
         };
-        Pattern {
-            pattern: Box::new(Patterns::Ring(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Ring(pattern)))
     }
 }
 

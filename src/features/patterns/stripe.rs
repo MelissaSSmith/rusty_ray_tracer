@@ -13,16 +13,11 @@ pub struct StripePattern {
 
 impl TwoColorCreate for StripePattern {
     fn create(color_a: Color, color_b: Color) -> Pattern {
-        let transform = Matrix::identity();
         let pattern = StripePattern {
             pattern_a: Box::new(SolidPattern::create(color_a)),
             pattern_b: Box::new(SolidPattern::create(color_b))
         };
-        Pattern {
-            pattern: Box::new(Patterns::Stripe(pattern)),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Stripe(pattern)))
     }
 }
 

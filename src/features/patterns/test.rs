@@ -9,12 +9,7 @@ pub struct TestPattern {}
 
 impl EmptyCreate for TestPattern {
     fn create() -> Pattern {
-        let transform = Matrix::identity();
-        Pattern {
-            pattern: Box::new(Patterns::Test(TestPattern {})),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse()
-        }
+        Pattern::create(Box::new(Patterns::Test(TestPattern {})))
     }
 }
 
