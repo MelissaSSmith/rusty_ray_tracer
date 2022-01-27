@@ -111,6 +111,13 @@ impl World {
         let reflected = self.reflected_color(&computation, remaining);
         let refracted = self.refracted_color(&computation, remaining);
 
+        let material = &computation.clone().object().material();
+        if material.reflective() > 0.0 && material.transparency() > 0.0 {
+            let reflectance = Intersection::schlick(computation);
+
+            return  surface_color + reflected * reflectance + refracted * (1.0 - reflectance);
+        }
+
         surface_color + reflected + refracted
     }
 
@@ -571,5 +578,34 @@ mod tests {
         let color = world.shade_hit(&computations, 5);
 
         assert!(color.equals(Color::create(0.93642, 00.68642, 0.68642)));
+    }
+
+    #[test]
+    fn test_shade_hit_with_a_transparent_and_reflective_material() {
+        let sqrt2 = f64::sqrt(2.0);
+        let mut world = World::create_default();
+        let floor = Shape::Plane.create()
+            .with_transform(Matrix::translate(0.0, -1.0, 0.0))
+            .with_material(Material::create()
+                .with_transparency(0.5)
+                .with_refractive_index(1.5)
+                .with_reflective(0.5)
+            );
+        let ball = Shape::Plane.create()
+            .with_transform(Matrix::translate(0.0, -3.5, -0.5))
+            .with_material(Material::create()
+                .with_color(Color::create(1.0, 0.0, 0.0))
+                .with_ambient(0.5)
+            );
+        world.add_object(floor.clone());
+        world.add_object(ball.clone());
+
+        let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
+        let intersections = vec![Intersection::create(sqrt2, &floor)];
+        let computations = intersections[0].prepare_computations(ray, &intersections);
+
+        let color = world.shade_hit(&computations, 5);
+
+        assert!(color.equals(Color::create(0.93391, 0.69643, 0.69243)));
     }
 }

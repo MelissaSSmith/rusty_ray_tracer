@@ -48,6 +48,7 @@ impl Intersection {
 
         computation.set_n1(n1);
         computation.set_n2(n2);
+        computation.set_cos_i(eye_vector ^ normal);
         computation.set_point(point);
         computation.set_eye_vector(eye_vector);
         computation.set_normal_vector(normal);
@@ -97,6 +98,27 @@ impl Intersection {
         containers.last().unwrap().material().refractive_index()
     }
 
+
+    pub fn schlick(computations: &Computation) -> f64 {
+        let n1 = computations.n1();
+        let n2 = computations.n2();
+
+        let mut cos = computations.cos_i();
+
+        if n1 > n2 {
+            let n = n1 / n2;
+            let sin2_t = n.powi(2) * (1.0 - cos.powi(2));
+            if sin2_t > 1.0 {
+                return 1.0;
+            }
+            cos = (1.0 - sin2_t).sqrt();
+        }
+
+        let r0 = ((n1 - n2) / (n1 + n2)).powi(2);
+
+        r0 + (1.0 - r0) * (1.0 - cos).powi(5)
+    }
+
     fn equals(&self, _intersection: Intersection) -> bool {
         self.t == _intersection.t &&
             self.object.equals(&_intersection.object)
@@ -110,6 +132,7 @@ mod tests {
     use crate::features::material::Material;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::operations::consts::EPSILON;
+    use crate::features::primitives::operations::Operations;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::primitives::tuple_trait::Tuple;
@@ -314,5 +337,44 @@ mod tests {
 
         assert!(computation.under_point().z() > EPSILON/2.0);
         assert!(computation.point().z() < computation.under_point().z());
+    }
+
+
+    #[test]
+    fn test_determine_reflectance_under_total_internal_reflection() {
+        let sqrt2 = f64::sqrt(2.0);
+        let shape = Shape::Sphere.glass();
+        let ray = Ray::create(Point::create(0.0, 0.0, sqrt2/2.0), Vector::create(0.0, 1.0, 0.0));
+        let intersections = vec![Intersection::create(-sqrt2/2.0, &shape), Intersection::create(sqrt2/2.0, &shape)];
+        let computations = intersections[1].prepare_computations(ray, &intersections);
+
+        let reflectance = Intersection::schlick(&computations);
+
+        assert_eq!(reflectance, 1.0);
+    }
+
+    #[test]
+    fn test_determine_reflectance_of_a_perpendicular_ray() {
+        let sqrt2 = f64::sqrt(2.0);
+        let shape = Shape::Sphere.glass();
+        let ray = Ray::create(Point::zero(), Vector::create(0.0, 1.0, 0.0));
+        let intersections = vec![Intersection::create(-1.0, &shape), Intersection::create(1.0, &shape)];
+        let computations = intersections[1].prepare_computations(ray, &intersections);
+
+        let reflectance = Intersection::schlick(&computations);
+
+        assert!(reflectance.equals(0.04));
+    }
+
+    #[test]
+    fn test_determine_reflectance_when_n2_is_greater_than_n1_and_small_angle() {
+        let shape = Shape::Sphere.glass();
+        let ray = Ray::create(Point::create(0.0, 0.99, -2.0), Vector::create(0.0, 0.0, 1.0));
+        let intersections = vec![Intersection::create(1.8589, &shape)];
+        let computations = intersections[0].prepare_computations(ray, &intersections);
+
+        let reflectance = Intersection::schlick(&computations);
+
+        assert!(reflectance.equals(0.48873));
     }
 }

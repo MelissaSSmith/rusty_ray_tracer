@@ -33,7 +33,7 @@ fn sphere_scene_test() {
         .with_ambient(0.1)
         .with_diffuse(0.7)
         .with_specular(0.3)
-        .with_reflective(0.75)
+        .with_reflective(0.25)
         .with_pattern(PerturbedPattern::create(mid_pattern, Some(2.5)));
     let middle = Shape::Sphere.create()
         .with_transform(Matrix::translate(-0.5, 1.0, 0.5) * Matrix::rotate_x(PI/2.0))
@@ -70,8 +70,8 @@ fn sphere_scene_test() {
     let floor_material = material.clone().with_pattern(perturb_pattern);
 
     let backdrop = Shape::Plane.create()
-        .with_material(Material::create().with_ambient(1.0).with_pattern(StripePattern::create(Color::create(0.5, 0.5, 0.5), Color::create(0.1, 0.1, 0.1))))
-        .with_transform(Matrix::rotate_x(PI/2.0) * Matrix::translate(0.0, 0.0, 4.0));
+        .with_material(Material::create().with_ambient(1.0).with_color(Color::create(0.1, 0.1, 0.1)).with_reflective(1.0))
+        .with_transform(Matrix::translate(0.0, 0.0, 4.0) * Matrix::rotate_x(PI/2.0));
 
     let floor = Shape::Plane.create().with_material(floor_material);
 
