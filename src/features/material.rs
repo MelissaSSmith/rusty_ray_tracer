@@ -63,6 +63,10 @@ impl Material {
         self.specular = specular;
     }
 
+    pub fn set_shininess(&mut self, shininess: f64) {
+        self.shininess = shininess;
+    }
+
     pub fn set_reflective(&mut self, reflective: f64) {
         self.reflective = reflective;
     }
@@ -105,6 +109,13 @@ impl Material {
     pub fn with_specular(self, specular: f64) -> Material {
         Material {
             specular,
+            ..self
+        }
+    }
+
+    pub fn with_shininess(self, shininess: f64) -> Material {
+        Material {
+            shininess,
             ..self
         }
     }

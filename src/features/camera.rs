@@ -77,6 +77,14 @@ impl Camera {
         self.inverse_transform = self.transform.inverse();
     }
 
+    pub fn with_transform(self, transform: Matrix) -> Camera {
+        Camera {
+            transform: transform.clone(),
+            inverse_transform: transform.inverse(),
+            ..self
+        }
+    }
+
     fn calculate_pixel_size(h_size: i32, v_size: i32, field_of_view: f64) -> PixelSize {
         let half_view = (field_of_view/2.0).tan();
         let aspect = h_size as f64 / v_size as f64;
