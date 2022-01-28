@@ -180,7 +180,7 @@ impl World {
                 match hit {
                     None => { false }
                     Some(h) => {
-                        h.t < distance
+                        h.t < distance && h.object.has_shadow()
                     }
                 }
             }
@@ -312,7 +312,7 @@ mod tests {
 
         let color = world.color_at(&ray);
 
-        assert!(color.equals(world.objects[1].material().color()));
+        assert!(color.equals(WHITE));
     }
 
     #[test]

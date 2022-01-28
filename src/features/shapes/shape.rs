@@ -72,7 +72,8 @@ pub struct Object {
     transformation: Matrix,
     inverse_transformation: Matrix,
     material: Material,
-    shape: String
+    shape: String,
+    has_shadow: bool
 }
 
 impl Object {
@@ -82,7 +83,8 @@ impl Object {
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material: Material::create(),
-            shape: shape_type
+            shape: shape_type,
+            has_shadow: true
         }
     }
 
@@ -95,7 +97,8 @@ impl Object {
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
-            shape: shape_type
+            shape: shape_type,
+            has_shadow: true
         }
     }
 
@@ -108,7 +111,8 @@ impl Object {
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
-            shape: shape_type
+            shape: shape_type,
+            has_shadow: false
         }
     }
 
@@ -121,7 +125,8 @@ impl Object {
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
-            shape: shape_type
+            shape: shape_type,
+            has_shadow: false
         }
     }
 
@@ -134,7 +139,8 @@ impl Object {
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
-            shape: shape_type
+            shape: shape_type,
+            has_shadow: false
         }
     }
 
@@ -147,7 +153,8 @@ impl Object {
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
-            shape: shape_type
+            shape: shape_type,
+            has_shadow: true
         }
     }
 
@@ -173,6 +180,10 @@ impl Object {
         self.shape.clone()
     }
 
+    pub fn has_shadow(&self) -> bool {
+        self.has_shadow
+    }
+
     pub fn set_transform(&mut self, _transformation: Matrix) {
         self.transformation = _transformation.clone();
         self.inverse_transformation = _transformation.inverse();
@@ -193,6 +204,13 @@ impl Object {
     pub fn with_material(self, _material: Material) -> Object {
         Object {
             material: _material,
+            ..self
+        }
+    }
+
+    pub fn with_has_shadow(self, _has_shadow: bool) -> Object {
+        Object {
+            has_shadow: _has_shadow,
             ..self
         }
     }

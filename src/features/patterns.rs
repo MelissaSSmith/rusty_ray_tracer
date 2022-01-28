@@ -66,6 +66,11 @@ impl Pattern {
             Patterns::Test(p) => { p.pattern_at(&pattern_point) }
         }
     }
+
+    pub fn equals(&self, other_pattern: &Pattern) -> bool {
+        self.transformation.equals(other_pattern.clone().transformation) &&
+            self.inverse_transformation.equals(other_pattern.clone().inverse_transformation) //todo: add patterns
+    }
 }
 
 impl Pattern {

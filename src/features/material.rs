@@ -10,7 +10,6 @@ use crate::features::shapes::shape::Object;
 #[derive(Clone)]
 pub struct Material {
     pattern: Pattern,
-    color: Color,
     ambient: f64,
     diffuse: f64,
     specular: f64,
@@ -24,7 +23,6 @@ impl Material {
     pub fn create() -> Material {
         Material {
             pattern: SolidPattern::create(WHITE),
-            color: WHITE,
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
@@ -43,7 +41,7 @@ impl Material {
             self.reflective == other_material.reflective &&
             self.transparency == other_material.transparency &&
             self.refractive_index == other_material.refractive_index &&
-            self.color.equals(other_material.color) //todo: add pattern
+            self.pattern.equals(&other_material.pattern)
     }
 
     //setters
@@ -149,10 +147,6 @@ impl Material {
     }
 
     //getters
-    pub fn color(&self) -> Color {
-        self.color
-    }
-
     pub fn reflective(&self) -> f64 {
         self.reflective
     }
