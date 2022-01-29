@@ -40,9 +40,7 @@ impl TwoPatternCreate for CheckerPattern {
 impl PatternAtWithInverse for CheckerPattern {
     fn pattern_at(&self, point: &Point, inverse: &Matrix) -> Color {
         let tp = inverse.clone() * *point;
-        let value = (tp.x() + EPSILON).floor()
-            + (tp.y() + EPSILON).floor()
-            + (tp.z() + EPSILON).floor();
+        let value = tp.x().floor() + tp.y().floor() + tp.z().floor();
         if value % 2.0 == 0.0 {
             return self.pattern_a.pattern_at(&tp);
         }

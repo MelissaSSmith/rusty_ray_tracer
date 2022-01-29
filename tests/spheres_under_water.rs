@@ -17,7 +17,7 @@ use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-//#[ignore]
+#[ignore]
 fn spheres_under_water_test() {
     let camera = Camera::create(300, 300, 0.45)
         .with_transform(Matrix::view_transform(
