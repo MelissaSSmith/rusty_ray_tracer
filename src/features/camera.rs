@@ -55,7 +55,6 @@ impl Camera {
     }
 
     pub fn render(&self, world: World) -> Canvas {
-        const BAND_SIZE: i32 = 10;
         let mut canvas = Canvas::create(self.h_size, self.v_size);
 
         canvas.pixels

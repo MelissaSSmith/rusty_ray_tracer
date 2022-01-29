@@ -6,6 +6,7 @@ use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
+use crate::features::shapes::cube::Cube;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
 
@@ -14,55 +15,71 @@ use crate::features::shapes::plane::Plane;
 pub enum Shape {
     Object,
     Sphere,
-    Plane
+    Plane,
+    Cube
 }
 
 impl Shape {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Shape::Sphere => "Sphere",
+            Shape::Plane => "Plane",
+            Shape::Cube => "Cube",
+            _ => "Object"
+        }
+    }
+
     pub fn create(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::create(String::from("Sphere")) }
-            Shape::Plane => { Object::create(String::from("Plane")) }
-            _ => { Object::create(String::from("Object")) }
+            Shape::Sphere => { Object::create(String::from(Shape::Sphere.as_str())) }
+            Shape::Plane => { Object::create(String::from(Shape::Plane.as_str())) }
+            Shape::Cube => { Object::create(String::from(Shape::Cube.as_str())) }
+            _ => { Object::create(String::from(Shape::Object.as_str())) }
         }
     }
 
     pub fn air(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::air(String::from("Sphere")) }
-            Shape::Plane => { Object::air(String::from("Plane")) }
-            _ => { Object::air(String::from("Object")) }
+            Shape::Sphere => { Object::air(String::from(Shape::Sphere.as_str())) }
+            Shape::Plane => { Object::air(String::from(Shape::Plane.as_str())) }
+            Shape::Cube => { Object::air(String::from(Shape::Cube.as_str())) }
+            _ => { Object::air(String::from(Shape::Object.as_str())) }
         }
     }
 
     pub fn vacuum(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::vacuum(String::from("Sphere")) }
-            Shape::Plane => { Object::vacuum(String::from("Plane")) }
-            _ => { Object::vacuum(String::from("Object")) }
+            Shape::Sphere => { Object::vacuum(String::from(Shape::Sphere.as_str())) }
+            Shape::Plane => { Object::vacuum(String::from(Shape::Plane.as_str())) }
+            Shape::Cube => { Object::vacuum(String::from(Shape::Cube.as_str())) }
+            _ => { Object::vacuum(String::from(Shape::Object.as_str())) }
         }
     }
 
     pub fn water(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::water(String::from("Sphere")) }
-            Shape::Plane => { Object::water(String::from("Plane")) }
-            _ => { Object::water(String::from("Object")) }
+            Shape::Sphere => { Object::water(String::from(Shape::Sphere.as_str())) }
+            Shape::Plane => { Object::water(String::from(Shape::Plane.as_str())) }
+            Shape::Cube => { Object::water(String::from(Shape::Cube.as_str())) }
+            _ => { Object::water(String::from(Shape::Object.as_str())) }
         }
     }
 
     pub fn diamond(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::diamond(String::from("Sphere")) }
-            Shape::Plane => { Object::diamond(String::from("Plane")) }
-            _ => { Object::diamond(String::from("Object")) }
+            Shape::Sphere => { Object::diamond(String::from(Shape::Sphere.as_str())) }
+            Shape::Plane => { Object::diamond(String::from(Shape::Plane.as_str())) }
+            Shape::Cube => { Object::diamond(String::from(Shape::Cube.as_str())) }
+            _ => { Object::diamond(String::from(Shape::Object.as_str())) }
         }
     }
 
     pub fn glass(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::glass(String::from("Sphere")) }
-            Shape::Plane => { Object::glass(String::from("Plane")) }
-            _ => { Object::glass(String::from("Object")) }
+            Shape::Sphere => { Object::glass(String::from(Shape::Sphere.as_str())) }
+            Shape::Plane => { Object::glass(String::from(Shape::Plane.as_str())) }
+            Shape::Cube => { Object::glass(String::from(Shape::Cube.as_str())) }
+            _ => { Object::glass(String::from(Shape::Object.as_str())) }
         }
     }
 }
@@ -222,6 +239,7 @@ impl Intersect for Object {
         match _object.shape.as_ref() {
             "Sphere" => { Sphere::intersect(_object, &transformed_ray) }
             "Plane" => { Plane::intersect(_object, &transformed_ray) }
+            "Cube" => { Cube::intersect(_object, &transformed_ray) }
             _ => { vec![] }
         }
     }
@@ -233,6 +251,7 @@ impl Normal for Object {
         let object_normal = match _object.shape.as_ref() {
             "Sphere" => { Sphere::normal(_object, &object_point) }
             "Plane" => { Plane::normal(_object, &object_point) }
+            "Cube" => { Cube::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
         let world_normal = _object.inverse_transformation().transpose() * object_normal;

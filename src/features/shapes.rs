@@ -7,6 +7,7 @@ use crate::features::shapes::shape::Object;
 pub mod sphere;
 pub mod plane;
 pub mod shape;
+pub mod cube;
 
 pub trait Intersect {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection>;
