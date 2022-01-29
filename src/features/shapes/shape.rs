@@ -7,6 +7,7 @@ use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::cube::Cube;
+use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
 
@@ -16,7 +17,8 @@ pub enum Shape {
     Object,
     Sphere,
     Plane,
-    Cube
+    Cube,
+    Cylinder
 }
 
 impl Shape {
@@ -25,6 +27,7 @@ impl Shape {
             Shape::Sphere => "Sphere",
             Shape::Plane => "Plane",
             Shape::Cube => "Cube",
+            Shape::Cylinder => "Cylinder",
             _ => "Object"
         }
     }
@@ -34,6 +37,7 @@ impl Shape {
             Shape::Sphere => { Object::create(String::from(Shape::Sphere.as_str())) }
             Shape::Plane => { Object::create(String::from(Shape::Plane.as_str())) }
             Shape::Cube => { Object::create(String::from(Shape::Cube.as_str())) }
+            Shape::Cylinder => { Object::create(String::from(Shape::Cylinder.as_str())) }
             _ => { Object::create(String::from(Shape::Object.as_str())) }
         }
     }
@@ -43,6 +47,7 @@ impl Shape {
             Shape::Sphere => { Object::air(String::from(Shape::Sphere.as_str())) }
             Shape::Plane => { Object::air(String::from(Shape::Plane.as_str())) }
             Shape::Cube => { Object::air(String::from(Shape::Cube.as_str())) }
+            Shape::Cylinder => { Object::air(String::from(Shape::Cylinder.as_str())) }
             _ => { Object::air(String::from(Shape::Object.as_str())) }
         }
     }
@@ -52,6 +57,7 @@ impl Shape {
             Shape::Sphere => { Object::vacuum(String::from(Shape::Sphere.as_str())) }
             Shape::Plane => { Object::vacuum(String::from(Shape::Plane.as_str())) }
             Shape::Cube => { Object::vacuum(String::from(Shape::Cube.as_str())) }
+            Shape::Cylinder => { Object::vacuum(String::from(Shape::Cylinder.as_str())) }
             _ => { Object::vacuum(String::from(Shape::Object.as_str())) }
         }
     }
@@ -61,6 +67,7 @@ impl Shape {
             Shape::Sphere => { Object::water(String::from(Shape::Sphere.as_str())) }
             Shape::Plane => { Object::water(String::from(Shape::Plane.as_str())) }
             Shape::Cube => { Object::water(String::from(Shape::Cube.as_str())) }
+            Shape::Cylinder => { Object::water(String::from(Shape::Cylinder.as_str())) }
             _ => { Object::water(String::from(Shape::Object.as_str())) }
         }
     }
@@ -70,6 +77,7 @@ impl Shape {
             Shape::Sphere => { Object::diamond(String::from(Shape::Sphere.as_str())) }
             Shape::Plane => { Object::diamond(String::from(Shape::Plane.as_str())) }
             Shape::Cube => { Object::diamond(String::from(Shape::Cube.as_str())) }
+            Shape::Cylinder => { Object::diamond(String::from(Shape::Cylinder.as_str())) }
             _ => { Object::diamond(String::from(Shape::Object.as_str())) }
         }
     }
@@ -79,6 +87,7 @@ impl Shape {
             Shape::Sphere => { Object::glass(String::from(Shape::Sphere.as_str())) }
             Shape::Plane => { Object::glass(String::from(Shape::Plane.as_str())) }
             Shape::Cube => { Object::glass(String::from(Shape::Cube.as_str())) }
+            Shape::Cylinder => { Object::glass(String::from(Shape::Cylinder.as_str())) }
             _ => { Object::glass(String::from(Shape::Object.as_str())) }
         }
     }
@@ -240,6 +249,7 @@ impl Intersect for Object {
             "Sphere" => { Sphere::intersect(_object, &transformed_ray) }
             "Plane" => { Plane::intersect(_object, &transformed_ray) }
             "Cube" => { Cube::intersect(_object, &transformed_ray) }
+            "Cylinder" => { Cylinder::intersect(_object, &transformed_ray) }
             _ => { vec![] }
         }
     }
@@ -252,6 +262,7 @@ impl Normal for Object {
             "Sphere" => { Sphere::normal(_object, &object_point) }
             "Plane" => { Plane::normal(_object, &object_point) }
             "Cube" => { Cube::normal(_object, &object_point) }
+            "Cylinder" => { Cylinder::normal(_object, &transformed_ray) }
             _ => { Vector::zero() }
         };
         let world_normal = _object.inverse_transformation().transpose() * object_normal;
