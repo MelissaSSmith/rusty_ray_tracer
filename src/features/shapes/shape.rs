@@ -12,7 +12,6 @@ use crate::features::shapes::cube::Cube;
 use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
-use crate::features::shapes::shape::Shape::Cone;
 
 //todo: derive => Debug, PartialEq, Serialize, Deserialize (requires Matrix not using Vec in backend)
 #[derive(Clone)]
@@ -22,7 +21,7 @@ pub enum Shape {
     Plane,
     Cube,
     Cylinder(Cylinder),
-    Cone
+    Cone(Cone)
 }
 
 impl Shape {
@@ -32,7 +31,7 @@ impl Shape {
             Shape::Plane => "Plane",
             Shape::Cube => "Cube",
             Shape::Cylinder(_) => "Cylinder",
-            Shape::Cone => "Cone",
+            Shape::Cone(_) => "Cone",
             _ => "Object"
         }
     }
@@ -43,7 +42,7 @@ impl Shape {
             Shape::Plane => { Object::create(Shape::Plane) }
             Shape::Cube => { Object::create(Shape::Cube) }
             Shape::Cylinder(c) => { Object::create(Shape::Cylinder(*c)) }
-            Shape::Cone => { Object::create(Shape::Cone) }
+            Shape::Cone(c) => { Object::create(Shape::Cone(*c)) }
             _ => { Object::create(Shape::Object) }
         }
     }
@@ -54,7 +53,7 @@ impl Shape {
             Shape::Plane => { Object::air(Shape::Plane) }
             Shape::Cube => { Object::air(Shape::Cube) }
             Shape::Cylinder(c) => { Object::air(Shape::Cylinder(*c)) }
-            Shape::Cone => { Object::air(Shape::Cone) }
+            Shape::Cone(c) => { Object::air(Shape::Cone(*c)) }
             _ => { Object::air(Shape::Object) }
         }
     }
@@ -65,7 +64,7 @@ impl Shape {
             Shape::Plane => { Object::vacuum(Shape::Plane) }
             Shape::Cube => { Object::vacuum(Shape::Cube) }
             Shape::Cylinder(c) => { Object::vacuum(Shape::Cylinder(*c)) }
-            Shape::Cone => { Object::vacuum(Shape::Cone) }
+            Shape::Cone(c) => { Object::vacuum(Shape::Cone(*c)) }
             _ => { Object::vacuum(Shape::Object) }
         }
     }
@@ -76,7 +75,7 @@ impl Shape {
             Shape::Plane => { Object::water(Shape::Plane) }
             Shape::Cube => { Object::water(Shape::Cube) }
             Shape::Cylinder(c) => { Object::water(Shape::Cylinder(*c)) }
-            Shape::Cone => { Object::water(Shape::Cone) }
+            Shape::Cone(c) => { Object::water(Shape::Cone(*c)) }
             _ => { Object::water(Shape::Object) }
         }
     }
@@ -87,7 +86,7 @@ impl Shape {
             Shape::Plane => { Object::diamond(Shape::Plane) }
             Shape::Cube => { Object::diamond(Shape::Cube) }
             Shape::Cylinder(c) => { Object::diamond(Shape::Cylinder(*c)) }
-            Shape::Cone => { Object::diamond(Shape::Cone) }
+            Shape::Cone(c) => { Object::diamond(Shape::Cone(*c)) }
             _ => { Object::diamond(Shape::Object) }
         }
     }
@@ -98,7 +97,7 @@ impl Shape {
             Shape::Plane => { Object::glass(Shape::Plane) }
             Shape::Cube => { Object::glass(Shape::Cube) }
             Shape::Cylinder(c) => { Object::glass(Shape::Cylinder(*c)) }
-            Shape::Cone => { Object::glass(Shape::Cone) }
+            Shape::Cone(c) => { Object::glass(Shape::Cone(*c)) }
             _ => { Object::glass(Shape::Object) }
         }
     }
@@ -255,6 +254,30 @@ impl Object {
             ..self
         }
     }
+
+    pub fn maximum_bound(&self) -> f64 {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.maximum_bound() },
+            Shape::Cone(c) => { c.maximum_bound() },
+            _ => 0.0
+        }
+    }
+
+    pub fn minimum_bound(&self) -> f64 {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.minimum_bound() },
+            Shape::Cone(c) => { c.minimum_bound() },
+            _ => 0.0
+        }
+    }
+
+    pub fn closed(&self) -> bool {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.closed() },
+            Shape::Cone(c) => { c.closed() },
+            _ => false
+        }
+    }
 }
 
 impl Intersect for Object {
@@ -265,7 +288,7 @@ impl Intersect for Object {
             Shape::Plane => { Plane::intersect(_object, &transformed_ray) }
             Shape::Cube => { Cube::intersect(_object, &transformed_ray) }
             Shape::Cylinder(_) => { Cylinder::intersect(_object, &transformed_ray) }
-            Shape::Cone => { Cone::intersect(_object, &transformed_ray) }
+            Shape::Cone(_) => { Cone::intersect(_object, &transformed_ray) }
             _ => { vec![] }
         }
     }
@@ -279,7 +302,7 @@ impl Normal for Object {
             Shape::Plane => { Plane::normal(_object, &object_point) }
             Shape::Cube => { Cube::normal(_object, &object_point) }
             Shape::Cylinder(_) => { Cylinder::normal(_object, &object_point) }
-            Shape::Cone => { Cone::normal(_object, &object_point) }
+            Shape::Cone(_) => { Cone::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
         let world_normal = _object.inverse_transformation().transpose() * object_normal;

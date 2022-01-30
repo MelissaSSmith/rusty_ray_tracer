@@ -15,29 +15,6 @@ pub struct Cylinder {
     closed: bool
 }
 
-impl Object {
-    pub fn maximum_bound(&self) -> f64 {
-        match self.shape() {
-            Shape::Cylinder(c) => { c.maximum_bound() },
-            _ => 0.0
-        }
-    }
-
-    pub fn minimum_bound(&self) -> f64 {
-        match self.shape() {
-            Shape::Cylinder(c) => { c.minimum_bound() },
-            _ => 0.0
-        }
-    }
-
-    pub fn closed(&self) -> bool {
-        match self.shape() {
-            Shape::Cylinder(c) => { c.closed() },
-            _ => false
-        }
-    }
-}
-
 impl Cylinder {
     pub fn create() -> Cylinder {
         Cylinder {
@@ -47,15 +24,15 @@ impl Cylinder {
         }
     }
 
-    fn maximum_bound(&self) -> f64 {
+    pub fn maximum_bound(&self) -> f64 {
         self.maximum
     }
 
-    fn minimum_bound(&self) -> f64 {
+    pub fn minimum_bound(&self) -> f64 {
         self.minimum
     }
 
-    fn closed(&self) -> bool {
+    pub fn closed(&self) -> bool {
         self.closed
     }
 
@@ -124,8 +101,6 @@ impl Intersect for Cylinder {
 
             let t0 = (-b - disc.sqrt()) / (2.0 * a);
             let t1 = (-b + disc.sqrt()) / (2.0 * a);
-
-
 
             let y0 = _ray.origin.y() + t0 * _ray.direction.y();
             if _object.minimum_bound() < y0 && y0 < _object.maximum_bound() {
