@@ -7,7 +7,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Cube {}
 
 impl Cube {

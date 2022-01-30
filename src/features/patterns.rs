@@ -71,9 +71,7 @@ impl Pattern {
         self.transformation.equals(other_pattern.clone().transformation) &&
             self.inverse_transformation.equals(other_pattern.clone().inverse_transformation) //todo: add patterns
     }
-}
 
-impl Pattern {
     pub fn transformation(&self) -> Matrix {
         self.transformation.clone()
     }

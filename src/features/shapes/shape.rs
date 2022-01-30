@@ -1,3 +1,4 @@
+use std::iter::Map;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
@@ -18,7 +19,7 @@ pub enum Shape {
     Sphere,
     Plane,
     Cube,
-    Cylinder
+    Cylinder(Cylinder)
 }
 
 impl Shape {
@@ -27,68 +28,68 @@ impl Shape {
             Shape::Sphere => "Sphere",
             Shape::Plane => "Plane",
             Shape::Cube => "Cube",
-            Shape::Cylinder => "Cylinder",
+            Shape::Cylinder(_) => "Cylinder",
             _ => "Object"
         }
     }
 
     pub fn create(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::create(String::from(Shape::Sphere.as_str())) }
-            Shape::Plane => { Object::create(String::from(Shape::Plane.as_str())) }
-            Shape::Cube => { Object::create(String::from(Shape::Cube.as_str())) }
-            Shape::Cylinder => { Object::create(String::from(Shape::Cylinder.as_str())) }
-            _ => { Object::create(String::from(Shape::Object.as_str())) }
+            Shape::Sphere => { Object::create(Shape::Sphere) }
+            Shape::Plane => { Object::create(Shape::Plane) }
+            Shape::Cube => { Object::create(Shape::Cube) }
+            Shape::Cylinder(c) => { Object::create(Shape::Cylinder(*c)) }
+            _ => { Object::create(Shape::Object) }
         }
     }
 
     pub fn air(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::air(String::from(Shape::Sphere.as_str())) }
-            Shape::Plane => { Object::air(String::from(Shape::Plane.as_str())) }
-            Shape::Cube => { Object::air(String::from(Shape::Cube.as_str())) }
-            Shape::Cylinder => { Object::air(String::from(Shape::Cylinder.as_str())) }
-            _ => { Object::air(String::from(Shape::Object.as_str())) }
+            Shape::Sphere => { Object::air(Shape::Sphere) }
+            Shape::Plane => { Object::air(Shape::Plane) }
+            Shape::Cube => { Object::air(Shape::Cube) }
+            Shape::Cylinder(c) => { Object::air(Shape::Cylinder(*c)) }
+            _ => { Object::air(Shape::Object) }
         }
     }
 
     pub fn vacuum(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::vacuum(String::from(Shape::Sphere.as_str())) }
-            Shape::Plane => { Object::vacuum(String::from(Shape::Plane.as_str())) }
-            Shape::Cube => { Object::vacuum(String::from(Shape::Cube.as_str())) }
-            Shape::Cylinder => { Object::vacuum(String::from(Shape::Cylinder.as_str())) }
-            _ => { Object::vacuum(String::from(Shape::Object.as_str())) }
+            Shape::Sphere => { Object::vacuum(Shape::Sphere) }
+            Shape::Plane => { Object::vacuum(Shape::Plane) }
+            Shape::Cube => { Object::vacuum(Shape::Cube) }
+            Shape::Cylinder(c) => { Object::vacuum(Shape::Cylinder(*c)) }
+            _ => { Object::vacuum(Shape::Object) }
         }
     }
 
     pub fn water(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::water(String::from(Shape::Sphere.as_str())) }
-            Shape::Plane => { Object::water(String::from(Shape::Plane.as_str())) }
-            Shape::Cube => { Object::water(String::from(Shape::Cube.as_str())) }
-            Shape::Cylinder => { Object::water(String::from(Shape::Cylinder.as_str())) }
-            _ => { Object::water(String::from(Shape::Object.as_str())) }
+            Shape::Sphere => { Object::water(Shape::Sphere) }
+            Shape::Plane => { Object::water(Shape::Plane) }
+            Shape::Cube => { Object::water(Shape::Cube) }
+            Shape::Cylinder(c) => { Object::water(Shape::Cylinder(*c)) }
+            _ => { Object::water(Shape::Object) }
         }
     }
 
     pub fn diamond(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::diamond(String::from(Shape::Sphere.as_str())) }
-            Shape::Plane => { Object::diamond(String::from(Shape::Plane.as_str())) }
-            Shape::Cube => { Object::diamond(String::from(Shape::Cube.as_str())) }
-            Shape::Cylinder => { Object::diamond(String::from(Shape::Cylinder.as_str())) }
-            _ => { Object::diamond(String::from(Shape::Object.as_str())) }
+            Shape::Sphere => { Object::diamond(Shape::Sphere) }
+            Shape::Plane => { Object::diamond(Shape::Plane) }
+            Shape::Cube => { Object::diamond(Shape::Cube) }
+            Shape::Cylinder(c) => { Object::diamond(Shape::Cylinder(*c)) }
+            _ => { Object::diamond(Shape::Object) }
         }
     }
 
     pub fn glass(&self) -> Object {
         match self {
-            Shape::Sphere => { Object::glass(String::from(Shape::Sphere.as_str())) }
-            Shape::Plane => { Object::glass(String::from(Shape::Plane.as_str())) }
-            Shape::Cube => { Object::glass(String::from(Shape::Cube.as_str())) }
-            Shape::Cylinder => { Object::glass(String::from(Shape::Cylinder.as_str())) }
-            _ => { Object::glass(String::from(Shape::Object.as_str())) }
+            Shape::Sphere => { Object::glass(Shape::Sphere) }
+            Shape::Plane => { Object::glass(Shape::Plane) }
+            Shape::Cube => { Object::glass(Shape::Cube) }
+            Shape::Cylinder(c) => { Object::glass(Shape::Cylinder(*c)) }
+            _ => { Object::glass(Shape::Object) }
         }
     }
 }
@@ -98,12 +99,12 @@ pub struct Object {
     transformation: Matrix,
     inverse_transformation: Matrix,
     material: Material,
-    shape: String,
+    shape: Shape,
     has_shadow: bool
 }
 
 impl Object {
-    fn create(shape_type: String) -> Object {
+    fn create(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         Object {
             transformation: transform.clone(),
@@ -114,7 +115,7 @@ impl Object {
         }
     }
 
-    fn glass(shape_type: String) -> Object {
+    fn glass(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
@@ -128,7 +129,7 @@ impl Object {
         }
     }
 
-    fn air(shape_type: String) -> Object {
+    fn air(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
@@ -142,7 +143,7 @@ impl Object {
         }
     }
 
-    fn vacuum(shape_type: String) -> Object {
+    fn vacuum(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
@@ -156,7 +157,7 @@ impl Object {
         }
     }
 
-    fn water(shape_type: String) -> Object {
+    fn water(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
@@ -170,7 +171,7 @@ impl Object {
         }
     }
 
-    fn diamond(shape_type: String) -> Object {
+    fn diamond(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         let material = Material::create()
             .with_transparency(1.0)
@@ -185,7 +186,7 @@ impl Object {
     }
 
     pub fn equals(&self, other: &Object) -> bool {
-        self.shape() == other.shape() &&
+        self.shape_type() == other.shape_type() &&
             self.material().equals(other.material()) &&
             self.transformation().equals(other.transformation())
     }
@@ -202,7 +203,11 @@ impl Object {
         self.material.clone()
     }
 
-    pub fn shape(&self) -> String {
+    pub fn shape_type(&self) -> String {
+        String::from(self.shape.as_str())
+    }
+
+    pub fn shape(&self) -> Shape {
         self.shape.clone()
     }
 
@@ -245,11 +250,11 @@ impl Object {
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = _ray.transform(_object.clone().inverse_transformation());
-        match _object.shape.as_ref() {
-            "Sphere" => { Sphere::intersect(_object, &transformed_ray) }
-            "Plane" => { Plane::intersect(_object, &transformed_ray) }
-            "Cube" => { Cube::intersect(_object, &transformed_ray) }
-            "Cylinder" => { Cylinder::intersect(_object, &transformed_ray) }
+        match _object.shape {
+            Shape::Sphere => { Sphere::intersect(_object, &transformed_ray) }
+            Shape::Plane => { Plane::intersect(_object, &transformed_ray) }
+            Shape::Cube => { Cube::intersect(_object, &transformed_ray) }
+            Shape::Cylinder(_) => { Cylinder::intersect(_object, &transformed_ray) }
             _ => { vec![] }
         }
     }
@@ -258,11 +263,11 @@ impl Intersect for Object {
 impl Normal for Object {
     fn normal(_object: &Object, _point: &Point) -> Vector {
         let object_point = _object.inverse_transformation() * *_point;
-        let object_normal = match _object.shape.as_ref() {
-            "Sphere" => { Sphere::normal(_object, &object_point) }
-            "Plane" => { Plane::normal(_object, &object_point) }
-            "Cube" => { Cube::normal(_object, &object_point) }
-            "Cylinder" => { Cylinder::normal(_object, &object_point) }
+        let object_normal = match _object.shape {
+            Shape::Sphere => { Sphere::normal(_object, &object_point) }
+            Shape::Plane => { Plane::normal(_object, &object_point) }
+            Shape::Cube => { Cube::normal(_object, &object_point) }
+            Shape::Cylinder(_) => { Cylinder::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
         let world_normal = _object.inverse_transformation().transpose() * object_normal;

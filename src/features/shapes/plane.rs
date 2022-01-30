@@ -7,7 +7,7 @@ use crate::features::primitives::vector::Vector;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Plane {}
 
 impl Intersect for Plane {
