@@ -9,6 +9,7 @@ pub mod plane;
 pub mod shape;
 pub mod cube;
 pub mod cylinder;
+pub mod cone;
 
 pub trait Intersect {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection>;
