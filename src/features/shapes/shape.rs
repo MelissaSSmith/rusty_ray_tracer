@@ -262,7 +262,7 @@ impl Normal for Object {
             "Sphere" => { Sphere::normal(_object, &object_point) }
             "Plane" => { Plane::normal(_object, &object_point) }
             "Cube" => { Cube::normal(_object, &object_point) }
-            "Cylinder" => { Cylinder::normal(_object, &transformed_ray) }
+            "Cylinder" => { Cylinder::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
         let world_normal = _object.inverse_transformation().transpose() * object_normal;
