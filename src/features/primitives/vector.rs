@@ -25,7 +25,7 @@ impl Vector {
     }
 
     pub fn equals(&self, _vector: Vector) -> bool {
-        self.x.equals(_vector.x) && self.y.equals(_vector.y) && self.z.equals(_vector.z)
+        self.x.equals_low_epsilon(_vector.x) && self.y.equals_low_epsilon(_vector.y) && self.z.equals_low_epsilon(_vector.z)
     }
 }
 

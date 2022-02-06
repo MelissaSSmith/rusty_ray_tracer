@@ -1,5 +1,6 @@
 use std::iter::Map;
 use std::ops::Deref;
+use uuid::Uuid;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
@@ -14,6 +15,7 @@ use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
+use crate::features::world::World;
 
 //todo: derive => Debug, PartialEq, Serialize, Deserialize (requires Matrix not using Vec in backend)
 #[derive(Clone)]
@@ -115,24 +117,26 @@ impl Shape {
 
 #[derive(Clone)]
 pub struct Object {
+    id: Uuid,
     transformation: Matrix,
     inverse_transformation: Matrix,
     material: Material,
     shape: Shape,
     has_shadow: bool,
-    parent: Box<Option<Object>>
+    parent: Option<Uuid>
 }
 
 impl Object {
     fn create(shape_type: Shape) -> Object {
         let transform = Matrix::identity();
         Object {
+            id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material: Material::create(),
             shape: shape_type,
             has_shadow: true,
-            parent: Box::new(None)
+            parent: None
         }
     }
 
@@ -142,12 +146,13 @@ impl Object {
             .with_transparency(1.0)
             .with_refractive_index(1.5);
         Object {
+            id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
             has_shadow: true,
-            parent: Box::new(None)
+            parent: None
         }
     }
 
@@ -157,12 +162,13 @@ impl Object {
             .with_transparency(1.0)
             .with_refractive_index(1.00029);
         Object {
+            id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
             has_shadow: false,
-            parent: Box::new(None)
+            parent: None
         }
     }
 
@@ -172,12 +178,13 @@ impl Object {
             .with_transparency(1.0)
             .with_refractive_index(1.0);
         Object {
+            id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
             has_shadow: false,
-            parent: Box::new(None)
+            parent: None
         }
     }
 
@@ -187,12 +194,13 @@ impl Object {
             .with_transparency(1.0)
             .with_refractive_index(1.33);
         Object {
+            id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
             has_shadow: false,
-            parent: Box::new(None)
+            parent: None
         }
     }
 
@@ -202,12 +210,13 @@ impl Object {
             .with_transparency(1.0)
             .with_refractive_index(2.417);
         Object {
+            id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
             has_shadow: true,
-            parent: Box::new(None)
+            parent: None
         }
     }
 
@@ -215,6 +224,10 @@ impl Object {
         self.shape_type() == other.shape_type() &&
             self.material().equals(other.material()) &&
             self.transformation().equals(other.transformation())
+    }
+
+    pub fn id(&self)  -> Uuid {
+        self.id
     }
 
     pub fn transformation(&self) -> Matrix {
@@ -237,8 +250,8 @@ impl Object {
         self.shape.clone()
     }
 
-    pub fn parent(&self) -> Box<Option<Object>> {
-        self.parent.clone()
+    pub fn parent(&self) -> Option<Uuid> {
+        self.parent
     }
 
     pub fn has_shadow(&self) -> bool {
@@ -252,6 +265,10 @@ impl Object {
 
     pub fn set_material(&mut self, _material: Material) {
         self.material = _material;
+    }
+
+    fn set_parent(&mut self, object: Object) {
+        self.parent = Some(object.id())
     }
 
     pub fn with_transform(self, _transform: Matrix) -> Object {
@@ -300,48 +317,54 @@ impl Object {
         }
     }
 
-    pub fn shapes(&self) -> Vec<Object> {
+    pub fn children(&self) -> Vec<Object> {
         match self.shape() {
             Shape::Group(g) => { g.shapes() }
             _ => vec![]
         }
     }
 
-    pub fn add_child(&mut self, object: Object) {
+    pub fn add_child(&mut self, mut object: Object) {
         match self.shape() {
-            Shape::Group(g) => {
-                let o = Object {
-                    parent: Box::new(Some(self.deref().clone())),
-                    ..object.clone()
-                }.with_transform(
-                    self.transformation() * object.transformation()
-                );
-                let group = g.add_child(o.clone());
-                self.shape = Shape::Group(group)
+            Shape::Group(mut g) => {
+                object.set_parent(self.clone());
+                g.add_child(object);
+
+                self.shape = Shape::Group(g)
             },
             _ => {}
         }
     }
 
-    pub fn world_to_object(self, point: Point) -> Point {
-        let mut object_point = point;
-
-        if self.parent().is_some() {
-            println!("Here {}", self.shape_type());
-            object_point = self.parent().unwrap().world_to_object(point);
+    pub fn get_object_by_id(&self, id:Uuid) -> Option<Object> {
+        match self.shape() {
+            Shape::Group(g) => { g.get_object_by_id(id) }
+            _ => { None }
         }
+    }
+
+    pub fn world_to_object(self, point: Point, world: &World) -> Point {
+        let object_point = match self.parent() {
+            Some(id) => {
+                let parent = world.get_object_by_id(id).expect("Object not found!");
+                parent.world_to_object(point, world)
+            }
+            None => point,
+        };
 
         self.inverse_transformation() * object_point
     }
 
-    pub fn normal_to_world(self, normal: Vector) -> Vector {
-        let mut normal = (self.inverse_transformation().transpose() * normal).normalize();
+    pub fn normal_to_world(self, normal: Vector, world: &World) -> Vector {
+        let world_normal = (self.inverse_transformation().transpose() * normal).normalize();
 
-        if self.parent.is_some() {
-            normal = self.parent().unwrap().normal_to_world(normal);
+        match self.parent() {
+            None => { world_normal }
+            Some(id) => {
+                let parent = world.get_object_by_id(id).expect("Object not found!");
+                parent.normal_to_world(world_normal, world)
+            }
         }
-
-        normal
     }
 }
 
@@ -386,23 +409,25 @@ mod tests {
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::group::Group;
     use crate::features::shapes::shape::{Object, Shape};
+    use crate::features::world::World;
 
     #[test]
     fn test_convert_a_point_from_world_object_space() {
-        let mut group_1 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::rotate_y(PI/2.0));
-        let mut group_2 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
         let sphere = Shape::Sphere.create()
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
-        group_2.add_child(sphere);
+        let mut group_2 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
+        let mut group_1 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::rotate_y(PI/2.0));
+
+        group_2.add_child(sphere.clone());
         group_1.add_child(group_2);
+        let world = World::create().with_objects(vec![group_1]);
 
-        let object = group_1.shapes()[0].clone().shapes()[0].clone();
+        let object = world.get_object_by_id(sphere.id()).unwrap();
 
-        let point = object.world_to_object(Point::create(-2.0, 0.0, -10.0));
+        let point = object.world_to_object(Point::create(-2.0, 0.0, -10.0), &world);
 
-        println!("{} {} {}", point.x(), point.y(), point.z());
         assert!(point.equals(Point::create(0.0, 0.0, -1.0)));
     }
 
@@ -414,12 +439,16 @@ mod tests {
             .with_transform(Matrix::scale(1.0, 2.0, 3.0));
         let sphere = Shape::Sphere.create()
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
+
         group_2.add_child(sphere.clone());
         group_1.add_child(group_2);
+        let world = World::create().with_objects(vec![group_1]);
 
-        let sqrt_3 = f64::sqrt(3.0);
+        let object = world.get_object_by_id(sphere.id()).unwrap();
 
-        let normal = sphere.normal_to_world(Vector::create(sqrt_3/3.0, sqrt_3/3.0, sqrt_3/3.0));
+        let sqrt_3 = f64::sqrt(3.0)/3.0;
+
+        let normal = object.normal_to_world(Vector::create(sqrt_3, sqrt_3, sqrt_3), &world);
 
         assert!(normal.equals(Vector::create(0.2857, 0.4286, -0.8571)));
     }

@@ -197,7 +197,6 @@ mod tests {
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::patterns::TwoColorCreate;
     use crate::features::primitives::point::Point;
-    use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;

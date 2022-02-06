@@ -182,7 +182,7 @@ mod tests {
 
     #[test]
     fn test_intersecting_a_cone_parallel_to_one_of_its_halves() {
-        let cone = Shape::Cone(Cone::create()).create();;
+        let cone = Shape::Cone(Cone::create()).create();
 
         let direction = Vector::create(0.0, 1.0, 1.0).normalize();
         let ray = Ray::create(Point::create(0.0, 0.0, -1.0), direction);

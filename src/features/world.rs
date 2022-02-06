@@ -1,3 +1,4 @@
+use uuid::Uuid;
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::computation::Computation;
@@ -83,6 +84,20 @@ impl World {
 
     pub fn color_at(&self, ray: &Ray) -> Color {
         self.color_at_impl(ray, self.recursion_limit)
+    }
+
+    pub fn get_object_by_id(&self, id: Uuid) -> Option<Object> {
+        for object in &self.objects {
+            if object.id() == id {
+                return Some(object.clone());
+            }
+
+            if let Some(container) = object.get_object_by_id(id) {
+                return Some(container);
+            }
+        }
+
+        None
     }
 
     fn intersect(&self, _ray: Ray) -> Vec<Intersection>{

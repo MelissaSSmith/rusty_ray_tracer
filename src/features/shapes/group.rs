@@ -1,3 +1,4 @@
+use uuid::Uuid;
 use crate::features::intersection::Intersection;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
@@ -7,22 +8,34 @@ use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
 pub struct Group {
-    shapes: Vec<Object>
+    objects: Vec<Object>
 }
 
 impl Group {
     pub fn create() -> Group {
-        Group { shapes: vec![] }
+        Group { objects: vec![] }
     }
 
     pub fn shapes(&self) -> Vec<Object> {
-        self.shapes.clone()
+        self.objects.clone()
     }
 
-    pub fn add_child(&self, object: Object) -> Group {
-        Group {
-            shapes: [self.shapes.clone(), vec![object]].concat()
+    pub fn get_object_by_id(&self, id: Uuid) -> Option<Object> {
+        for object in &self.objects {
+            if object.id() == id {
+                return Some(object.clone());
+            }
+
+            if let Some(container) = object.get_object_by_id(id) {
+                return Some(container);
+            }
         }
+
+        None
+    }
+
+    pub fn add_child(&mut self, object: Object) {
+        self.objects.push(object);
     }
 }
 
@@ -30,7 +43,8 @@ impl Intersect for Group {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
 
-        for shape in  _object.shapes() {
+        for mut shape in  _object.children() {
+            shape.set_transform(_object.transformation() * shape.transformation());
             intersections.append(&mut Object::intersect(&shape, _ray));
         }
 
@@ -55,14 +69,13 @@ mod tests {
     use crate::features::shapes::group::Group;
     use crate::features::shapes::Intersect;
     use crate::features::shapes::shape::{Object, Shape};
-    use crate::features::shapes::shape::Shape::Sphere;
 
     #[test]
     fn test_create_a_new_group() {
         let group = Shape::Group(Group::create()).create();
 
         assert!(group.transformation().equals(Matrix::identity()));
-        assert_eq!(group.shapes().len(), 0);
+        assert_eq!(group.children().len(), 0);
     }
 
     #[test]
@@ -79,10 +92,9 @@ mod tests {
 
         group.add_child(object.clone());
 
-        println!("{}", group.shapes().len());
-        assert_eq!(group.shapes().len(), 1);
-        assert!(group.shapes()[0].equals(&object));
-        assert!(group.shapes()[0].parent().is_some() && group.shapes()[0].parent().unwrap().equals(&group));
+        assert_eq!(group.children().len(), 1);
+        assert!(group.children()[0].equals(&object));
+        assert!(group.children()[0].parent().is_some() && group.children()[0].parent().unwrap() == group.id());
     }
 
     #[test]
@@ -106,10 +118,10 @@ mod tests {
         let intersections = Group::intersect(&group, &ray);
 
         assert_eq!(intersections.len(), 4);
-        assert!(intersections[0].object.equals(&group.shapes()[1]));
-        assert!(intersections[1].object.equals(&group.shapes()[1]));
-        assert!(intersections[2].object.equals(&group.shapes()[0]));
-        assert!(intersections[3].object.equals(&group.shapes()[0]));
+        assert!(intersections[0].object.equals(&group.children()[1]));
+        assert!(intersections[1].object.equals(&group.children()[1]));
+        assert!(intersections[2].object.equals(&group.children()[0]));
+        assert!(intersections[3].object.equals(&group.children()[0]));
     }
 
     #[test]
