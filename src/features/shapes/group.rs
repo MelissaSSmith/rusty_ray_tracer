@@ -53,12 +53,6 @@ impl Intersect for Group {
     }
 }
 
-impl Normal for Group {
-    fn normal(_object: &Object, _point: &Point) -> Vector {
-        todo!()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::features::primitives::matrix::Matrix;

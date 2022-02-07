@@ -395,7 +395,6 @@ impl NormalAt for Object {
             Shape::Cube => { Cube::normal(_object, &object_point) }
             Shape::Cylinder(_) => { Cylinder::normal(_object, &object_point) }
             Shape::Cone(_) => { Cone::normal(_object, &object_point) }
-            Shape::Group(_) => { Group::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
         match _world {
