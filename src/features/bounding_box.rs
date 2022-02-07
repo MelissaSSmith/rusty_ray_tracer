@@ -43,6 +43,10 @@ impl BoundingBox {
             self.minimum().y() <= point.y() && point.y() <= self.maximum().y() &&
             self.minimum().z() <= point.z() && point.z() <= self.maximum().z()
     }
+
+    pub fn contains_box(&self, bounding_box: BoundingBox) -> bool {
+        self.contains_point(bounding_box.minimum()) && self.contains_point(bounding_box.maximum())
+    }
 }
 
 impl Add<BoundingBox> for BoundingBox {
@@ -155,6 +159,30 @@ mod tests {
             let result = bound_box.contains_point(test.0);
 
             assert_eq!(result, test.1);
+        }
+    }
+
+    #[test]
+    fn test_check_to_see_if_a_box_contains_a_given_box() {
+        let bound_box = BoundingBox::create()
+            .with_minimum(Point::create(5.0, -2.0, 0.0))
+            .with_maximum(Point::create(11.0, 4.0, 7.0));
+
+        let tests = vec![
+            (Point::create(5.0, -2.0, 0.0), Point::create(11.0, 4.0, 7.0), true),
+            (Point::create(6.0, -1.0, 1.0), Point::create(10.0, 3.0, 6.0), true),
+            (Point::create(4.0, -3.0, -1.0), Point::create(10.0, 3.0, 6.0), false),
+            (Point::create(6.0, -1.0, 1.0), Point::create(12.0, 5.0, 8.0), false)
+        ];
+
+        for test in tests {
+            let test_box = BoundingBox::create()
+                .with_maximum(test.1)
+                .with_minimum(test.0);
+
+            let result = bound_box.contains_box(test_box);
+
+            assert_eq!(result, test.2);
         }
     }
 }
