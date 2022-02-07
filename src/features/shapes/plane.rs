@@ -90,4 +90,12 @@ mod tests {
         assert_eq!(1, intersections.len());
         assert_eq!(1.0, intersections[0].t);
     }
+
+    #[test]
+    fn test_plane_has_a_bounding_box() {
+        let plane = Shape::Plane.create();
+
+        assert!(plane.bounds().minimum().equals(Point::create(-f64::INFINITY, 0.0, -f64::INFINITY)));
+        assert!(plane.bounds().maximum().equals(Point::create(f64::INFINITY, 0.0, f64::INFINITY)));
+    }
 }

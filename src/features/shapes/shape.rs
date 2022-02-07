@@ -1,6 +1,7 @@
 use std::iter::Map;
 use std::ops::Deref;
 use uuid::Uuid;
+use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
@@ -42,76 +43,81 @@ impl Shape {
         }
     }
 
-    pub fn create(&self) -> Object {
+    fn create_object(&self, has_shadow: bool, material: Material) -> Object {
         match self {
-            Shape::Sphere => { Object::create(Shape::Sphere) }
-            Shape::Plane => { Object::create(Shape::Plane) }
-            Shape::Cube => { Object::create(Shape::Cube) }
-            Shape::Cylinder(c) => { Object::create(Shape::Cylinder(*c)) }
-            Shape::Cone(c) => { Object::create(Shape::Cone(*c)) }
-            Shape::Group(g) => { Object::create(Shape::Group(g.clone())) }
-            _ => { Object::create(Shape::Object) }
+            Shape::Sphere => {
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-1.0, -1.0, -1.0))
+                    .with_maximum(Point::create(1.0, 1.0, 1.0));
+                Object::create(Shape::Sphere, has_shadow, material, bounds)
+            }
+            Shape::Plane => {
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-f64::INFINITY, 0.0, -f64::INFINITY))
+                    .with_maximum(Point::create(f64::INFINITY, 0.0, f64::INFINITY));
+                Object::create(Shape::Plane, has_shadow, material, bounds)
+            }
+            Shape::Cube => {
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-1.0, -1.0, -1.0))
+                    .with_maximum(Point::create(1.0, 1.0, 1.0));
+                Object::create(Shape::Cube, has_shadow, material, bounds)
+            }
+            Shape::Cylinder(c) => {
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-1.0, c.minimum_bound(), -1.0))
+                    .with_maximum(Point::create(1.0, c.maximum_bound(), 1.0));
+                Object::create(Shape::Cylinder(*c), has_shadow, material, bounds)
+            }
+            Shape::Cone(c) => {
+                let limit = f64::max(c.minimum_bound().abs(), c.maximum_bound().abs());
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-limit, c.minimum_bound(), -limit))
+                    .with_maximum(Point::create(limit, c.maximum_bound(), limit));
+                Object::create(Shape::Cone(*c), has_shadow, material, bounds)
+            }
+            Shape::Group(g) => { Object::create(Shape::Group(g.clone()), has_shadow, material,BoundingBox::create()) }
+            _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }
+    }
+
+    pub fn create(&self) -> Object {
+        self.create_object(true, Material::create())
     }
 
     pub fn air(&self) -> Object {
-        match self {
-            Shape::Sphere => { Object::air(Shape::Sphere) }
-            Shape::Plane => { Object::air(Shape::Plane) }
-            Shape::Cube => { Object::air(Shape::Cube) }
-            Shape::Cylinder(c) => { Object::air(Shape::Cylinder(*c)) }
-            Shape::Cone(c) => { Object::air(Shape::Cone(*c)) }
-            Shape::Group(g) => { Object::air(Shape::Group(g.clone())) }
-            _ => { Object::air(Shape::Object) }
-        }
+        let material = Material::create()
+            .with_transparency(1.0)
+            .with_refractive_index(1.00029);
+        self.create_object(false, material)
     }
 
     pub fn vacuum(&self) -> Object {
-        match self {
-            Shape::Sphere => { Object::vacuum(Shape::Sphere) }
-            Shape::Plane => { Object::vacuum(Shape::Plane) }
-            Shape::Cube => { Object::vacuum(Shape::Cube) }
-            Shape::Cylinder(c) => { Object::vacuum(Shape::Cylinder(*c)) }
-            Shape::Cone(c) => { Object::vacuum(Shape::Cone(*c)) }
-            Shape::Group(g) => { Object::vacuum(Shape::Group(g.clone())) }
-            _ => { Object::vacuum(Shape::Object) }
-        }
+        let material = Material::create()
+            .with_transparency(1.0)
+            .with_refractive_index(1.0);
+        self.create_object(false, material)
     }
 
     pub fn water(&self) -> Object {
-        match self {
-            Shape::Sphere => { Object::water(Shape::Sphere) }
-            Shape::Plane => { Object::water(Shape::Plane) }
-            Shape::Cube => { Object::water(Shape::Cube) }
-            Shape::Cylinder(c) => { Object::water(Shape::Cylinder(*c)) }
-            Shape::Cone(c) => { Object::water(Shape::Cone(*c)) }
-            Shape::Group(g) => { Object::water(Shape::Group(g.clone())) }
-            _ => { Object::water(Shape::Object) }
-        }
+        let material = Material::create()
+            .with_transparency(1.0)
+            .with_refractive_index(1.33);
+        self.create_object(false, material)
     }
 
     pub fn diamond(&self) -> Object {
-        match self {
-            Shape::Sphere => { Object::diamond(Shape::Sphere) }
-            Shape::Plane => { Object::diamond(Shape::Plane) }
-            Shape::Cube => { Object::diamond(Shape::Cube) }
-            Shape::Cylinder(c) => { Object::diamond(Shape::Cylinder(*c)) }
-            Shape::Cone(c) => { Object::diamond(Shape::Cone(*c)) }
-            Shape::Group(g) => { Object::diamond(Shape::Group(g.clone())) }
-            _ => { Object::diamond(Shape::Object) }
-        }
+        let material = Material::create()
+            .with_transparency(1.0)
+            .with_refractive_index(2.417);
+        self.create_object(true, material)
     }
 
     pub fn glass(&self) -> Object {
-        match self {
-            Shape::Sphere => { Object::glass(Shape::Sphere) }
-            Shape::Plane => { Object::glass(Shape::Plane) }
-            Shape::Cube => { Object::glass(Shape::Cube) }
-            Shape::Cylinder(c) => { Object::glass(Shape::Cylinder(*c)) }
-            Shape::Cone(c) => { Object::glass(Shape::Cone(*c)) }
-            Shape::Group(g) => { Object::glass(Shape::Group(g.clone())) }
-            _ => { Object::glass(Shape::Object) }
-        }
+        let material = Material::create()
+            .with_transparency(1.0)
+            .with_refractive_index(1.5);
+        self.create_object(true, material)
     }
 }
 
@@ -123,100 +129,22 @@ pub struct Object {
     material: Material,
     shape: Shape,
     has_shadow: bool,
-    parent: Option<Uuid>
+    parent: Option<Uuid>,
+    bounds: BoundingBox
 }
 
 impl Object {
-    fn create(shape_type: Shape) -> Object {
+    fn create(shape_type: Shape, has_shadow: bool, material: Material, bounds: BoundingBox) -> Object {
         let transform = Matrix::identity();
-        Object {
-            id: Uuid::new_v4(),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse(),
-            material: Material::create(),
-            shape: shape_type,
-            has_shadow: true,
-            parent: None
-        }
-    }
-
-    fn glass(shape_type: Shape) -> Object {
-        let transform = Matrix::identity();
-        let material = Material::create()
-            .with_transparency(1.0)
-            .with_refractive_index(1.5);
         Object {
             id: Uuid::new_v4(),
             transformation: transform.clone(),
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
-            has_shadow: true,
-            parent: None
-        }
-    }
-
-    fn air(shape_type: Shape) -> Object {
-        let transform = Matrix::identity();
-        let material = Material::create()
-            .with_transparency(1.0)
-            .with_refractive_index(1.00029);
-        Object {
-            id: Uuid::new_v4(),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse(),
-            material,
-            shape: shape_type,
-            has_shadow: false,
-            parent: None
-        }
-    }
-
-    fn vacuum(shape_type: Shape) -> Object {
-        let transform = Matrix::identity();
-        let material = Material::create()
-            .with_transparency(1.0)
-            .with_refractive_index(1.0);
-        Object {
-            id: Uuid::new_v4(),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse(),
-            material,
-            shape: shape_type,
-            has_shadow: false,
-            parent: None
-        }
-    }
-
-    fn water(shape_type: Shape) -> Object {
-        let transform = Matrix::identity();
-        let material = Material::create()
-            .with_transparency(1.0)
-            .with_refractive_index(1.33);
-        Object {
-            id: Uuid::new_v4(),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse(),
-            material,
-            shape: shape_type,
-            has_shadow: false,
-            parent: None
-        }
-    }
-
-    fn diamond(shape_type: Shape) -> Object {
-        let transform = Matrix::identity();
-        let material = Material::create()
-            .with_transparency(1.0)
-            .with_refractive_index(2.417);
-        Object {
-            id: Uuid::new_v4(),
-            transformation: transform.clone(),
-            inverse_transformation: transform.inverse(),
-            material,
-            shape: shape_type,
-            has_shadow: true,
-            parent: None
+            has_shadow,
+            parent: None,
+            bounds
         }
     }
 
@@ -252,6 +180,10 @@ impl Object {
 
     pub fn parent(&self) -> Option<Uuid> {
         self.parent
+    }
+
+    pub fn bounds(&self) -> BoundingBox {
+        self.bounds
     }
 
     pub fn has_shadow(&self) -> bool {

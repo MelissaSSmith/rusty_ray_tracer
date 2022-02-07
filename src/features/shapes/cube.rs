@@ -145,4 +145,12 @@ mod tests {
             assert!(normal.equals(test.1));
         }
     }
+
+    #[test]
+    fn test_cube_has_a_bounding_box() {
+        let cube = Shape::Cube.create();
+
+        assert!(cube.bounds().minimum().equals(Point::create(-1.0, -1.0, -1.0)));
+        assert!(cube.bounds().maximum().equals(Point::create(1.0, 1.0, 1.0)));
+    }
 }

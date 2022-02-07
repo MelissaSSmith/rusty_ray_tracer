@@ -7,6 +7,9 @@ pub trait Operations<Rhs = Self> {
 
 impl Operations for f64 {
     fn equals(self, b: f64) -> bool {
+        if self.abs() == f64::INFINITY && b.abs() == f64::INFINITY {
+            return self == b
+        }
         let diff = self - b;
         diff.abs() < EPSILON
     }

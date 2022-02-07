@@ -265,4 +265,12 @@ mod tests {
         assert_eq!(sphere.material().transparency(), 1.0);
         assert_eq!(sphere.material().refractive_index(), 1.5);
     }
+
+    #[test]
+    fn test_sphere_has_a_bounding_box() {
+        let sphere = Shape::Sphere.create();
+
+        assert!(sphere.bounds().minimum().equals(Point::create(-1.0, -1.0, -1.0)));
+        assert!(sphere.bounds().maximum().equals(Point::create(1.0, 1.0, 1.0)));
+    }
 }

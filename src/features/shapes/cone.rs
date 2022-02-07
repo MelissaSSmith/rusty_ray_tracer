@@ -234,4 +234,24 @@ mod tests {
             assert!(normal.equals(test.1));
         }
     }
+
+    #[test]
+    fn test_unbounded_cone_has_a_bounding_box() {
+        let cone = Shape::Cone(Cone::create()).create();
+
+        assert!(cone.bounds().minimum().equals(Point::create(-f64::INFINITY, -f64::INFINITY, -f64::INFINITY)));
+        assert!(cone.bounds().maximum().equals(Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY)));
+    }
+
+    #[test]
+    fn test_bounded_cone_has_a_bounding_box() {
+        let cone = Shape::Cone(
+            Cone::create()
+                .with_minimum_bound(-5.0)
+                .with_maximum_bound(3.0)
+        ).create();
+
+        assert!(cone.bounds().minimum().equals(Point::create(-5.0, -5.0, -5.0)));
+        assert!(cone.bounds().maximum().equals(Point::create(5.0, 3.0, 5.0)));
+    }
 }

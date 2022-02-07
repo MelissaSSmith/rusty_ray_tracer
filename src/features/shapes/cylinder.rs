@@ -297,4 +297,24 @@ mod tests {
             assert!(normal.equals(test.1));
         }
     }
+
+    #[test]
+    fn test_unbounded_cylinder_has_a_bounding_box() {
+        let cylinder = Shape::Cylinder(Cylinder::create()).create();
+
+        assert!(cylinder.bounds().minimum().equals(Point::create(-1.0, -f64::INFINITY, -1.0)));
+        assert!(cylinder.bounds().maximum().equals(Point::create(1.0, f64::INFINITY, 1.0)));
+    }
+
+    #[test]
+    fn test_bounded_cylinder_has_a_bounding_box() {
+        let cylinder = Shape::Cylinder(
+            Cylinder::create()
+                .with_maximum_bound(3.0)
+                .with_minimum_bound(-5.0)
+        ).create();
+
+        assert!(cylinder.bounds().minimum().equals(Point::create(-1.0, -5.0, -1.0)));
+        assert!(cylinder.bounds().maximum().equals(Point::create(1.0, 3.0, 1.0)));
+    }
 }
