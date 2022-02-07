@@ -1,7 +1,13 @@
+use std::process::Output;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
+
+pub trait Transform<Rhs = Self> {
+    type Output;
+    fn transform(self, matrix: Matrix) -> Self::Output;
+}
 
 impl Matrix {
     pub fn translate(x: f64, y: f64, z: f64) -> Matrix {

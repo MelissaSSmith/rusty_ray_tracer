@@ -1,6 +1,9 @@
 use std::ops::Add;
+use std::process::Output;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
+use crate::features::transformations::Transform;
 
 #[derive(Clone, Copy)]
 pub struct BoundingBox {
@@ -49,6 +52,28 @@ impl BoundingBox {
     }
 }
 
+impl Transform<BoundingBox> for BoundingBox {
+    type Output = BoundingBox;
+    fn transform(self, matrix: Matrix) -> Self::Output {
+        let mut points = Vec::<Point>::new();
+        points.push(self.minimum());
+        points.push(Point::create(self.minimum().x(), self.minimum().y(), self.maximum().z()));
+        points.push(Point::create(self.minimum().x(), self.maximum().y(), self.minimum().z()));
+        points.push(Point::create(self.minimum().x(), self.maximum().y(), self.maximum().z()));
+        points.push(Point::create(self.maximum().x(), self.minimum().y(), self.minimum().z()));
+        points.push(Point::create(self.maximum().x(), self.minimum().y(), self.maximum().z()));
+        points.push(Point::create(self.maximum().x(), self.maximum().y(), self.minimum().z()));
+        points.push(self.maximum());
+
+        let mut transformed_box = BoundingBox::create();
+        for point in points {
+            transformed_box = transformed_box + (matrix.clone() * point);
+        }
+
+        transformed_box
+    }
+}
+
 impl Add<BoundingBox> for BoundingBox {
     type Output = BoundingBox;
 
@@ -89,9 +114,12 @@ impl Add<Point> for BoundingBox {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
     use crate::features::bounding_box::BoundingBox;
+    use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
+    use crate::features::transformations::Transform;
 
     #[test]
     fn test_create_an_empty_bounding_box() {
@@ -184,5 +212,18 @@ mod tests {
 
             assert_eq!(result, test.2);
         }
+    }
+
+    #[test]
+    fn test_transforming_a_bounding_box() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(-1.0, -1.0, -1.0))
+            .with_maximum(Point::create(1.0, 1.0, 1.0));
+        let matrix = Matrix::rotate_x(PI/4.0) * Matrix::rotate_y(PI/4.0);
+
+        let new_bounds = bounds.transform(matrix);
+
+        assert!(new_bounds.minimum().equals(Point::create(-1.414214, -1.707107, -1.707107)));
+        assert!(new_bounds.maximum().equals(Point::create(1.414214, 1.707107, 1.707107)));
     }
 }
