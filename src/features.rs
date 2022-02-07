@@ -11,4 +11,5 @@ pub mod camera;
 pub mod canvas;
 pub mod patterns;
 pub mod primitives;
+pub mod bounding_box;
 

@@ -4,6 +4,7 @@ use crate::features::ray::Ray;
 use smallvec::SmallVec;
 use crate::features::shapes::{Normal, NormalAt};
 use crate::features::shapes::shape::Object;
+use crate::features::world::World;
 
 #[derive(Clone)]
 pub struct Intersection {
@@ -31,11 +32,11 @@ impl Intersection {
         hit
     }
 
-    pub(crate) fn prepare_computations(&self, _ray: Ray, _intersections: &Vec<Intersection>) -> Computation {
+    pub(crate) fn prepare_computations(&self, _ray: Ray, _intersections: &Vec<Intersection>, _world: Option<&World>) -> Computation {
         let mut computation = Computation::create(self.t, &self.object);
 
         let point = _ray.position(self.t);
-        let normal = Object::normal(&self.object, &point, None);
+        let normal = Object::normal(&self.object, &point, _world);
         let eye_vector = -_ray.direction();
 
         let (n1, n2) = Intersection::calculate_n1_and_n2(_intersections, self.clone());
@@ -218,7 +219,7 @@ mod tests {
         let shape = Shape::Sphere.create();
         let intersection = Intersection::create(4.0, &shape);
 
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let computation = intersection.prepare_computations(ray, &vec![], None);
 
         assert_eq!(4.0, computation.t());
         assert!(computation.point().equals(Point::create(0.0, 0.0, -1.0)));
@@ -232,7 +233,7 @@ mod tests {
         let shape = Shape::Sphere.create();
         let intersection = Intersection::create(4.0, &shape);
 
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let computation = intersection.prepare_computations(ray, &vec![], None);
 
         assert_eq!(false, computation.inside());
     }
@@ -243,7 +244,7 @@ mod tests {
         let shape = Shape::Sphere.create();
         let intersection = Intersection::create(1.0, &shape);
 
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let computation = intersection.prepare_computations(ray, &vec![], None);
 
         assert_eq!(true, computation.inside());
         assert!(computation.point().equals(Point::create(0.0, 0.0, 1.0)));
@@ -259,7 +260,7 @@ mod tests {
 
         let intersection = Intersection::create(5.0, &sphere);
 
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let computation = intersection.prepare_computations(ray, &vec![], None);
 
         assert!(computation.over_point().z() < -EPSILON/2.0);
         assert!(computation.point().z() > computation.over_point().z());
@@ -272,7 +273,7 @@ mod tests {
         let ray = Ray::create(Point::create(0.0, 1.0, -1.0), Vector::create(0.0, -sqrt_2/2.0, sqrt_2/2.0));
         let intersection = Intersection::create(sqrt_2, &shape);
 
-        let computation = intersection.prepare_computations(ray, &vec![]);
+        let computation = intersection.prepare_computations(ray, &vec![], None);
 
         let reflect = computation.reflect_vector();
         assert!(reflect.equals(Vector::create(0.0, sqrt_2/2.0, sqrt_2/2.0)));
@@ -302,7 +303,7 @@ mod tests {
 
         let mut computations = Vec::<Computation>::new();
         for (index, intersection) in intersections.iter().enumerate() {
-            let comp = intersection.prepare_computations(ray, &intersections);
+            let comp = intersection.prepare_computations(ray, &intersections, None);
             computations.push(comp);
         }
 
@@ -333,7 +334,7 @@ mod tests {
         let intersection = Intersection::create(5.0, &shape);
         let intersections = vec![intersection.clone()];
 
-        let computation = intersection.prepare_computations(ray, &intersections);
+        let computation = intersection.prepare_computations(ray, &intersections, None);
 
         assert!(computation.under_point().z() > EPSILON/2.0);
         assert!(computation.point().z() < computation.under_point().z());
@@ -346,7 +347,7 @@ mod tests {
         let shape = Shape::Sphere.glass();
         let ray = Ray::create(Point::create(0.0, 0.0, sqrt2/2.0), Vector::create(0.0, 1.0, 0.0));
         let intersections = vec![Intersection::create(-sqrt2/2.0, &shape), Intersection::create(sqrt2/2.0, &shape)];
-        let computations = intersections[1].prepare_computations(ray, &intersections);
+        let computations = intersections[1].prepare_computations(ray, &intersections, None);
 
         let reflectance = Intersection::schlick(&computations);
 
@@ -359,7 +360,7 @@ mod tests {
         let shape = Shape::Sphere.glass();
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 1.0, 0.0));
         let intersections = vec![Intersection::create(-1.0, &shape), Intersection::create(1.0, &shape)];
-        let computations = intersections[1].prepare_computations(ray, &intersections);
+        let computations = intersections[1].prepare_computations(ray, &intersections, None);
 
         let reflectance = Intersection::schlick(&computations);
 
@@ -371,7 +372,7 @@ mod tests {
         let shape = Shape::Sphere.glass();
         let ray = Ray::create(Point::create(0.0, 0.99, -2.0), Vector::create(0.0, 0.0, 1.0));
         let intersections = vec![Intersection::create(1.8589, &shape)];
-        let computations = intersections[0].prepare_computations(ray, &intersections);
+        let computations = intersections[0].prepare_computations(ray, &intersections, None);
 
         let reflectance = Intersection::schlick(&computations);
 

@@ -8,20 +8,20 @@ use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
 pub struct Group {
-    objects: Vec<Object>
+    children: Vec<Object>
 }
 
 impl Group {
     pub fn create() -> Group {
-        Group { objects: vec![] }
+        Group { children: vec![] }
     }
 
     pub fn shapes(&self) -> Vec<Object> {
-        self.objects.clone()
+        self.children.clone()
     }
 
     pub fn get_object_by_id(&self, id: Uuid) -> Option<Object> {
-        for object in &self.objects {
+        for object in &self.children {
             if object.id() == id {
                 return Some(object.clone());
             }
@@ -35,7 +35,7 @@ impl Group {
     }
 
     pub fn add_child(&mut self, object: Object) {
-        self.objects.push(object);
+        self.children.push(object);
     }
 }
 
