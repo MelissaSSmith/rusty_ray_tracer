@@ -3,6 +3,7 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
+use crate::features::world::World;
 
 pub mod sphere;
 pub mod plane;
@@ -18,4 +19,8 @@ pub trait Intersect {
 
 pub trait Normal {
     fn normal(_object: &Object, _point: &Point) -> Vector;
+}
+
+pub trait NormalAt {
+    fn normal(_object: &Object, _point: &Point, _world: Option<&World>) -> Vector;
 }

@@ -8,7 +8,7 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Intersect, Normal};
+use crate::features::shapes::{Intersect, Normal, NormalAt};
 use crate::features::shapes::cone::Cone;
 use crate::features::shapes::cube::Cube;
 use crate::features::shapes::cylinder::Cylinder;
@@ -343,26 +343,26 @@ impl Object {
         }
     }
 
-    pub fn world_to_object(self, point: Point, world: &World) -> Point {
-        let object_point = match self.parent() {
+    fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
+        let object_point = match _object.parent() {
             Some(id) => {
                 let parent = world.get_object_by_id(id).expect("Object not found!");
-                parent.world_to_object(point, world)
+                Object::world_to_object(&parent, &point, world)
             }
-            None => point,
+            None => *point,
         };
 
-        self.inverse_transformation() * object_point
+        _object.inverse_transformation() * object_point
     }
 
-    pub fn normal_to_world(self, normal: Vector, world: &World) -> Vector {
-        let world_normal = (self.inverse_transformation().transpose() * normal).normalize();
+    fn normal_to_world(_object: &Object, normal: &Vector, world: &World) -> Vector {
+        let world_normal = (_object.inverse_transformation().transpose() * *normal).normalize();
 
-        match self.parent() {
+        match _object.parent() {
             None => { world_normal }
             Some(id) => {
                 let parent = world.get_object_by_id(id).expect("Object not found!");
-                parent.normal_to_world(world_normal, world)
+                Object::normal_to_world(&parent, &world_normal, world)
             }
         }
     }
@@ -383,9 +383,12 @@ impl Intersect for Object {
     }
 }
 
-impl Normal for Object {
-    fn normal(_object: &Object, _point: &Point) -> Vector {
-        let object_point = _object.inverse_transformation() * *_point;
+impl NormalAt for Object {
+    fn normal(_object: &Object, _point: &Point, _world: Option<&World>) -> Vector {
+        let object_point = match _world {
+            None => { _object.inverse_transformation() * *_point }
+            Some(w) => { Object::world_to_object(_object, _point, w) }
+        };
         let object_normal = match _object.shape {
             Shape::Sphere => { Sphere::normal(_object, &object_point) }
             Shape::Plane => { Plane::normal(_object, &object_point) }
@@ -395,8 +398,12 @@ impl Normal for Object {
             Shape::Group(_) => { Group::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
-        let world_normal = _object.inverse_transformation().transpose() * object_normal;
-        world_normal.normalize()
+        match _world {
+            None => {
+                (_object.inverse_transformation().transpose() * object_normal).normalize()
+            }
+            Some(w) => { Object::normal_to_world(_object, &object_normal, w) }
+        }
     }
 }
 
@@ -408,6 +415,7 @@ mod tests {
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::group::Group;
+    use crate::features::shapes::{Normal, NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
     use crate::features::world::World;
 
@@ -426,7 +434,7 @@ mod tests {
 
         let object = world.get_object_by_id(sphere.id()).unwrap();
 
-        let point = object.world_to_object(Point::create(-2.0, 0.0, -10.0), &world);
+        let point = Object::world_to_object(&object, &Point::create(-2.0, 0.0, -10.0), &world);
 
         assert!(point.equals(Point::create(0.0, 0.0, -1.0)));
     }
@@ -448,8 +456,28 @@ mod tests {
 
         let sqrt_3 = f64::sqrt(3.0)/3.0;
 
-        let normal = object.normal_to_world(Vector::create(sqrt_3, sqrt_3, sqrt_3), &world);
+        let normal = Object::normal_to_world(&object, &Vector::create(sqrt_3, sqrt_3, sqrt_3), &world);
 
         assert!(normal.equals(Vector::create(0.2857, 0.4286, -0.8571)));
+    }
+
+    #[test]
+    fn test_find_normal_on_object_in_a_group() {
+        let sphere = Shape::Sphere.create()
+            .with_transform(Matrix::translate(5.0,0.0, 0.0));
+        let mut group_2 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::scale(1.0, 2.0, 3.0));
+        let mut group_1 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::rotate_y(PI/2.0));
+
+        group_2.add_child(sphere.clone());
+        group_1.add_child(group_2);
+        let world = World::create().with_objects(vec![group_1]);
+
+        let object = world.get_object_by_id(sphere.id()).unwrap();
+
+        let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), Some(&world));
+
+        assert!(point.equals(Vector::create(0.2857, 0.4286, -0.8571)));
     }
 }

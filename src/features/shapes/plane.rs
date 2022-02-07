@@ -31,7 +31,7 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
-    use crate::features::shapes::{Intersect, Normal};
+    use crate::features::shapes::{Intersect, Normal, NormalAt};
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::{Object, Shape};
@@ -40,7 +40,7 @@ mod tests {
     fn test_normal_of_a_plane_is_constant_everywhere() {
         let plane = Shape::Plane.create();
 
-        let n1 = Object::normal(&plane, &Point::zero());
+        let n1 = Object::normal(&plane, &Point::zero(), None);
         let n2 = Plane::normal(&plane, &Point::create(10.0, 0.0, -10.0));
         let n3 = Plane::normal(&plane, &Point::create(-5.0, 0.0, 150.0));
 

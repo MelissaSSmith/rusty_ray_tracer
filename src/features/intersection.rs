@@ -2,7 +2,7 @@ use crate::features::computation::Computation;
 use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
 use crate::features::ray::Ray;
 use smallvec::SmallVec;
-use crate::features::shapes::Normal;
+use crate::features::shapes::{Normal, NormalAt};
 use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
@@ -35,7 +35,7 @@ impl Intersection {
         let mut computation = Computation::create(self.t, &self.object);
 
         let point = _ray.position(self.t);
-        let normal = Object::normal(&self.object, &point);
+        let normal = Object::normal(&self.object, &point, None);
         let eye_vector = -_ray.direction();
 
         let (n1, n2) = Intersection::calculate_n1_and_n2(_intersections, self.clone());

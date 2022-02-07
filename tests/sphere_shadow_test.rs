@@ -13,7 +13,7 @@ use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
-use rusty_ray_tracer::features::shapes::{Intersect, Normal};
+use rusty_ray_tracer::features::shapes::{Intersect, Normal, NormalAt};
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
 
 #[test]
@@ -49,7 +49,7 @@ fn sphere_shadow_test() {
                 None => {}
                 Some(hit) => {
                     let point = ray.position(hit.t);
-                    let normal = Object::normal(&hit.object, &point);
+                    let normal = Object::normal(&hit.object, &point, None);
                     let eye = -ray.direction();
                     let color = hit.object.material().lighting(&light, &hit.object, &point, &eye, &normal, false);
                     canvas.write_pixel(x, y, color);

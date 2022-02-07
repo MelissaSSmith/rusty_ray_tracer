@@ -44,7 +44,7 @@ mod tests {
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
-    use crate::features::shapes::{Intersect, Normal};
+    use crate::features::shapes::{Intersect, Normal, NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
 
     #[test]
@@ -177,7 +177,7 @@ mod tests {
     fn test_normal_on_a_sphere_at_a_point_on_the_x_axis() {
         let sphere = Shape::Sphere.create();
 
-        let normal = Object::normal(&sphere, &Point::create(1.0, 0.0, 0.0));
+        let normal = Object::normal(&sphere, &Point::create(1.0, 0.0, 0.0), None);
 
         assert!(normal.equals(Vector::create(1.0, 0.0, 0.0)));
     }
@@ -186,7 +186,7 @@ mod tests {
     fn test_normal_on_a_sphere_at_a_point_on_the_y_axis() {
         let sphere = Shape::Sphere.create();
 
-        let normal = Object::normal(&sphere, &Point::create(0.0, 1.0, 0.0));
+        let normal = Object::normal(&sphere, &Point::create(0.0, 1.0, 0.0), None);
 
         assert!(normal.equals(Vector::create(0.0, 1.0, 0.0)));
     }
@@ -195,7 +195,7 @@ mod tests {
     fn test_normal_on_a_sphere_at_a_point_on_the_z_axis() {
         let sphere = Shape::Sphere.create();
 
-        let normal = Object::normal(&sphere, &Point::create(0.0, 0.0, 1.0));
+        let normal = Object::normal(&sphere, &Point::create(0.0, 0.0, 1.0), None);
 
         assert!(normal.equals(Vector::create(0.0, 0.0, 1.0)));
     }
@@ -204,7 +204,7 @@ mod tests {
     fn test_normal_on_a_sphere_at_a_nonaxial_point() {
         let sphere = Shape::Sphere.create();
 
-        let normal = Object::normal(&sphere, &Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
+        let normal = Object::normal(&sphere, &Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0), None);
 
         assert!(normal.equals(Vector::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0)));
     }
@@ -213,7 +213,7 @@ mod tests {
     fn test_normal_is_a_normalized_vector() {
         let sphere = Shape::Sphere.create();
 
-        let normal = Object::normal(&sphere, &Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
+        let normal = Object::normal(&sphere, &Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0), None);
 
         assert!(normal.equals(normal.normalize()));
     }
@@ -223,7 +223,7 @@ mod tests {
         let sphere = Shape::Sphere.create()
             .with_transform(Matrix::translate(0.0, 1.0, 0.0));
 
-        let normal = Object::normal(&sphere, &Point::create(0.0, 1.70711, -FRAC_1_SQRT_2));
+        let normal = Object::normal(&sphere, &Point::create(0.0, 1.70711, -FRAC_1_SQRT_2), None);
 
         assert!(normal.equals(Vector::create(0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2)));
     }
@@ -233,7 +233,7 @@ mod tests {
         let matrix = Matrix::scale(1.0, 0.5, 1.0) * Matrix::rotate_z(PI/5.0);
         let sphere = Shape::Sphere.create().with_transform(matrix);
 
-        let normal = Object::normal(&sphere, &Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0));
+        let normal = Object::normal(&sphere, &Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0), None);
 
         assert!(normal.equals(Vector::create(0.0, 0.97014, -0.24254)));
     }
