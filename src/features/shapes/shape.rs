@@ -16,6 +16,7 @@ use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
+use crate::features::transformations::Transform;
 use crate::features::world::World;
 
 //todo: derive => Debug, PartialEq, Serialize, Deserialize (requires Matrix not using Vec in backend)
@@ -183,7 +184,19 @@ impl Object {
     }
 
     pub fn bounds(&self) -> BoundingBox {
-        self.bounds
+        match self.shape() {
+            Shape::Group(g) => {
+                let mut bounds = BoundingBox::create();
+
+                for child in g.shapes() {
+                    let child_box = child.parent_space_bounds();
+                    bounds = bounds + child_box;
+                }
+
+                bounds
+            }
+            _ => { self.bounds }
+        }
     }
 
     pub fn has_shadow(&self) -> bool {
@@ -273,6 +286,10 @@ impl Object {
             Shape::Group(g) => { g.get_object_by_id(id) }
             _ => { None }
         }
+    }
+
+    fn parent_space_bounds(&self) -> BoundingBox {
+        self.bounds().transform(self.transformation())
     }
 
     fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
@@ -410,5 +427,16 @@ mod tests {
         let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), Some(&world));
 
         assert!(point.equals(Vector::create(0.2857, 0.4286, -0.8571)));
+    }
+
+    #[test]
+    fn test_querying_a_shapes_bounding_box_in_its_parent_space() {
+        let shape = Shape::Sphere.create()
+            .with_transform(Matrix::translate(1.0, -3.0, 5.0) * Matrix::scale(0.5, 2.0, 4.0) );
+
+        let bounds = shape.parent_space_bounds();
+
+        assert!(bounds.minimum().equals(Point::create(0.5, -5.0, 1.0)));
+        assert!(bounds.maximum().equals(Point::create(1.5, -1.0, 9.0)));
     }
 }

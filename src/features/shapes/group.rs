@@ -60,6 +60,7 @@ mod tests {
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::ray::Ray;
+    use crate::features::shapes::cylinder::Cylinder;
     use crate::features::shapes::group::Group;
     use crate::features::shapes::Intersect;
     use crate::features::shapes::shape::{Object, Shape};
@@ -130,5 +131,25 @@ mod tests {
 
         println!("{}", intersections.len());
         assert_eq!(intersections.len(), 2);
+    }
+
+    #[test]
+    fn test_group_has_a_bounding_box_that_contains_its_children() {
+        let sphere = Shape::Sphere.create()
+            .with_transform(Matrix::translate(2.0, 5.0, -3.0) * Matrix::scale(2.0, 2.0, 2.0));
+        let cylinder = Shape::Cylinder(
+            Cylinder::create()
+                .with_minimum_bound(-2.0)
+                .with_maximum_bound(2.0)
+        ).create()
+            .with_transform(Matrix::translate(-4.0, -1.0, 4.0) * Matrix::scale(0.5, 1.0, 0.5));
+        let mut group = Shape::Group(Group::create()).create();
+        group.add_child(sphere);
+        group.add_child(cylinder);
+
+        let bounds = group.bounds();
+
+        assert!(bounds.minimum().equals(Point::create(-4.5, -3.0, -5.0)));
+        assert!(bounds.maximum().equals(Point::create(4.0, 7.0, 4.5)));
     }
 }
