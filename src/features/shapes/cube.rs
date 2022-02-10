@@ -10,38 +10,11 @@ use crate::features::shapes::shape::Object;
 #[derive(Clone, Copy)]
 pub struct Cube {}
 
-impl Cube {
-    fn check_axis(origin: &f64, direction: &f64) -> (f64, f64) {
-        let mut tmin = 0.0;
-        let mut tmax = 0.0;
-
-        let tmin_numerator = -1.0 - origin;
-        let tmax_numerator = 1.0 - origin;
-
-        if direction.abs() >= EPSILON {
-            tmin = tmin_numerator / direction;
-            tmax = tmax_numerator / direction;
-        } else {
-            tmin = tmin_numerator * f64::INFINITY;
-            tmax = tmax_numerator * f64::INFINITY;
-        }
-
-        if tmin > tmax {
-            return Cube::swap(tmin, tmax);
-        }
-        (tmin, tmax)
-    }
-
-    fn swap(tmin: f64, tmax: f64) -> (f64, f64) {
-        (tmax, tmin)
-    }
-}
-
 impl Intersect for Cube {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        let (xtmin, xtmax) = Cube::check_axis(&_ray.origin.x(), &_ray.direction.x());
-        let (ytmin, ytmax) = Cube::check_axis(&_ray.origin.y(), &_ray.direction.y());
-        let (ztmin, ztmax) = Cube::check_axis(&_ray.origin.z(), &_ray.direction.z());
+        let (xtmin, xtmax) = Object::check_axis(&_ray.origin.x(), &_ray.direction.x(), -1.0, 1.0);
+        let (ytmin, ytmax) = Object::check_axis(&_ray.origin.y(), &_ray.direction.y(), -1.0, 1.0);
+        let (ztmin, ztmax) = Object::check_axis(&_ray.origin.z(), &_ray.direction.z(), -1.0, 1.0);
 
         let tmin = vec![xtmin, ytmin, ztmin].iter().fold(-f64::INFINITY, |a, &b| a.max(b));
         let tmax = vec![xtmax, ytmax, ztmax].iter().fold(f64::INFINITY, |a, &b| a.min(b));

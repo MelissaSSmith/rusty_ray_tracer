@@ -1,8 +1,14 @@
 use std::ops::Add;
 use std::process::Output;
+use crate::features::intersection::Intersection;
 use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
+use crate::features::ray::Ray;
+use crate::features::shapes::cube::Cube;
+use crate::features::shapes::Intersect;
+use crate::features::shapes::shape::Object;
 use crate::features::transformations::Transform;
 
 #[derive(Clone, Copy)]
@@ -49,6 +55,17 @@ impl BoundingBox {
 
     pub fn contains_box(&self, bounding_box: BoundingBox) -> bool {
         self.contains_point(bounding_box.minimum()) && self.contains_point(bounding_box.maximum())
+    }
+
+    pub fn intersects(_bounds: &BoundingBox, _ray: &Ray) -> bool {
+        let (xtmin, xtmax) = Object::check_axis(&_ray.origin.x(), &_ray.direction.x(), _bounds.minimum().x(), _bounds.maximum().x());
+        let (ytmin, ytmax) = Object::check_axis(&_ray.origin.y(), &_ray.direction.y(), _bounds.minimum().y(), _bounds.maximum().y());
+        let (ztmin, ztmax) = Object::check_axis(&_ray.origin.z(), &_ray.direction.z(), _bounds.minimum().z(), _bounds.maximum().z());
+
+        let tmin = vec![xtmin, ytmin, ztmin].iter().fold(-f64::INFINITY, |a, &b| a.max(b));
+        let tmax = vec![xtmax, ytmax, ztmax].iter().fold(f64::INFINITY, |a, &b| a.min(b));
+
+        tmax >= tmin
     }
 }
 
@@ -119,6 +136,8 @@ mod tests {
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
+    use crate::features::primitives::vector::Vector;
+    use crate::features::ray::Ray;
     use crate::features::transformations::Transform;
 
     #[test]
@@ -225,5 +244,69 @@ mod tests {
 
         assert!(new_bounds.minimum().equals(Point::create(-1.414214, -1.707107, -1.707107)));
         assert!(new_bounds.maximum().equals(Point::create(1.414214, 1.707107, 1.707107)));
+    }
+
+    #[test]
+    fn test_intersect_a_ray_with_a_bounding_box_at_the_origin() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(-1.0, -1.0, -1.0))
+            .with_maximum(Point::create(1.0, 1.0, 1.0));
+
+        let tests = vec![
+            (Point::create(5.0, 0.5, 0.0), Vector::create(-1.0, 0.0, 0.0), true),
+            (Point::create(-5.0, 0.5, 0.0), Vector::create(1.0, 0.0, 0.0), true),
+            (Point::create(0.5, 5.0, 0.0), Vector::create(0.0, -1.0, 0.0), true),
+            (Point::create(0.5, -5.0, 0.0), Vector::create(0.0, 1.0, 0.0), true),
+            (Point::create(0.5, 0.0, 5.0), Vector::create(0.0, 0.0, -1.0), true),
+            (Point::create(0.5, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0), true),
+            (Point::create(0.0, 0.5, 0.0), Vector::create(0.0, 0.0, 1.0), true),
+            (Point::create(-2.0, 0.0, 0.0), Vector::create(2.0, 4.0, 6.0), false),
+            (Point::create(0.0, -2.0, 0.0), Vector::create(6.0, 2.0, 4.0), false),
+            (Point::create(0.0, 0.0, -2.0), Vector::create(4.0, 6.0, 2.0), false),
+            (Point::create(2.0, 0.0, 2.0), Vector::create(0.0, 0.0, -1.0), false),
+            (Point::create(0.0, 2.0, 2.0), Vector::create(0.0, -1.0, 0.0), false),
+            (Point::create(2.0, 2.0, 0.0), Vector::create(-1.0, 0.0, 0.0), false)
+        ];
+
+        for test in tests {
+            let direction = test.1.normalize();
+            let ray = Ray::create(test.0, direction);
+
+            let result = BoundingBox::intersects(&bounds, &ray);
+
+            assert_eq!(result, test.2);
+        }
+    }
+
+    #[test]
+    fn test_intersect_a_ray_with_a_non_cubic_bounding_box() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(5.0, -2.0, 0.0))
+            .with_maximum(Point::create(11.0, 4.0, 7.0));
+
+        let tests = vec![
+            (Point::create(15.0, 1.0, 2.0), Vector::create(-1.0, 0.0, 0.0), true),
+            (Point::create(-5.0, -1.0, 4.0), Vector::create(1.0, 0.0, 0.0), true),
+            (Point::create(7.0, 6.0, 5.0), Vector::create(0.0, -1.0, 0.0), true),
+            (Point::create(9.0, -5.0, 6.0), Vector::create(0.0, 1.0, 0.0), true),
+            (Point::create(8.0, 2.0, 12.0), Vector::create(0.0, 0.0, -1.0), true),
+            (Point::create(6.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0), true),
+            (Point::create(8.0, 1.0, 3.5), Vector::create(0.0, 0.0, 1.0), true),
+            (Point::create(9.0, -1.0, -8.0), Vector::create(2.0, 4.0, 6.0), false),
+            (Point::create(8.0, 3.0, -4.0), Vector::create(6.0, 2.0, 4.0), false),
+            (Point::create(9.0, -1.0, -2.0), Vector::create(4.0, 6.0, 2.0), false),
+            (Point::create(4.0, 0.0, 9.0), Vector::create(0.0, 0.0, -1.0), false),
+            (Point::create(8.0, 6.0, -1.0), Vector::create(0.0, -1.0, 0.0), false),
+            (Point::create(12.0, 5.0, 4.0), Vector::create(-1.0, 0.0, 0.0), false)
+        ];
+
+        for test in tests {
+            let direction = test.1.normalize();
+            let ray = Ray::create(test.0, direction);
+
+            let result = BoundingBox::intersects(&bounds, &ray);
+
+            assert_eq!(result, test.2);
+        }
     }
 }
