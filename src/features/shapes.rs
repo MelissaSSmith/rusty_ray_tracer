@@ -13,6 +13,7 @@ pub mod cylinder;
 pub mod cone;
 pub mod group;
 pub mod functions;
+mod test;
 
 pub trait Intersect {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection>;
