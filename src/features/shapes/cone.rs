@@ -19,7 +19,7 @@ impl Cone {
     pub fn create() -> Cone {
         Cone {
             maximum: f64::INFINITY,
-            minimum: -f64::INFINITY,
+            minimum: f64::NEG_INFINITY,
             closed: false
         }
     }
@@ -239,7 +239,7 @@ mod tests {
     fn test_unbounded_cone_has_a_bounding_box() {
         let cone = Shape::Cone(Cone::create()).create();
 
-        assert!(cone.bounds().minimum().equals(Point::create(-f64::INFINITY, -f64::INFINITY, -f64::INFINITY)));
+        assert!(cone.bounds().minimum().equals(Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY)));
         assert!(cone.bounds().maximum().equals(Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY)));
     }
 

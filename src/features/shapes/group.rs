@@ -1,6 +1,8 @@
 use uuid::Uuid;
+use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
@@ -43,8 +45,13 @@ impl Intersect for Group {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
 
+        println!("{} {} {}", _object.bounds().minimum().x(), _object.bounds().minimum().y(), _object.bounds().minimum().z());
+        println!("{} {} {}", _object.bounds().maximum().x(), _object.bounds().maximum().y(), _object.bounds().maximum().z());
+        if !BoundingBox::intersects(&_object.bounds(), &_ray) {
+            return intersections;
+        }
         for mut shape in  _object.children() {
-            shape.set_transform(_object.transformation() * shape.transformation());
+            //shape.set_transform(_object.transformation() * shape.transformation());
             intersections.append(&mut Object::intersect(&shape, _ray));
         }
 
@@ -64,6 +71,7 @@ mod tests {
     use crate::features::shapes::group::Group;
     use crate::features::shapes::Intersect;
     use crate::features::shapes::shape::{Object, Shape};
+    use crate::features::shapes::test::TestShape;
 
     #[test]
     fn test_create_a_new_group() {
@@ -129,7 +137,6 @@ mod tests {
 
         let intersections = Object::intersect(&group, &ray);
 
-        println!("{}", intersections.len());
         assert_eq!(intersections.len(), 2);
     }
 
@@ -151,5 +158,37 @@ mod tests {
 
         assert!(bounds.minimum().equals(Point::create(-4.5, -3.0, -5.0)));
         assert!(bounds.maximum().equals(Point::create(4.0, 7.0, 4.5)));
+    }
+
+    #[test]
+    fn test_intersecting_group_does_not_test_children_if_box_is_missed() {
+        let child = Shape::TestShape(TestShape::create()).create();
+        let mut group = Shape::Group(Group::create()).create();
+        group.add_child(child);
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 1.0, 0.0));
+
+        let intersections = Object::intersect(&group, &ray);
+
+        match intersections[0].object.shape() {
+            Shape::TestShape(t) => { assert_eq!(true, t.saved_ray().is_none())}
+            _ => {assert_eq!(0, 1)}
+        }
+        assert_eq!(0, intersections.len());
+    }
+
+    #[test]
+    fn test_intersecting_group_tests_children_if_box_is_hit() {
+        let child = Shape::TestShape(TestShape::create()).create();
+        let mut group = Shape::Group(Group::create()).create();
+        group.add_child(child);
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+
+        let intersections = Object::intersect(&group, &ray);
+
+        assert_eq!(1, intersections.len());
+        match intersections[0].object.shape() {
+            Shape::TestShape(t) => { assert_eq!(true, t.saved_ray().is_some())}
+            _ => {assert_eq!(0, 1)}
+        }
     }
 }

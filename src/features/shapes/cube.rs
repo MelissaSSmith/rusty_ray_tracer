@@ -16,7 +16,7 @@ impl Intersect for Cube {
         let (ytmin, ytmax) = Object::check_axis(&_ray.origin.y(), &_ray.direction.y(), -1.0, 1.0);
         let (ztmin, ztmax) = Object::check_axis(&_ray.origin.z(), &_ray.direction.z(), -1.0, 1.0);
 
-        let tmin = vec![xtmin, ytmin, ztmin].iter().fold(-f64::INFINITY, |a, &b| a.max(b));
+        let tmin = vec![xtmin, ytmin, ztmin].iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
         let tmax = vec![xtmax, ytmax, ztmax].iter().fold(f64::INFINITY, |a, &b| a.min(b));
 
         if tmin > tmax {
@@ -31,7 +31,7 @@ impl Normal for Cube {
     fn normal(_object: &Object, _point: &Point) -> Vector {
         let maxc = vec![_point.x().abs(), _point.y().abs(), _point.z().abs()]
             .iter()
-            .fold(-f64::INFINITY, |a, &b| a.max(b));
+            .fold(f64::NEG_INFINITY, |a, &b| a.max(b));
 
         if maxc == _point.x().abs() {
             return Vector::create(_point.x(), 0.0, 0.0);

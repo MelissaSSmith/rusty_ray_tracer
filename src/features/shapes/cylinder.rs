@@ -19,7 +19,7 @@ impl Cylinder {
     pub fn create() -> Cylinder {
         Cylinder {
             maximum: f64::INFINITY,
-            minimum: -f64::INFINITY,
+            minimum: f64::NEG_INFINITY,
             closed: false
         }
     }
@@ -209,7 +209,7 @@ mod tests {
         let cylinder = Shape::Cylinder(Cylinder::create()).create();
 
         assert_eq!(cylinder.maximum_bound(), f64::INFINITY);
-        assert_eq!(cylinder.minimum_bound(), -f64::INFINITY);
+        assert_eq!(cylinder.minimum_bound(), f64::NEG_INFINITY);
     }
 
     #[test]
@@ -302,7 +302,7 @@ mod tests {
     fn test_unbounded_cylinder_has_a_bounding_box() {
         let cylinder = Shape::Cylinder(Cylinder::create()).create();
 
-        assert!(cylinder.bounds().minimum().equals(Point::create(-1.0, -f64::INFINITY, -1.0)));
+        assert!(cylinder.bounds().minimum().equals(Point::create(-1.0, f64::NEG_INFINITY, -1.0)));
         assert!(cylinder.bounds().maximum().equals(Point::create(1.0, f64::INFINITY, 1.0)));
     }
 

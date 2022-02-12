@@ -57,7 +57,7 @@ impl Shape {
             }
             Shape::Plane => {
                 let bounds = BoundingBox::create()
-                    .with_minimum(Point::create(-f64::INFINITY, 0.0, -f64::INFINITY))
+                    .with_minimum(Point::create(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY))
                     .with_maximum(Point::create(f64::INFINITY, 0.0, f64::INFINITY));
                 Object::create(Shape::Plane, has_shadow, material, bounds)
             }
@@ -201,7 +201,7 @@ impl Object {
 
                 bounds
             }
-            _ => { self.bounds }
+            _ => { self.bounds.transform(self.transformation()) }
         }
     }
 
@@ -278,10 +278,11 @@ impl Object {
     pub fn add_child(&mut self, mut object: Object) {
         match self.shape() {
             Shape::Group(mut g) => {
+                self.bounds = self.bounds() + object.bounds();
+                //self.bounds.transform(object.transformation());
                 object.set_parent(self.clone());
                 g.add_child(object);
-
-                self.shape = Shape::Group(g)
+                self.shape = Shape::Group(g);
             },
             _ => {}
         }

@@ -95,7 +95,7 @@ mod tests {
     fn test_plane_has_a_bounding_box() {
         let plane = Shape::Plane.create();
 
-        assert!(plane.bounds().minimum().equals(Point::create(-f64::INFINITY, 0.0, -f64::INFINITY)));
+        assert!(plane.bounds().minimum().equals(Point::create(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY)));
         assert!(plane.bounds().maximum().equals(Point::create(f64::INFINITY, 0.0, f64::INFINITY)));
     }
 }

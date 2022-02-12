@@ -21,7 +21,7 @@ impl BoundingBox {
     pub fn create() -> BoundingBox {
         BoundingBox {
             minimum: Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY),
-            maximum: Point::create(-f64::INFINITY, -f64::INFINITY, -f64::INFINITY)
+            maximum: Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY)
         }
     }
 
@@ -62,16 +62,24 @@ impl BoundingBox {
         let (ytmin, ytmax) = Object::check_axis(&_ray.origin.y(), &_ray.direction.y(), _bounds.minimum().y(), _bounds.maximum().y());
         let (ztmin, ztmax) = Object::check_axis(&_ray.origin.z(), &_ray.direction.z(), _bounds.minimum().z(), _bounds.maximum().z());
 
-        let tmin = vec![xtmin, ytmin, ztmin].iter().fold(-f64::INFINITY, |a, &b| a.max(b));
+        let tmin = vec![xtmin, ytmin, ztmin].iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
         let tmax = vec![xtmax, ytmax, ztmax].iter().fold(f64::INFINITY, |a, &b| a.min(b));
 
-        tmax >= tmin
+        println!("{} {}", tmin, tmax);
+        if tmax < 0.0 {
+            return false;
+        }
+
+        tmin <= tmax
     }
 }
 
 impl Transform<BoundingBox> for BoundingBox {
     type Output = BoundingBox;
     fn transform(self, matrix: Matrix) -> Self::Output {
+        if matrix.equals(Matrix::identity()) {
+            return self
+        }
         let mut points = Vec::<Point>::new();
         points.push(self.minimum());
         points.push(Point::create(self.minimum().x(), self.minimum().y(), self.maximum().z()));
@@ -145,7 +153,7 @@ mod tests {
         let bound_box = BoundingBox::create();
 
         assert!(bound_box.minimum().equals(Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY)));
-        assert!(bound_box.maximum().equals(Point::create(-f64::INFINITY, -f64::INFINITY, -f64::INFINITY)));
+        assert!(bound_box.maximum().equals(Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY)));
     }
 
     #[test]

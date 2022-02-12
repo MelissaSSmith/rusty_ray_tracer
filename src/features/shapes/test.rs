@@ -17,6 +17,10 @@ impl TestShape {
             saved_ray: None
         }
     }
+
+    pub fn saved_ray(&self) -> Option<Ray> {
+        self.saved_ray
+    }
 }
 
 impl Intersect for TestShape {
