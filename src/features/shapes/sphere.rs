@@ -44,7 +44,7 @@ mod tests {
     use crate::features::shapes::sphere::Sphere;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
-    use crate::features::shapes::{Intersect, Normal, NormalAt};
+    use crate::features::shapes::{Intersect, NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
 
     #[test]

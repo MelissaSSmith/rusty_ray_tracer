@@ -199,9 +199,9 @@ impl Object {
                     bounds = bounds + child_box;
                 }
 
-                bounds
+                bounds.transform(self.transformation())
             }
-            _ => { self.bounds.transform(self.transformation()) }
+            _ => { self.bounds }
         }
     }
 
@@ -278,8 +278,6 @@ impl Object {
     pub fn add_child(&mut self, mut object: Object) {
         match self.shape() {
             Shape::Group(mut g) => {
-                self.bounds = self.bounds() + object.bounds();
-                //self.bounds.transform(object.transformation());
                 object.set_parent(self.clone());
                 g.add_child(object);
                 self.shape = Shape::Group(g);
@@ -372,7 +370,7 @@ mod tests {
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::group::Group;
-    use crate::features::shapes::{Normal, NormalAt};
+    use crate::features::shapes::{NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
     use crate::features::world::World;
 
