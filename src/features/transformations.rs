@@ -68,11 +68,11 @@ impl Matrix {
         let forward = (to - from).normalize();
         let left = forward * up.normalize();
         let true_up = left * forward;
-        let vec_1 = vec![left.x(), left.y(), left.z(), 0.0];
-        let vec_2 = vec![true_up.x(), true_up.y(), true_up.z(), 0.0];
-        let vec_3 = vec![-forward.x(), -forward.y(), -forward.z(), 0.0];
-        let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
-        let orientation = Matrix::create(vec![vec_1, vec_2, vec_3, vec_4]);
+        let vec_1 = [left.x(), left.y(), left.z(), 0.0];
+        let vec_2 = [true_up.x(), true_up.y(), true_up.z(), 0.0];
+        let vec_3 = [-forward.x(), -forward.y(), -forward.z(), 0.0];
+        let vec_4 = [0.0, 0.0, 0.0, 1.0];
+        let orientation = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
         let translation = Matrix::translate(-from.x(), -from.y(), -from.z());
         orientation * translation
     }
@@ -382,10 +382,10 @@ mod tests {
 
         let matrix = Matrix::view_transform(from, to, up);
 
-        let vec_1 = vec![-0.50709, 0.50709, 0.67612, -2.36643];
-        let vec_2 = vec![0.76772, 0.60609, 0.12122, -2.82843];
-        let vec_3 = vec![-0.35857, 0.59761, -0.71714, 0.0];
-        let vec_4 = vec![0.0, 0.0, 0.0, 1.0];
-        assert!(matrix.equals(Matrix::create(vec![vec_1, vec_2, vec_3, vec_4])));
+        let vec_1 = [-0.50709, 0.50709, 0.67612, -2.36643];
+        let vec_2 = [0.76772, 0.60609, 0.12122, -2.82843];
+        let vec_3 = [-0.35857, 0.59761, -0.71714, 0.0];
+        let vec_4 = [0.0, 0.0, 0.0, 1.0];
+        assert!(matrix.equals(Matrix::create([vec_1, vec_2, vec_3, vec_4])));
     }
 }
