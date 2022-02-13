@@ -19,7 +19,6 @@ use crate::features::shapes::plane::Plane;
 use crate::features::transformations::Transform;
 use crate::features::world::World;
 
-//todo: derive => Debug, PartialEq, Serialize, Deserialize (requires Matrix not using Vec in backend)
 #[derive(Clone)]
 pub enum Shape {
     Object,
@@ -139,7 +138,7 @@ impl Object {
         let transform = Matrix::identity();
         Object {
             id: Uuid::new_v4(),
-            transformation: transform.clone(),
+            transformation: transform,
             inverse_transformation: transform.inverse(),
             material,
             shape: shape_type,
@@ -160,11 +159,11 @@ impl Object {
     }
 
     pub fn transformation(&self) -> Matrix {
-        self.transformation.clone()
+        self.transformation
     }
 
     pub fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
+        self.inverse_transformation
     }
 
     pub fn material(&self) -> Material {
@@ -204,7 +203,7 @@ impl Object {
     }
 
     pub fn set_transform(&mut self, _transformation: Matrix) {
-        self.transformation = _transformation.clone();
+        self.transformation = _transformation;
         self.inverse_transformation = _transformation.inverse();
     }
 
@@ -218,7 +217,7 @@ impl Object {
 
     pub fn with_transform(self, _transform: Matrix) -> Object {
         Object {
-            transformation: _transform.clone(),
+            transformation: _transform,
             inverse_transformation: _transform.inverse(),
             ..self
         }
@@ -318,7 +317,7 @@ impl Object {
 
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        let transformed_ray = _ray.transform(_object.clone().inverse_transformation());
+        let transformed_ray = _ray.transform(_object.inverse_transformation());
         match _object.shape {
             Shape::Sphere => { Sphere::intersect(_object, &transformed_ray) }
             Shape::Plane => { Plane::intersect(_object, &transformed_ray) }

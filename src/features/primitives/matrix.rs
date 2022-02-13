@@ -9,9 +9,9 @@ pub struct Matrix {
 }
 
 impl Matrix{
-    pub fn create(vecs: [[f64; 4]; 4]) -> Matrix {
+    pub fn create(data: [[f64; 4]; 4]) -> Matrix {
         Matrix{
-            matrix: vecs
+            matrix: data
         }
     }
 
@@ -25,18 +25,20 @@ impl Matrix{
         Matrix::create(identity)
     }
 
-    pub fn get(&self, x: usize, y: usize) -> f64 {
-        let x = self.matrix.get(x);
-        match x {
-            None => {-1.0}
-            Some(m) => {
-                let x_y = m.get(y);
-                match x_y {
-                    None => {-1.0}
-                    Some(n) => {*n}
-                }
+    pub fn inverse(&self) -> Matrix {
+        let mut inverse = [[0.0; 4]; 4];
+        let d = self.determinant(4);
+        for row in 0..4 {
+            for col in 0..4 {
+                inverse[col][row] = self.cofactor(row, col, 3) / d;
             }
         }
+
+        Matrix::create(inverse)
+    }
+
+    pub fn get(&self, x: usize, y: usize) -> f64 {
+        self.matrix[x][y]
     }
 
     pub fn set(&mut self, x: usize, y: usize, val: f64) {
@@ -98,7 +100,7 @@ impl Matrix{
         }
         let mut determinate = 0.0;
         for col in 0..4 {
-            determinate = determinate + self.get(0, col) * self.cofactor(0, col, size);
+            determinate += self.get(0, col) * self.cofactor(0, col, size - 1);
         }
         determinate
     }
@@ -111,12 +113,11 @@ impl Matrix{
             }
         }
 
-        Matrix::create(matrix)
+        Matrix {matrix}
     }
 
     fn minor(&self, row: usize, column: usize, size: usize) -> f64{
-        let sub_matrix = self.sub_matrix(row, column);
-        sub_matrix.determinant(size)
+        self.sub_matrix(row, column).determinant(size)
     }
 
     fn cofactor(&self, row: usize, column: usize, size: usize) -> f64 {
@@ -130,17 +131,6 @@ impl Matrix{
     fn is_invertible(&self) -> bool {
         let determinant = self.determinant(4);
         determinant != 0.0
-    }
-
-    pub(crate) fn inverse(&self) -> Matrix {
-        let mut inverse = [[0.0; 4]; 4];
-        let determinant = self.determinant(4);
-        for r in 0..4 {
-            for c in 0..4 {
-                inverse[c][r] = self.cofactor(r, c, 3) / determinant;
-            }
-        }
-        Matrix::create(inverse)
     }
 }
 
@@ -223,7 +213,7 @@ mod tests {
     fn test_create_matrix_3_3() {
         let vec_1 = [-3.0, 5.0, 0.0, 0.0];
         let vec_2 = [1.0, -2.0, -7.0, 0.0];
-        let vec_3 = [0.0, 0.0, 0.0, 0.0];
+        let vec_3 = [0.0, 1.0, 1.0, 0.0];
         let vec_4 = [0.0, 0.0, 0.0, 0.0];
         let m = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
@@ -456,10 +446,10 @@ mod tests {
         let vec_4 = [0.0, 0.0, 0.0, 0.0];
         let m = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        let minor_a = m.minor(0, 0, 3);
-        let cofactor_a = m.cofactor(0, 0, 3);
-        let minor_b = m.minor(1, 0, 3);
-        let cofactor_b = m.cofactor(1, 0, 3);
+        let minor_a = m.minor(0, 0, 2);
+        let cofactor_a = m.cofactor(0, 0, 2);
+        let minor_b = m.minor(1, 0, 2);
+        let cofactor_b = m.cofactor(1, 0, 2);
 
         assert_eq!(minor_a, -12.0);
         assert_eq!(cofactor_a, -12.0);
@@ -475,9 +465,9 @@ mod tests {
         let vec_4 = [0.0, 0.0, 0.0, 0.0];
         let m = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        let cofactor_a = m.cofactor(0, 0, 3);
-        let cofactor_b = m.cofactor(0, 1, 3);
-        let cofactor_c = m.cofactor(0, 2, 3);
+        let cofactor_a = m.cofactor(0, 0, 2);
+        let cofactor_b = m.cofactor(0, 1, 2);
+        let cofactor_c = m.cofactor(0, 2, 2);
         let determinant = m.determinant(3);
 
         assert_eq!(cofactor_a, 56.0);
@@ -494,10 +484,10 @@ mod tests {
         let vec_4 = [-6.0, 7.0, 7.0, -9.0];
         let m = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        let cofactor_a = m.cofactor(0, 0, 4);
-        let cofactor_b = m.cofactor(0, 1, 4);
-        let cofactor_c = m.cofactor(0, 2, 4);
-        let cofactor_d = m.cofactor(0, 3, 4);
+        let cofactor_a = m.cofactor(0, 0, 3);
+        let cofactor_b = m.cofactor(0, 1, 3);
+        let cofactor_c = m.cofactor(0, 2, 3);
+        let cofactor_d = m.cofactor(0, 3, 3);
         let determinant = m.determinant(4);
 
         assert_eq!(cofactor_a, 690.0);
@@ -540,9 +530,9 @@ mod tests {
         let inverse_m = m.inverse();
 
         assert_eq!(532.0, m.determinant(4));
-        assert_eq!(-160.0, m.cofactor(2, 3, 4));
+        assert_eq!(-160.0, m.cofactor(2, 3, 3));
         assert_eq!(-160.0/532.0, inverse_m.get(3, 2));
-        assert_eq!(105.0, m.cofactor(3, 2, 4));
+        assert_eq!(105.0, m.cofactor(3, 2, 3));
         assert_eq!(105.0/532.0, inverse_m.get(2, 3));
 
         let vec_1 = [0.21805, 0.45113, 0.24060, -0.04511];

@@ -47,7 +47,7 @@ impl Pattern {
         let transform = Matrix::identity();
         Pattern {
             pattern,
-            transformation: transform.clone(),
+            transformation: transform,
             inverse_transformation: transform.inverse()
         }
     }
@@ -73,11 +73,11 @@ impl Pattern {
     }
 
     pub fn transformation(&self) -> Matrix {
-        self.transformation.clone()
+        self.transformation
     }
 
     pub fn inverse_transformation(&self) -> Matrix {
-        self.inverse_transformation.clone()
+        self.inverse_transformation
     }
 
     pub fn pattern(&self) -> Patterns {
@@ -85,7 +85,7 @@ impl Pattern {
     }
 
     pub fn transform(&mut self, transform: Matrix) {
-        self.transformation = self.transformation.clone() * transform;
+        self.transformation = self.transformation * transform;
         self.inverse_transformation = self.transformation.inverse();
     }
 

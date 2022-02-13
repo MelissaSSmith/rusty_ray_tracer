@@ -27,13 +27,13 @@ struct PixelSize {
 impl Camera {
     pub fn create(h_size: i32, v_size: i32, field_of_view: f64) -> Camera {
         let pixel_size = Camera::calculate_pixel_size(h_size, v_size, field_of_view);
-        let identity = Matrix::identity();
+        let transform = Matrix::identity();
         Camera {
             h_size,
             v_size,
             field_of_view,
-            transform: identity,
-            inverse_transform: identity.inverse(),
+            transform,
+            inverse_transform: transform.inverse(),
             half_width: pixel_size.half_width,
             half_height: pixel_size.half_height,
             pixel_size: pixel_size.pixel_size

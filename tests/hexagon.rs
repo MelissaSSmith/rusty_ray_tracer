@@ -42,7 +42,7 @@ fn hexagon_side() -> Object {
 
 fn hexagon() -> Object {
     let mut hex = Shape::Group(Group::create()).create()
-        .with_transform(Matrix::translate(0.0, 0.75, 0.0) * Matrix::rotate_x(PI / 3.0));
+        .with_transform(Matrix::translate(0.0, 0.5, 0.0) * Matrix::rotate_x(PI / 3.0));
 
     for n in 0..=5 {
         let side = hexagon_side()
