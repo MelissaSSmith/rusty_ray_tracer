@@ -34,7 +34,7 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::patterns::blended::BlendedPattern;
-    use crate::features::patterns::{TwoPatternCreate, Patterns, PatternAt, OneColorCreate};
+    use crate::features::patterns::{TwoPatternCreate, PatternAt, OneColorCreate};
     use crate::features::patterns::solid::SolidPattern;
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::primitives::point::Point;

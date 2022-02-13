@@ -68,7 +68,6 @@ mod tests {
     use crate::features::shapes::group::Group;
     use crate::features::shapes::Intersect;
     use crate::features::shapes::shape::{Object, Shape};
-    use crate::features::shapes::test::TestShape;
 
     #[test]
     fn test_create_a_new_group() {

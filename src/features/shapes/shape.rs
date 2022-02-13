@@ -16,7 +16,6 @@ use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
-use crate::features::shapes::test::TestShape;
 use crate::features::transformations::Transform;
 use crate::features::world::World;
 
@@ -30,7 +29,6 @@ pub enum Shape {
     Cylinder(Cylinder),
     Cone(Cone),
     Group(Group),
-    TestShape(TestShape)
 }
 
 impl Shape {
@@ -42,7 +40,6 @@ impl Shape {
             Shape::Cylinder(_) => "Cylinder",
             Shape::Cone(_) => "Cone",
             Shape::Group(_) => "Group",
-            Shape::TestShape(_) => "TestShape",
             _ => "Object"
         }
     }
@@ -81,9 +78,6 @@ impl Shape {
                 Object::create(Shape::Cone(*c), has_shadow, material, bounds)
             }
             Shape::Group(g) => { Object::create(Shape::Group(g.clone()), has_shadow, material,BoundingBox::create()) },
-            Shape::TestShape(t) => {
-                Object::create(Shape::TestShape(*t), has_shadow, material, BoundingBox::create())
-            }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }
     }
@@ -332,7 +326,6 @@ impl Intersect for Object {
             Shape::Cylinder(_) => { Cylinder::intersect(_object, &transformed_ray) }
             Shape::Cone(_) => { Cone::intersect(_object, &transformed_ray) }
             Shape::Group(_) => { Group::intersect(_object, _ray) }
-            Shape::TestShape(_) => { TestShape::intersect(_object, _ray) }
             _ => { vec![] }
         }
     }
@@ -350,7 +343,6 @@ impl NormalAt for Object {
             Shape::Cube => { Cube::normal(_object, &object_point) }
             Shape::Cylinder(_) => { Cylinder::normal(_object, &object_point) }
             Shape::Cone(_) => { Cone::normal(_object, &object_point) }
-            Shape::TestShape(_) => { TestShape::normal(_object, &object_point) }
             _ => { Vector::zero() }
         };
         match _world {

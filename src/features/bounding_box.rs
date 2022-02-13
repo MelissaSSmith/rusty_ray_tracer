@@ -1,13 +1,8 @@
 use std::ops::Add;
-use std::process::Output;
-use crate::features::intersection::Intersection;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::shapes::cube::Cube;
-use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::Object;
 use crate::features::transformations::Transform;
 
@@ -99,13 +94,13 @@ impl Add<BoundingBox> for BoundingBox {
     type Output = BoundingBox;
 
     fn add(self, rhs: BoundingBox) -> Self::Output {
-        let min_x = if rhs.minimum().x() < self.minimum().x() { rhs.minimum().x() } else { self.minimum().x() };
-        let min_y = if rhs.minimum().y() < self.minimum().y() { rhs.minimum().y() } else { self.minimum().y() };
-        let min_z = if rhs.minimum().z() < self.minimum().z() { rhs.minimum().z() } else { self.minimum().z() };
+        let min_x = f64::min(self.minimum().x(), rhs.minimum().x());
+        let min_y = f64::min(self.minimum().y(), rhs.minimum().y());
+        let min_z = f64::min(self.minimum().z(), rhs.minimum().z());
 
-        let max_x = if rhs.maximum().x() > self.maximum().x() { rhs.maximum().x() } else { self.maximum().x() };
-        let max_y = if rhs.maximum().y() > self.maximum().y() { rhs.maximum().y() } else { self.maximum().y() };
-        let max_z = if rhs.maximum().z() > self.maximum().z() { rhs.maximum().z() } else { self.maximum().z() };
+        let max_x = f64::max(self.maximum().x(), rhs.maximum().x());
+        let max_y = f64::max(self.maximum().y(), rhs.maximum().y());
+        let max_z = f64::max(self.maximum().z(), rhs.maximum().z());
 
         BoundingBox {
             minimum: Point::create(min_x, min_y, min_z),
