@@ -1,8 +1,9 @@
 use std::f64::consts::PI;
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::consts::WHITE;
+use rusty_ray_tracer::features::color::consts::{RED, WHITE};
 use rusty_ray_tracer::features::light::PointLight;
+use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -15,6 +16,10 @@ use rusty_ray_tracer::features::world::World;
 fn hexagon_corner() -> Object {
     Shape::Sphere.create()
         .with_transform(Matrix::translate(0.0, 0.0, -1.0) * Matrix::scale(0.25, 0.25, 0.25))
+        .with_material(
+            Material::create()
+                .with_color(RED)
+        )
 }
 
 fn hexagon_edge() -> Object {
@@ -29,6 +34,10 @@ fn hexagon_edge() -> Object {
                 Matrix::rotate_z(-PI/2.0) *
                 Matrix::scale(0.25, 1.0, 0.25)
 
+        )
+        .with_material(
+            Material::create()
+                .with_color(RED)
         )
 }
 
@@ -54,6 +63,7 @@ fn hexagon() -> Object {
 }
 
 #[test]
+#[ignore]
 fn test_hexagon() {
     let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
     let objects = vec![hexagon()];

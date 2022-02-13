@@ -69,7 +69,7 @@ fn sphere_scene_test() {
     let perturb_pattern = PerturbedPattern::create(pattern, Some(4.0));
     let floor_material = material.clone().with_pattern(perturb_pattern);
 
-    let backdrop = Shape::Plane.create()
+    let _backdrop = Shape::Plane.create()
         .with_material(Material::create().with_ambient(1.0).with_color(Color::create(0.1, 0.1, 0.1)).with_reflective(1.0))
         .with_transform(Matrix::translate(0.0, 0.0, 4.0) * Matrix::rotate_x(PI/2.0));
 

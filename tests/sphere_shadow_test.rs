@@ -13,7 +13,7 @@ use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
-use rusty_ray_tracer::features::shapes::{Intersect, Normal, NormalAt};
+use rusty_ray_tracer::features::shapes::{Intersect, NormalAt};
 use rusty_ray_tracer::features::shapes::sphere::Sphere;
 
 #[test]

@@ -1,4 +1,3 @@
-use array2d::Array2D;
 use crate::features::primitives::operations::Operations;
 use crate::features::primitives::tuple_trait::Tuple as TupleTrait;
 use crate::features::primitives::tuple::Tuple;
@@ -41,11 +40,11 @@ impl Matrix{
         self.matrix[x][y]
     }
 
-    pub fn set(&mut self, x: usize, y: usize, val: f64) {
+    pub(crate) fn set(&mut self, x: usize, y: usize, val: f64) {
         self.matrix[x][y] = val;
     }
 
-    pub fn equals(&self, _matrix: Matrix) -> bool {
+    pub(crate) fn equals(&self, _matrix: Matrix) -> bool {
         let mut equals = true;
 
         for row in 0..4 {
