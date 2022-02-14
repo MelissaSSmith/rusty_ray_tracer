@@ -1,5 +1,3 @@
-use std::iter::Map;
-use std::ops::Deref;
 use uuid::Uuid;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
@@ -334,7 +332,7 @@ impl Intersect for Object {
             Shape::Cylinder(_) => { Cylinder::intersect(_object, &transformed_ray) }
             Shape::Cone(_) => { Cone::intersect(_object, &transformed_ray) }
             Shape::Group(_) => { Group::intersect(_object, _ray) }
-            Shape::Triangle(t) => { Triangle::intersect(_object, _ray) }
+            Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
             _ => { vec![] }
         }
     }

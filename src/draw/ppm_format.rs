@@ -82,7 +82,6 @@ impl PPMFile for Canvas {
 #[cfg(test)]
 mod tests {
     use crate::features::canvas::Canvas;
-    use crate::features::color::Color;
     use crate::draw::ppm_format::PPMFormat;
 
     #[test]
@@ -96,75 +95,4 @@ mod tests {
         let expected = String::from("P3\n5 3\n255");
         assert_eq!(expected, result);
     }
-
-    #[test]
-    fn test_convert_canvas_to_ppm_pixel_data() {
-        let width = 5;
-        let height = 3;
-        let mut canvas = Canvas::create(width, height);
-
-        let color_a = Color::create(1.5, 0.0, 0.0);
-        let color_b = Color::create(0.0, 0.5, 0.0);
-        let color_c = Color::create(-0.5, 0.0, 1.0);
-
-        canvas.write_pixel(0, 0, color_a);
-        canvas.write_pixel(2, 1, color_b);
-        canvas.write_pixel(4, 2, color_c);
-
-        //let pixel_data = canvas.create_pixel_data();
-
-        let expected = "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 255";
-        //assert_eq!(expected, pixel_data);
-    }
-
-    #[test]
-    fn test_splitting_long_lines_when_convert_canvas_to_ppm_pixel_data() {
-        let width = 10;
-        let height = 2;
-        let mut canvas = Canvas::create(width, height);
-
-        for x in 0..width {
-            for y in 0..height {
-                let color = Color::create(1.0,0.8,0.6);
-                canvas.write_pixel(x, y, color);
-            }
-        }
-
-        //let pixel_data = canvas.create_pixel_data();
-
-        let expected = "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n153 255 204 153 \
-        255 204 153 255 204 153 255 204 153\n255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 \
-        255 204\n153 255 204 153 255 204 153 255 204 153 255 204 153";
-        //assert_eq!(expected, pixel_data);
-    }
-
-    #[test]
-    fn test_convert_canvas_to_ppm_termination_line() {
-        let result = Canvas::create_termination();
-
-        let expected = String::from("\n");
-        assert_eq!(expected, result);
-    }
-
-    #[test]
-    fn test_convert_to_ppm() {
-        let width = 10;
-        let height = 2;
-        let mut canvas = Canvas::create(width, height);
-
-        for x in 0..width {
-            for y in 0..height {
-                let color = Color::create(1.0,0.8,0.6);
-                canvas.write_pixel(x, y, color);
-            }
-        }
-
-        //let ppm = canvas.convert_to_ppm();
-
-        let expected = "P3\n10 2\n255\n255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n153 255 204 153 \
-        255 204 153 255 204 153 255 204 153\n255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 \
-        255 204\n153 255 204 153 255 204 153 255 204 153 255 204 153\n";
-        //assert_eq!(expected, ppm);
-    }
-
 }

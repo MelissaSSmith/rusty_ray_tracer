@@ -157,8 +157,8 @@ mod tests {
         let n3 = Triangle::normal(&object, &Point::create(0.5, 0.25, 0.0));
 
         assert!(triangle.normal_vector().equals(n1));
-        assert!(triangle.normal_vector().equals(n1));
-        assert!(triangle.normal_vector().equals(n1));
+        assert!(triangle.normal_vector().equals(n2));
+        assert!(triangle.normal_vector().equals(n3));
     }
 
     #[test]

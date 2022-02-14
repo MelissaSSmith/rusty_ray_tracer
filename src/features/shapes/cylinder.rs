@@ -6,7 +6,7 @@ use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
-use crate::features::shapes::shape::{Object, Shape};
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone, Copy)]
 pub struct Cylinder {

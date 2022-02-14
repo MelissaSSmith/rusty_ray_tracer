@@ -1,11 +1,8 @@
 use uuid::Uuid;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Intersect, Normal};
+use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]
@@ -87,7 +84,7 @@ mod tests {
     #[test]
     fn test_add_a_child_to_a_group() {
         let mut group = Shape::Group(Group::create()).create();
-        let mut object = Shape::Object.create();
+        let object = Shape::Object.create();
 
         group.add_child(object.clone());
 

@@ -1,5 +1,4 @@
 use crate::features::color::Color;
-use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 

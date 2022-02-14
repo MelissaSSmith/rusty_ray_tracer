@@ -6,7 +6,6 @@ use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
-use crate::features::world::World;
 
 #[derive(Clone)]
 pub struct Material {

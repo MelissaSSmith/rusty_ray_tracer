@@ -6,7 +6,6 @@ use crate::features::intersection::Intersection;
 use crate::features::light::PointLight;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
@@ -230,15 +229,6 @@ mod tests {
 
     #[test]
     fn test_create_default_world() {
-        let m1 = Material::create()
-            .with_color(Color::create(0.8, 1.0, 0.6))
-            .with_diffuse(0.7)
-            .with_specular(0.2);
-        let s1 = Shape::Sphere.create()
-            .with_material(m1);
-        let s2 = Shape::Sphere.create()
-            .with_transform(Matrix::scale(0.5, 0.5, 0.5));
-
         let world = World::create_default();
 
         assert!(world.clone().light().unwrap().position.equals(Point::create(-10.0, 10.0, -10.0)));
@@ -391,7 +381,7 @@ mod tests {
     fn test_reflect_color_for_a_non_reflective_material() {
         let mut world = World::create_default();
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
-        let mut shape = world.clone().objects()[1].clone();
+        let shape = world.clone().objects()[1].clone();
         shape.material().set_ambient(1.0);
         world.set_object(1, shape.clone());
         let intersection = Intersection::create(1.0, &shape);
@@ -539,7 +529,7 @@ mod tests {
 
     #[test]
     fn test_refracted_color_with_a_refracted_ray() {
-        let mut world = World::create_default();
+        let world = World::create_default();
         let mut a = world.clone().objects()[0].clone();
         a.set_material(Material::create()
             .with_ambient(1.0)

@@ -1,4 +1,3 @@
-use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::shapes::shape::Object;
 
 impl Object {

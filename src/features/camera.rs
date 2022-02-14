@@ -55,7 +55,7 @@ impl Camera {
     }
 
     pub fn render(&self, world: World) -> Canvas {
-        let mut canvas = Canvas::create(self.h_size, self.v_size);
+        let canvas = Canvas::create(self.h_size, self.v_size);
 
         canvas.pixels
             .par_iter_mut()

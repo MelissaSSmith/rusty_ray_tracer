@@ -1,6 +1,5 @@
 use crate::features::color::Color;
 use crate::features::patterns::{EmptyCreate, Pattern, PatternAt, Patterns};
-use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 

@@ -1,6 +1,5 @@
 use crate::features::primitives::operations::Operations;
 use crate::features::primitives::tuple_trait::Tuple as TupleTrait;
-use crate::features::primitives::tuple::Tuple;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Matrix {

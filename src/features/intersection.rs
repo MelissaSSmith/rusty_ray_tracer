@@ -1,5 +1,5 @@
 use crate::features::computation::Computation;
-use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
+use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::ray::Ray;
 use smallvec::SmallVec;
 use crate::features::shapes::{NormalAt};
@@ -302,7 +302,7 @@ mod tests {
         ];
 
         let mut computations = Vec::<Computation>::new();
-        for (index, intersection) in intersections.iter().enumerate() {
+        for (_, intersection) in intersections.iter().enumerate() {
             let comp = intersection.prepare_computations(ray, &intersections, None);
             computations.push(comp);
         }
@@ -356,7 +356,6 @@ mod tests {
 
     #[test]
     fn test_determine_reflectance_of_a_perpendicular_ray() {
-        let sqrt2 = f64::sqrt(2.0);
         let shape = Shape::Sphere.glass();
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 1.0, 0.0));
         let intersections = vec![Intersection::create(-1.0, &shape), Intersection::create(1.0, &shape)];
