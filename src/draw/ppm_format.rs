@@ -1,15 +1,11 @@
-use std::fs::{File, OpenOptions};
-use std::io::Write;
-use std::path::Path;
+use std::fs::File;
+use crate::draw::file_operations::{open_new_file, write_line_to_file};
 use crate::features::canvas::Canvas;
 
 trait PPMFormat {
     fn create_header(&self) -> String;
     fn create_termination() -> String;
     fn write_to_ppm(&self, file: &File);
-    fn write_to_file(file_name: String, file_data: String);
-    fn open_new_file(file_name: String) -> File;
-    fn write_line_to_file(file: &File, line: String);
 }
 
 pub trait PPMFile {
@@ -34,48 +30,19 @@ impl PPMFormat for Canvas {
                 line_array.push(scaled_color.format_color_string());
             }
 
-            Canvas::write_line_to_file(file, Canvas::format_pixel_line(line_array));
+            write_line_to_file(file, Canvas::format_pixel_line(line_array));
         }
     }
 
-    fn write_to_file(file_name: String, file_data: String) {
-        let path = Path::new(&file_name);
-        let display = path.display();
 
-        let mut file = match File::create(&path) {
-            Err(why) => panic!("couldn't create {}: {}", display, why),
-            Ok(file) => file,
-        };
-
-        match file.write_all(file_data.as_bytes()) {
-            Err(why) => panic!("couldn't write to {}: {}", display, why),
-            Ok(_) => (),
-        };
-    }
-
-    fn open_new_file(file_name: String) -> File {
-        let path = Path::new(&file_name);
-
-        OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(path).unwrap()
-    }
-
-    fn write_line_to_file(mut file: &File, line: String) {
-        if let Err(why) = writeln!(file, "{}", line) {
-            panic!("couldn't write to file: {}", why);
-        }
-    }
 }
 
 impl PPMFile for Canvas {
     fn convert_to_ppm_and_save(&self, file_name: String) {
-        let file = Canvas::open_new_file(file_name);
-        Canvas::write_line_to_file(&file, self.create_header());
+        let file = open_new_file(file_name);
+        write_line_to_file(&file, self.create_header());
         self.write_to_ppm(&file);
-        Canvas::write_line_to_file(&file, Canvas::create_termination());
+        write_line_to_file(&file, Canvas::create_termination());
     }
 }
 

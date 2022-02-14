@@ -114,3 +114,7 @@ Cargo.lock
 
 *.ppm
 *.xcf
+
+# test files
+unrecognized_line.txt
+vertex_records.txt
