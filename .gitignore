@@ -118,3 +118,4 @@ Cargo.lock
 # test files
 unrecognized_line.txt
 vertex_records.txt
+triangle_data.txt
