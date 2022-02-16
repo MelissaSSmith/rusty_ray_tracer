@@ -38,8 +38,10 @@ impl OBJParser {
                             vertices.push(OBJParser::create_vertex(l));
                         }
                         Some("f") => {
-                            let triangle = OBJParser::create_triangle(l, &vertices);
-                            group.add_child(Shape::Triangle(triangle).create());
+                            let triangles = OBJParser::fan_triangulation(l, &vertices);
+                            for triangle in triangles {
+                                group.add_child(Shape::Triangle(triangle).create());
+                            }
                         }
                         _ => { ignored_lines += 1; }
                     }
@@ -69,6 +71,25 @@ impl OBJParser {
         let index2 = tokens[2].parse::<usize>().unwrap();
         let index3 = tokens[3].parse::<usize>().unwrap();
         Triangle::create(vertices[index1], vertices[index2], vertices[index3])
+    }
+
+    fn fan_triangulation(line: String, vertices: &Vec<Point>) -> Vec<Triangle> {
+        let tokens: Vec<&str> = line.split(" ").collect();
+        let mut triangles = vec![];
+
+        let range = tokens.len()-2;
+        for index in 2..range {
+            if index >= vertices.len() {
+                break;
+            }
+            let index1 = tokens[1].parse::<usize>().unwrap();
+            let index2 = tokens[index].parse::<usize>().unwrap();
+            let index3 = tokens[index+1].parse::<usize>().unwrap();
+            let triangle = Triangle::create(vertices[index1], vertices[index2], vertices[index3]);
+            triangles.push(triangle);
+        }
+
+        triangles
     }
 }
 
@@ -138,5 +159,45 @@ mod tests {
         assert!(parser.vertices[1].equals(t2_shape.point1()));
         assert!(parser.vertices[3].equals(t2_shape.point2()));
         assert!(parser.vertices[4].equals(t2_shape.point3()));
+    }
+
+    #[test]
+    fn test_file_with_polygon_data() {
+        let file_contents = "\
+        v -1 1 0 \nv -1 0 0 \nv 1 0 0 \nv 1 1 0 \nv 0 2 0 \n\nf 1 2 3 4 5 \
+        ";
+        write_to_file(String::from("polygon_data.txt"), String::from(file_contents));
+
+        let parser = OBJParser::parse_obj_file(String::from("polygon_data.txt"));
+
+        assert_eq!(1, parser.ignored_lines);
+        assert_eq!(3, parser.default_group.children().len());
+
+        let t1 = parser.default_group.children()[0].clone();
+        let t1_shape = match t1.shape() {
+            Shape::Triangle(t) => t,
+            _ => panic!("Object is not a triangle!")
+        };
+        assert!(parser.vertices[1].equals(t1_shape.point1()));
+        assert!(parser.vertices[2].equals(t1_shape.point2()));
+        assert!(parser.vertices[3].equals(t1_shape.point3()));
+
+        let t2 = parser.default_group.children()[1].clone();
+        let t2_shape = match t2.shape() {
+            Shape::Triangle(t) => t,
+            _ => panic!("Object is not a triangle!")
+        };
+        assert!(parser.vertices[1].equals(t2_shape.point1()));
+        assert!(parser.vertices[3].equals(t2_shape.point2()));
+        assert!(parser.vertices[4].equals(t2_shape.point3()));
+
+        let t3 = parser.default_group.children()[2].clone();
+        let t3_shape = match t3.shape() {
+            Shape::Triangle(t) => t,
+            _ => panic!("Object is not a triangle!")
+        };
+        assert!(parser.vertices[1].equals(t3_shape.point1()));
+        assert!(parser.vertices[4].equals(t3_shape.point2()));
+        assert!(parser.vertices[5].equals(t3_shape.point3()));
     }
 }
