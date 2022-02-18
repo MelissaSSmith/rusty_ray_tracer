@@ -223,7 +223,7 @@ mod tests {
 
     #[test]
     fn test_named_groups_in_obj_files() {
-        let parser = OBJParser::parse_obj_file(String::from("triangles.obj"));
+        let parser = OBJParser::parse_obj_file(String::from("./source/obj_files/triangles.obj"));
 
         assert_eq!(1, parser.ignored_lines);
         assert_eq!(2, parser.default_group.children().len());

@@ -28,7 +28,8 @@ pub fn open_new_file(file_name: String) -> File {
 }
 
 pub fn open_file(file_name: String) -> File {
-    File::open(file_name).expect("file not found!")
+    let path = Path::new(file_name.as_str());
+    File::open(path).expect("file not found!")
 }
 
 pub fn write_line_to_file(mut file: &File, line: String) {
