@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
 use crate::draw::file_operations::open_file;
 use crate::features::primitives::point::Point;
@@ -29,7 +30,9 @@ impl OBJParser {
 
         let mut ignored_lines = 0;
         let mut vertices = vec![Point::zero()];
-        let mut group = Shape::Group(Group::create()).create();
+        let mut default_group = Shape::Group(Group::create()).create();
+        let mut groups: HashMap<String, Object> = HashMap::new();
+        let mut last_group_touched = String::from("Default");
         for line in reader.lines() {
             match line {
                 Ok(l) => {
@@ -39,9 +42,23 @@ impl OBJParser {
                         }
                         Some("f") => {
                             let triangles = OBJParser::fan_triangulation(l, &vertices);
-                            for triangle in triangles {
-                                group.add_child(Shape::Triangle(triangle).create());
+                            if last_group_touched.eq(&String::from("Default")) {
+                                for triangle in triangles {
+                                    default_group.add_child(Shape::Triangle(triangle).create());
+                                }
+                            } else {
+                                let last_group = groups.get_mut(last_group_touched.as_str());
+                                if let Some(group) = last_group {
+                                    for triangle in triangles {
+                                        group.add_child(Shape::Triangle(triangle).create());
+                                    }
+                                }
                             }
+                        }
+                        Some("g") => {
+                            let name = OBJParser::parse_group_name(l);
+                            groups.insert(name.clone(), Shape::Group(Group::create()).create());
+                            last_group_touched = name;
                         }
                         _ => { ignored_lines += 1; }
                     }
@@ -51,7 +68,11 @@ impl OBJParser {
                 }
             }
         }
-        OBJParser::create(ignored_lines, vertices, group)
+        let final_groups = groups.values().cloned().collect::<Vec<Object>>();
+        for final_group in final_groups {
+            default_group.add_child(final_group);
+        }
+        OBJParser::create(ignored_lines, vertices, default_group)
     }
 
     fn create_vertex(line: String) -> Point {
@@ -64,20 +85,14 @@ impl OBJParser {
         Point::create(x, y, z)
     }
 
-    fn create_triangle(line: String, vertices: &Vec<Point>) -> Triangle {
-        let tokens: Vec<&str> = line.split(" ").collect();
-
-        let index1 = tokens[1].parse::<usize>().unwrap();
-        let index2 = tokens[2].parse::<usize>().unwrap();
-        let index3 = tokens[3].parse::<usize>().unwrap();
-        Triangle::create(vertices[index1], vertices[index2], vertices[index3])
-    }
-
     fn fan_triangulation(line: String, vertices: &Vec<Point>) -> Vec<Triangle> {
         let tokens: Vec<&str> = line.split(" ").collect();
         let mut triangles = vec![];
 
-        let range = tokens.len()-2;
+        let mut range = tokens.len()-1;
+        if tokens.len() > 4 {
+            range = tokens.len()-2;
+        }
         for index in 2..range {
             if index >= vertices.len() {
                 break;
@@ -90,6 +105,11 @@ impl OBJParser {
         }
 
         triangles
+    }
+
+    fn parse_group_name(line: String) -> String {
+        let tokens: Vec<&str> = line.split(" ").collect();
+        tokens[1].to_string()
     }
 }
 
@@ -199,5 +219,31 @@ mod tests {
         assert!(parser.vertices[1].equals(t3_shape.point1()));
         assert!(parser.vertices[4].equals(t3_shape.point2()));
         assert!(parser.vertices[5].equals(t3_shape.point3()));
+    }
+
+    #[test]
+    fn test_named_groups_in_obj_files() {
+        let parser = OBJParser::parse_obj_file(String::from("triangles.obj"));
+
+        assert_eq!(1, parser.ignored_lines);
+        assert_eq!(2, parser.default_group.children().len());
+
+        let t1 = parser.default_group.children()[0].children()[0].clone();
+        let t1_shape = match t1.shape() {
+            Shape::Triangle(t) => t,
+            _ => panic!("Object is not a triangle!")
+        };
+        assert!(parser.vertices[1].equals(t1_shape.point1()));
+        assert!(parser.vertices[2].equals(t1_shape.point2()));
+        assert!(parser.vertices[3].equals(t1_shape.point3()));
+
+        let t2 = parser.default_group.children()[1].children()[0].clone();
+        let t2_shape = match t2.shape() {
+            Shape::Triangle(t) => t,
+            _ => panic!("Object is not a triangle!")
+        };
+        assert!(parser.vertices[1].equals(t2_shape.point1()));
+        assert!(parser.vertices[3].equals(t2_shape.point2()));
+        assert!(parser.vertices[4].equals(t2_shape.point3()));
     }
 }
