@@ -75,6 +75,10 @@ impl OBJParser {
         OBJParser::create(ignored_lines, vertices, default_group)
     }
 
+    fn obj_to_group(parser: OBJParser) -> Object {
+        parser.default_group
+    }
+
     fn create_vertex(line: String) -> Point {
         let tokens: Vec<&str> = line.split(" ").collect();
 
@@ -245,5 +249,13 @@ mod tests {
         assert!(parser.vertices[1].equals(t2_shape.point1()));
         assert!(parser.vertices[3].equals(t2_shape.point2()));
         assert!(parser.vertices[4].equals(t2_shape.point3()));
+    }
+
+    #[test]
+    fn test_convert_obj_model_to_group() {
+        let parser = OBJParser::parse_obj_file(String::from("./source/obj_files/triangles.obj"));
+        let group = OBJParser::obj_to_group(parser);
+
+        assert_eq!(2, group.children().len());
     }
 }
