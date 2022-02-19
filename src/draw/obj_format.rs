@@ -8,7 +8,7 @@ use crate::features::shapes::shape::{Object, Shape};
 use crate::features::shapes::triangle::Triangle;
 
 #[derive(Clone)]
-struct OBJParser {
+pub struct OBJParser {
     ignored_lines: i32,
     vertices: Vec<Point>,
     default_group: Object
@@ -24,8 +24,13 @@ impl OBJParser {
         }
     }
 
-    fn parse_obj_file(file_name: String) -> OBJParser {
-        let file = open_file(file_name);
+    pub fn parse(file_name: &String) -> Object {
+        let parser = OBJParser::parse_obj_file(file_name);
+        OBJParser::obj_to_group(parser)
+    }
+
+    fn parse_obj_file(file_name: &String) -> OBJParser {
+        let file = open_file(file_name.to_string());
         let reader = BufReader::new(file);
 
         let mut ignored_lines = 0;
@@ -134,7 +139,7 @@ mod tests {
         and came back the previous night.";
         write_to_file(String::from("unrecognized_line.txt"), String::from(file_contents));
 
-        let parser = OBJParser::parse_obj_file(String::from("unrecognized_line.txt"));
+        let parser = OBJParser::parse_obj_file(&String::from("unrecognized_line.txt"));
 
         assert_eq!(5, parser.ignored_lines);
     }
@@ -146,7 +151,7 @@ mod tests {
         ";
         write_to_file(String::from("vertex_records.txt"), String::from(file_contents));
 
-        let parser = OBJParser::parse_obj_file(String::from("vertex_records.txt"));
+        let parser = OBJParser::parse_obj_file(&String::from("vertex_records.txt"));
 
         assert_eq!(0, parser.ignored_lines);
         assert!(parser.vertices[1].equals(Point::create(-1.0, 1.0, 0.0)));
@@ -162,7 +167,7 @@ mod tests {
         ";
         write_to_file(String::from("triangle_data.txt"), String::from(file_contents));
 
-        let parser = OBJParser::parse_obj_file(String::from("triangle_data.txt"));
+        let parser = OBJParser::parse_obj_file(&String::from("triangle_data.txt"));
 
         assert_eq!(1, parser.ignored_lines);
 
@@ -192,7 +197,7 @@ mod tests {
         ";
         write_to_file(String::from("polygon_data.txt"), String::from(file_contents));
 
-        let parser = OBJParser::parse_obj_file(String::from("polygon_data.txt"));
+        let parser = OBJParser::parse_obj_file(&String::from("polygon_data.txt"));
 
         assert_eq!(1, parser.ignored_lines);
         assert_eq!(3, parser.default_group.children().len());
@@ -227,7 +232,7 @@ mod tests {
 
     #[test]
     fn test_named_groups_in_obj_files() {
-        let parser = OBJParser::parse_obj_file(String::from("./source/obj_files/triangles.obj"));
+        let parser = OBJParser::parse_obj_file(&String::from("./source/obj_files/triangles.obj"));
 
         assert_eq!(1, parser.ignored_lines);
         assert_eq!(2, parser.default_group.children().len());
@@ -253,7 +258,7 @@ mod tests {
 
     #[test]
     fn test_convert_obj_model_to_group() {
-        let parser = OBJParser::parse_obj_file(String::from("./source/obj_files/triangles.obj"));
+        let parser = OBJParser::parse_obj_file(&String::from("./source/obj_files/triangles.obj"));
         let group = OBJParser::obj_to_group(parser);
 
         assert_eq!(2, group.children().len());
