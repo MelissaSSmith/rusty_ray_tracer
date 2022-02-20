@@ -16,10 +16,6 @@ use rusty_ray_tracer::features::world::World;
 fn hexagon_corner() -> Object {
     Shape::Sphere.create()
         .with_transform(Matrix::translate(0.0, 0.0, -1.0) * Matrix::scale(0.25, 0.25, 0.25))
-        .with_material(
-            Material::create()
-                .with_color(RED)
-        )
 }
 
 fn hexagon_edge() -> Object {
@@ -35,37 +31,29 @@ fn hexagon_edge() -> Object {
                 Matrix::scale(0.25, 1.0, 0.25)
 
         )
-        .with_material(
-            Material::create()
-                .with_color(RED)
-        )
 }
 
-fn hexagon_side() -> Object {
-    let mut side = Shape::Group(Group::create()).create();
-    side.add_child(hexagon_corner());
-    side.add_child(hexagon_edge());
-
-    side
+fn hexagon_side(n:i32) -> Object {
+    Shape::Group(Group::create()).create()
+        .with_transform(Matrix::rotate_y(n as f64 * PI / 3.0))
+        .with_children(vec![hexagon_corner(), hexagon_edge()])
 }
 
 fn hexagon() -> Object {
-    let mut hex = Shape::Group(Group::create()).create()
-        .with_transform(Matrix::translate(0.0, 0.5, 0.0) * Matrix::rotate_x(PI / 3.0));
-
+    let mut children = vec![];
     for n in 0..=5 {
-        let side = hexagon_side()
-            .with_transform(Matrix::rotate_y(n as f64 * PI / 3.0));
-        hex.add_child(side);
+        children.push(hexagon_side(n));
     }
 
-    hex
+    Shape::Group(Group::create()).create()
+        .with_transform(Matrix::translate(0.0, 0.5, 0.0) * Matrix::rotate_x(PI / 3.0))
+        .with_children(children)
 }
 
 #[test]
-#[ignore]
+//#[ignore]
 fn test_hexagon() {
-    let light_source = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
+    let light_source = PointLight::create(WHITE, Point::create(-5.0, 10.0, -10.0));
     let objects = vec![hexagon()];
     let world = World::create_world(light_source, objects);
 

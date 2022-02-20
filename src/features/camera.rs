@@ -15,7 +15,8 @@ pub struct Camera {
     inverse_transform: Matrix,
     half_width: f64,
     half_height: f64,
-    pixel_size: f64
+    pixel_size: f64,
+    origin: Point
 }
 
 struct PixelSize {
@@ -36,7 +37,8 @@ impl Camera {
             inverse_transform: transform.inverse(),
             half_width: pixel_size.half_width,
             half_height: pixel_size.half_height,
-            pixel_size: pixel_size.pixel_size
+            pixel_size: pixel_size.pixel_size,
+            origin: transform.inverse() * Point::zero()
         }
     }
 
@@ -48,10 +50,9 @@ impl Camera {
         let world_y = self.half_height - y_offset;
 
         let pixel = self.inverse_transform * Point::create(world_x, world_y, -1.0);
-        let origin = self.inverse_transform * Point::zero();
-        let direction = (pixel - origin).normalize();
+        let direction = (pixel - self.origin).normalize();
 
-        Ray::create(origin, direction)
+        Ray::create(self.origin, direction)
     }
 
     pub fn render(&self, world: World) -> Canvas {
@@ -74,12 +75,14 @@ impl Camera {
     pub fn set_transform(&mut self, transform: Matrix) {
         self.transform = transform;
         self.inverse_transform = self.transform.inverse();
+        self.origin = self.inverse_transform * Point::zero();
     }
 
     pub fn with_transform(self, transform: Matrix) -> Camera {
         Camera {
             transform,
             inverse_transform: transform.inverse(),
+            origin: transform.inverse() * Point::zero(),
             ..self
         }
     }

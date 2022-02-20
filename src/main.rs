@@ -1,4 +1,5 @@
 use std::env;
+use std::f64::consts::PI;
 use std::path::PathBuf;
 use std::time::Instant;
 use crate::draw::obj_format::OBJParser;
@@ -32,16 +33,16 @@ fn main() {
             let world = create_default_world_with_group(group);
             println!("Created World. Time {}", start.elapsed().as_secs());
 
-            let camera = Camera::create(1080, 1080, 1.65347)
+            let camera = Camera::create(1080, 1080, PI/3.0)
                 .with_transform(Matrix::view_transform(
-                    Point::create(5.0, 2.5, -7.5),
-                    Point::create(1.5, 3.0, 0.0),
+                    Point::create(0.0, 1.5, -5.0),
+                    Point::create(0.0, 1.0, 0.0),
                     Vector::create(0.0, 1.0, 0.0)
                 ));
             let canvas = camera.render(world);
             println!("Rendered World. Time {}", start.elapsed().as_secs());
 
-            canvas.convert_to_ppm_and_save(format!("{}.ppm", PathBuf::from(filename).file_name().unwrap().to_str().unwrap()));
+            canvas.convert_to_ppm_and_save(format!("{}.ppm", PathBuf::from(filename).file_name().unwrap().to_str().unwrap())); //
             println!("DONE. Final Time {}", start.elapsed().as_secs());
         }
         _ => {

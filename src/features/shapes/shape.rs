@@ -210,8 +210,16 @@ impl Object {
     }
 
     pub fn set_transform(&mut self, _transformation: Matrix) {
-        self.transformation = _transformation;
-        self.inverse_transformation = _transformation.inverse();
+        match self.shape() {
+            Shape::Group(_) => {
+                let group = Group::create_with_children(self.children(), _transformation);
+                self.shape = Shape::Group(group);
+            }
+            _ => {
+                self.transformation = _transformation;
+                self.inverse_transformation = _transformation.inverse();
+            }
+        }
     }
 
     pub fn set_material(&mut self, _material: Material) {
@@ -219,14 +227,25 @@ impl Object {
     }
 
     fn set_parent(&mut self, object: Object) {
-        self.parent = Some(object.id())
+        self.parent = Some(object.id());
     }
 
     pub fn with_transform(self, _transform: Matrix) -> Object {
-        Object {
-            transformation: _transform,
-            inverse_transformation: _transform.inverse(),
-            ..self
+        match self.shape() {
+            Shape::Group(_) => {
+                let group = Group::create_with_children(self.children(), _transformation);
+                Object {
+                    shape: Shape::Group(group),
+                    ..self
+                }
+            }
+            _ => {
+                Object {
+                    transformation: _transform,
+                    inverse_transformation: _transform.inverse(),
+                    ..self
+                }
+            }
         }
     }
 
@@ -240,6 +259,16 @@ impl Object {
     pub fn with_has_shadow(self, _has_shadow: bool) -> Object {
         Object {
             has_shadow: _has_shadow,
+            ..self
+        }
+    }
+
+    pub fn with_children(self, children: Vec<Object>) -> Object {
+        let group = Group::create_with_children(children, self.transformation());
+        Object {
+            shape: Shape::Group(group),
+            transformation: Matrix::identity(),
+            inverse_transformation: Matrix::identity(),
             ..self
         }
     }

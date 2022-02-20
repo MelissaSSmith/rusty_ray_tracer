@@ -1,6 +1,7 @@
 use uuid::Uuid;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::Object;
@@ -13,6 +14,12 @@ pub struct Group {
 impl Group {
     pub fn create() -> Group {
         Group { children: vec![] }
+    }
+
+    pub fn create_with_children(children: Vec<Object>, transform: Matrix) -> Group {
+        Group {
+            children: Group::transform_children(children, transform)
+        }
     }
 
     pub fn shapes(&self) -> Vec<Object> {
@@ -36,6 +43,16 @@ impl Group {
     pub fn add_child(&mut self, object: Object) {
         self.children.push(object);
     }
+
+    fn transform_children(children: Vec<Object>, transform: Matrix) -> Vec<Object> {
+        let mut transformed_children = vec![];
+        for mut child in children {
+            child.set_transform(transform * child.transformation());
+            transformed_children.push(child);
+        }
+
+        transformed_children
+    }
 }
 
 impl Intersect for Group {
@@ -44,7 +61,6 @@ impl Intersect for Group {
 
         if BoundingBox::intersects(&_object.bounds(), _ray) {
             for mut shape in  _object.children() {
-                shape.set_transform(_object.transformation() * shape.transformation());
                 intersections.append(&mut Object::intersect(&shape, _ray));
             }
         }
@@ -123,8 +139,8 @@ mod tests {
     #[test]
     fn test_intersecting_a_transformed_group() {
         let mut group = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
-        group.add_child(Shape::Sphere.create().with_transform(Matrix::translate(5.0, 0.0, 0.0)));
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0))
+            .with_children(vec![Shape::Sphere.create().with_transform(Matrix::translate(5.0, 0.0, 0.0))]);
 
         let ray = Ray::create(Point::create(10.0, 0.0, -10.0), Vector::create(0.0, 0.0, 1.0));
 
