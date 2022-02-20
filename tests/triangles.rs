@@ -70,16 +70,14 @@ fn test_triangles() {
             .with_color(BLUE)
     );
 
-    let mut pyramid = Shape::Group(Group::create()).create()
+    let children = vec![t1, t2, t3, t4];
+    let pyramid = Shape::Group(Group::create()).create()
         .with_transform(
             Matrix::translate(-1.5, 0.0, 0.0) *
                 Matrix::rotate_y(PI / 5.0) *
                 Matrix::scale(2.0, 2.0, 2.0)
-        );
-    pyramid.add_child(t1);
-    pyramid.add_child(t2);
-    pyramid.add_child(t3);
-    pyramid.add_child(t4);
+        )
+        .with_children(children);
 
     let cube = Shape::Cube.create()
         .with_material(

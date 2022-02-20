@@ -35,14 +35,16 @@ fn main() {
 
             let camera = Camera::create(1080, 1080, PI/3.0)
                 .with_transform(Matrix::view_transform(
-                    Point::create(0.0, 1.5, -5.0),
+                    Point::create(0.0, 1.5, -8.0),
                     Point::create(0.0, 1.0, 0.0),
                     Vector::create(0.0, 1.0, 0.0)
                 ));
             let canvas = camera.render(world);
             println!("Rendered World. Time {}", start.elapsed().as_secs());
 
-            canvas.convert_to_ppm_and_save(format!("{}.ppm", PathBuf::from(filename).file_name().unwrap().to_str().unwrap())); //
+            let mut path = PathBuf::from(filename);
+            path.set_extension("ppm");
+            canvas.convert_to_ppm_and_save(format!("{}", path.file_name().unwrap().to_str().unwrap())); //
             println!("DONE. Final Time {}", start.elapsed().as_secs());
         }
         _ => {

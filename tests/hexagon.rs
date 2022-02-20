@@ -51,7 +51,7 @@ fn hexagon() -> Object {
 }
 
 #[test]
-//#[ignore]
+#[ignore]
 fn test_hexagon() {
     let light_source = PointLight::create(WHITE, Point::create(-5.0, 10.0, -10.0));
     let objects = vec![hexagon()];

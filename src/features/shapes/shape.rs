@@ -230,22 +230,11 @@ impl Object {
         self.parent = Some(object.id());
     }
 
-    pub fn with_transform(self, _transform: Matrix) -> Object {
-        match self.shape() {
-            Shape::Group(_) => {
-                let group = Group::create_with_children(self.children(), _transformation);
-                Object {
-                    shape: Shape::Group(group),
-                    ..self
-                }
-            }
-            _ => {
-                Object {
-                    transformation: _transform,
-                    inverse_transformation: _transform.inverse(),
-                    ..self
-                }
-            }
+    pub fn with_transform(self, _transform: Matrix) -> Object { //todo: handle group children. Otherwise order matters
+        Object {
+            transformation: _transform,
+            inverse_transformation: _transform.inverse(),
+            ..self
         }
     }
 
@@ -301,17 +290,6 @@ impl Object {
         match self.shape() {
             Shape::Group(g) => { g.shapes() }
             _ => vec![]
-        }
-    }
-
-    pub fn add_child(&mut self, mut object: Object) {
-        match self.shape() {
-            Shape::Group(mut g) => {
-                object.set_parent(self.clone());
-                g.add_child(object);
-                self.shape = Shape::Group(g);
-            },
-            _ => {}
         }
     }
 
@@ -407,13 +385,13 @@ mod tests {
     fn test_convert_a_point_from_world_object_space() {
         let sphere = Shape::Sphere.create()
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
-        let mut group_2 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::scale(2.0, 2.0, 2.0));
+        let group_2 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0))
+            .with_children(vec![sphere]);
         let mut group_1 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::rotate_y(PI/2.0));
+            .with_transform(Matrix::rotate_y(PI/2.0))
+            .with_children(vec![group_2]);
 
-        group_2.add_child(sphere.clone());
-        group_1.add_child(group_2);
         let world = World::create().with_objects(vec![group_1]);
 
         let object = world.get_object_by_id(sphere.id()).unwrap();
@@ -425,15 +403,15 @@ mod tests {
 
     #[test]
     fn test_convert_a_normal_from_object_to_world_space() {
-        let mut group_1 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::rotate_y(PI/2.0));
-        let mut group_2 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::scale(1.0, 2.0, 3.0));
         let sphere = Shape::Sphere.create()
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
+        let group_2 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::scale(1.0, 2.0, 3.0))
+            .with_children(vec![sphere]);
+        let group_1 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::rotate_y(PI/2.0))
+            .with_children(vec![group_2]);
 
-        group_2.add_child(sphere.clone());
-        group_1.add_child(group_2);
         let world = World::create().with_objects(vec![group_1]);
 
         let object = world.get_object_by_id(sphere.id()).unwrap();
@@ -449,13 +427,13 @@ mod tests {
     fn test_find_normal_on_object_in_a_group() {
         let sphere = Shape::Sphere.create()
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
-        let mut group_2 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::scale(1.0, 2.0, 3.0));
-        let mut group_1 = Shape::Group(Group::create()).create()
-            .with_transform(Matrix::rotate_y(PI/2.0));
+        let group_2 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::scale(1.0, 2.0, 3.0))
+            .with_children(vec![sphere]);
+        let group_1 = Shape::Group(Group::create()).create()
+            .with_transform(Matrix::rotate_y(PI/2.0))
+            .with_children(vec![group_2]);
 
-        group_2.add_child(sphere.clone());
-        group_1.add_child(group_2);
         let world = World::create().with_objects(vec![group_1]);
 
         let object = world.get_object_by_id(sphere.id()).unwrap();

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
 use crate::draw::file_operations::open_file;
+use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::shapes::group::Group;
@@ -35,7 +36,7 @@ impl OBJParser {
 
         let mut ignored_lines = 0;
         let mut vertices = vec![Point::zero()];
-        let mut default_group = Shape::Group(Group::create()).create();
+        let mut children = vec![];
         let mut groups: HashMap<String, Object> = HashMap::new();
         let mut last_group_touched = String::from("Default");
         for line in reader.lines() {
@@ -49,15 +50,14 @@ impl OBJParser {
                             let triangles = OBJParser::fan_triangulation(l, &vertices);
                             if last_group_touched.eq(&String::from("Default")) {
                                 for triangle in triangles {
-                                    default_group.add_child(Shape::Triangle(triangle).create());
+                                    children.push(Shape::Triangle(triangle).create());
                                 }
                             } else {
-                                let last_group = groups.get_mut(last_group_touched.as_str());
-                                if let Some(group) = last_group {
-                                    for triangle in triangles {
-                                        group.add_child(Shape::Triangle(triangle).create());
-                                    }
+                                let mut children = vec![];
+                                for triangle in triangles {
+                                    children.push(Shape::Triangle(triangle).create());
                                 }
+                                *groups.get_mut(last_group_touched.as_str()).unwrap() = Shape::Group(Group::create_with_children(children, Matrix::identity())).create();
                             }
                         }
                         Some("g") => {
@@ -73,11 +73,8 @@ impl OBJParser {
                 }
             }
         }
-        let final_groups = groups.values().cloned().collect::<Vec<Object>>();
-        for final_group in final_groups {
-            default_group.add_child(final_group);
-        }
-        OBJParser::create(ignored_lines, vertices, default_group)
+        children.append(&mut groups.values().cloned().collect::<Vec<Object>>());
+        OBJParser::create(ignored_lines, vertices, Shape::Group(Group::create_with_children(children, Matrix::identity())).create())
     }
 
     fn obj_to_group(parser: OBJParser) -> Object {
@@ -245,18 +242,18 @@ mod tests {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        // assert!(parser.vertices[1].equals(t1_shape.point1()));
-        // assert!(parser.vertices[2].equals(t1_shape.point2()));
-        // assert!(parser.vertices[3].equals(t1_shape.point3()));
+        assert!(parser.vertices[1].equals(t1_shape.point1()));
+        assert!(parser.vertices[2].equals(t1_shape.point2()));
+        assert!(parser.vertices[3].equals(t1_shape.point3()));
 
         let t2 = parser.default_group.children()[1].children()[0].clone();
         let t2_shape = match t2.shape() {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        // assert!(parser.vertices[1].equals(t2_shape.point1()));
-        // assert!(parser.vertices[3].equals(t2_shape.point2()));
-        // assert!(parser.vertices[4].equals(t2_shape.point3()));
+        assert!(parser.vertices[1].equals(t2_shape.point1()));
+        assert!(parser.vertices[3].equals(t2_shape.point2()));
+        assert!(parser.vertices[4].equals(t2_shape.point3()));
     }
 
     #[test]
