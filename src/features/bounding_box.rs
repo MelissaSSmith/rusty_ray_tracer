@@ -66,6 +66,38 @@ impl BoundingBox {
 
         tmin <= tmax
     }
+
+    pub(crate) fn split(&self) -> (BoundingBox, BoundingBox) {
+        let dx = f64::max(self.minimum().x(), self.maximum().x());
+        let dy = f64::max(self.minimum().y(), self.maximum().y());
+        let dz = f64::max(self.minimum().z(), self.maximum().z());
+        let greatest_value = f64::max(dx, f64::max(dy, dz));
+
+        let (mut x0, mut y0, mut z0) = (self.minimum().x(), self.minimum().y(), self.minimum().z());
+        let (mut x1, mut y1, mut z1) = (self.maximum().x(), self.maximum().y(), self.maximum().z());
+
+        if greatest_value == dx {
+            x0 = (x0 + dx) / 2.0;
+            x1 = x0;
+        } else if greatest_value == dy {
+            y0 = (y0 + dy) / 2.0;
+            y1 = y0;
+        } else {
+            z0 = (z0 + dz) / 2.0;
+            z1 = z0;
+        }
+
+        let mid_min = Point::create(x0, y0, z0);
+        let mid_max = Point::create(x1, y1, z1);
+
+        let left = BoundingBox::create()
+            .with_minimum(self.minimum())
+            .with_maximum(mid_max);
+        let right = BoundingBox::create()
+            .with_minimum(mid_min)
+            .with_maximum(self.maximum());
+        (left, right)
+    }
 }
 
 impl Transform<BoundingBox> for BoundingBox {
@@ -307,5 +339,61 @@ mod tests {
 
             assert_eq!(result, test.2);
         }
+    }
+
+    #[test]
+    fn test_splitting_a_perfect_cube() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(-1.0, -4.0, -5.0))
+            .with_maximum(Point::create(9.0, 6.0, 5.0));
+
+        let (left, right) = bounds.split();
+
+        assert!(left.minimum().equals(Point::create(-1.0, -4.0, -5.0)));
+        assert!(left.maximum().equals(Point::create(4.0, 6.0, 5.0)));
+        assert!(right.minimum().equals(Point::create(4.0, -4.0, -5.0)));
+        assert!(right.maximum().equals(Point::create(9.0, 6.0, 5.0)));
+    }
+
+    #[test]
+    fn test_splitting_an_x_wide_box() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(-1.0, -2.0, -3.0))
+            .with_maximum(Point::create(9.0, 5.5, 3.0));
+
+        let (left, right) = bounds.split();
+
+        assert!(left.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
+        assert!(left.maximum().equals(Point::create(4.0, 5.5, 3.0)));
+        assert!(right.minimum().equals(Point::create(4.0, -2.0, -3.0)));
+        assert!(right.maximum().equals(Point::create(9.0, 5.5, 3.0)));
+    }
+
+    #[test]
+    fn test_splitting_a_y_wide_box() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(-1.0, -2.0, -3.0))
+            .with_maximum(Point::create(5.0, 8.0, 3.0));
+
+        let (left, right) = bounds.split();
+
+        assert!(left.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
+        assert!(left.maximum().equals(Point::create(5.0, 3.0, 3.0)));
+        assert!(right.minimum().equals(Point::create(-1.0, 3.0, -3.0)));
+        assert!(right.maximum().equals(Point::create(5.0, 8.0, 3.0)));
+    }
+
+    #[test]
+    fn test_splitting_a_z_wide_box() {
+        let bounds = BoundingBox::create()
+            .with_minimum(Point::create(-1.0, -2.0, -3.0))
+            .with_maximum(Point::create(5.0, 3.0, 7.0));
+
+        let (left, right) = bounds.split();
+
+        assert!(left.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
+        assert!(left.maximum().equals(Point::create(5.0, 3.0, 2.0)));
+        assert!(right.minimum().equals(Point::create(-1.0, -2.0, 2.0)));
+        assert!(right.maximum().equals(Point::create(5.0, 3.0, 7.0)));
     }
 }

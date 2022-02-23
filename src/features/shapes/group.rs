@@ -16,9 +16,9 @@ impl Group {
         Group { children: vec![] }
     }
 
-    pub fn create_with_children(children: Vec<Object>, transform: Matrix) -> Group {
+    pub fn create_with_children(children: Vec<Object>, transform: Matrix, parent_id: Uuid) -> Group {
         Group {
-            children: Group::transform_children(children, transform)
+            children: Group::transform_children(children, transform, parent_id)
         }
     }
 
@@ -40,10 +40,11 @@ impl Group {
         None
     }
 
-    fn transform_children(children: Vec<Object>, transform: Matrix) -> Vec<Object> {
+    fn transform_children(children: Vec<Object>, transform: Matrix, parent_id: Uuid) -> Vec<Object> {
         let mut transformed_children = vec![];
         for mut child in children {
             child.set_transform(transform * child.transformation());
+            child.set_parent_id(parent_id);
             transformed_children.push(child);
         }
 
@@ -68,6 +69,7 @@ impl Intersect for Group {
 
 #[cfg(test)]
 mod tests {
+    use uuid::Uuid;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
@@ -97,7 +99,8 @@ mod tests {
     fn test_add_a_child_to_a_group() {
         let object = Shape::Object.create();
 
-        let group = Shape::Group(Group::create_with_children(vec![object], Matrix::identity())).create();
+        let group = Shape::Group(Group::create()).create()
+            .with_children(vec![object.clone()]);
 
         assert_eq!(group.children().len(), 1);
         assert!(group.children()[0].equals(&object));
@@ -169,7 +172,8 @@ mod tests {
 
     #[test]
     fn test_intersecting_group_does_not_test_children_if_box_is_missed() {
-        let mut group = Shape::Group(Group::create()).create()
+        let child = Shape::Sphere.create();
+        let group = Shape::Group(Group::create()).create()
             .with_children(vec![child]);
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 1.0, 0.0));
 
@@ -181,7 +185,7 @@ mod tests {
     #[test]
     fn test_intersecting_group_tests_children_if_box_is_hit() {
         let child = Shape::Sphere.create();
-        let mut group = Shape::Group(Group::create()).create()
+        let group = Shape::Group(Group::create()).create()
             .with_children(vec![child]);
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
 
@@ -189,4 +193,21 @@ mod tests {
 
         assert_eq!(true, intersections.len() > 0);
     }
+
+    // #[test]
+    // fn test_partitioning_a_groups_children() {
+    //     let s1 = Shape::Sphere.create()
+    //         .with_transform(Matrix::translate(-2.0, 0.0, 0.0));
+    //     let s2 = Shape::Sphere.create()
+    //         .with_transform(Matrix::translate(2.0, 0.0, 0.0));
+    //     let s3 = Shape::Sphere.create();
+    //
+    //     let group = Group::create_with_children(vec![s1.clone(), s2.clone(), s3.clone()], Matrix::identity(), Uuid::new_v4());
+    //
+    //     let (left, right) = group.partition_children();
+    //
+    //     assert!(group.shapes()[0].equals(&s3));
+    //     assert!(left[0].equals(&s1));
+    //     assert!(right[0].equals(&s2));
+    // }
 }

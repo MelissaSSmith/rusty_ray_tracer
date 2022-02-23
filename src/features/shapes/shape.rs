@@ -1,3 +1,4 @@
+use std::ops::Add;
 use uuid::Uuid;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
@@ -137,7 +138,8 @@ pub struct Object {
     shape: Shape,
     has_shadow: bool,
     parent: Option<Uuid>,
-    bounds: BoundingBox
+    bounds: BoundingBox,
+    parent_space_bounds: BoundingBox
 }
 
 impl Object {
@@ -151,7 +153,8 @@ impl Object {
             shape: shape_type,
             has_shadow,
             parent: None,
-            bounds
+            bounds,
+            parent_space_bounds: bounds.transform(transform)
         }
     }
 
@@ -205,6 +208,10 @@ impl Object {
         }
     }
 
+    fn parent_space_bounds(&self) -> BoundingBox {
+        self.parent_space_bounds
+    }
+
     pub fn has_shadow(&self) -> bool {
         self.has_shadow
     }
@@ -212,12 +219,13 @@ impl Object {
     pub fn set_transform(&mut self, _transformation: Matrix) {
         match self.shape() {
             Shape::Group(_) => {
-                let group = Group::create_with_children(self.children(), _transformation);
+                let group = Group::create_with_children(self.children(), _transformation, self.id());
                 self.shape = Shape::Group(group);
             }
             _ => {
                 self.transformation = _transformation;
                 self.inverse_transformation = _transformation.inverse();
+                self.parent_space_bounds = self.bounds.transform(_transformation);
             }
         }
     }
@@ -226,14 +234,15 @@ impl Object {
         self.material = _material;
     }
 
-    fn set_parent(&mut self, object: Object) {
-        self.parent = Some(object.id());
+    pub(crate) fn set_parent_id(&mut self, parent_id: Uuid) {
+        self.parent = Some(parent_id);
     }
 
     pub fn with_transform(self, _transform: Matrix) -> Object { //todo: handle group children. Otherwise order matters
         Object {
             transformation: _transform,
             inverse_transformation: _transform.inverse(),
+            parent_space_bounds: self.bounds.transform(_transform),
             ..self
         }
     }
@@ -253,11 +262,18 @@ impl Object {
     }
 
     pub fn with_children(self, children: Vec<Object>) -> Object {
-        let group = Group::create_with_children(children, self.transformation());
+        let group = Group::create_with_children(children, self.transformation(), self.id());
         Object {
             shape: Shape::Group(group),
             transformation: Matrix::identity(),
             inverse_transformation: Matrix::identity(),
+            ..self
+        }
+    }
+
+    fn with_id(self, id: Uuid) -> Object {
+        Object {
+            id,
             ..self
         }
     }
@@ -300,8 +316,61 @@ impl Object {
         }
     }
 
-    fn parent_space_bounds(&self) -> BoundingBox {
-        self.bounds().transform(self.transformation())
+    fn partition_children(&mut self) -> (Vec<Object>, Vec<Object>) {
+        match self.shape() {
+            Shape::Group(_) => {
+                let (mut left_children, mut right_children) = (vec![], vec![]);
+                let (left, right) = self.bounds().split();
+                self.children().retain(|child| {
+                    {
+                        if left.contains_box(child.parent_space_bounds()) {
+                            left_children.push(child.clone());
+                            return false;
+                        }
+                        if right.contains_box(child.parent_space_bounds()) {
+                            right_children.push(child.clone());
+                            return false;
+                        }
+                        return true;
+                    };
+                });
+                (left_children, right_children)
+            }
+            _ => { (vec![], vec![]) }
+        }
+    }
+
+    fn make_subgroup(&self, children: Vec<Object>) -> Object {
+        self.clone().with_id(Uuid::new_v4())
+            .with_children(children)
+    }
+
+    fn divide(&mut self, threshold: i32) -> Object {
+        match self.shape() {
+            Shape::Group(g) => {
+                let mut new_children = vec![];
+                if threshold <= g.shapes().len() as i32 {
+                    let (left, right) = self.partition_children();
+
+                    println!("Left: {}", left.len());
+                    println!("Right: {}", right.len());
+                    if left.len() > 0 {
+                        new_children.push(self.make_subgroup(left));
+                    }
+                    if right.len() > 0 {
+                        new_children.push(self.make_subgroup(right)); //todo: completely lost. group needs to have any shape not in subgroup plus subgroups
+                    }
+                }
+
+                println!("{}", new_children.len());
+                println!("{}", g.shapes().len());
+                for mut child in g.shapes() {
+                    new_children.push(child.divide(threshold));
+                }
+                self.clone().with_children(new_children)
+            }
+            _ => { self.clone() }
+        }
     }
 
     fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
@@ -387,8 +456,8 @@ mod tests {
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
         let group_2 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::scale(2.0, 2.0, 2.0))
-            .with_children(vec![sphere]);
-        let mut group_1 = Shape::Group(Group::create()).create()
+            .with_children(vec![sphere.clone()]);
+        let group_1 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
 
@@ -407,7 +476,7 @@ mod tests {
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
         let group_2 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::scale(1.0, 2.0, 3.0))
-            .with_children(vec![sphere]);
+            .with_children(vec![sphere.clone()]);
         let group_1 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
@@ -429,7 +498,7 @@ mod tests {
             .with_transform(Matrix::translate(5.0,0.0, 0.0));
         let group_2 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::scale(1.0, 2.0, 3.0))
-            .with_children(vec![sphere]);
+            .with_children(vec![sphere.clone()]);
         let group_1 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
@@ -452,5 +521,46 @@ mod tests {
 
         assert!(bounds.minimum().equals(Point::create(0.5, -5.0, 1.0)));
         assert!(bounds.maximum().equals(Point::create(1.5, -1.0, 9.0)));
+    }
+
+    #[test]
+    fn test_subdividing_a_primitive_does_nothing() {
+        let mut shape = Shape::Sphere.create();
+
+        let divided_object = shape.divide(1);
+
+        assert!(divided_object.equals(&shape));
+    }
+
+    #[test]
+    fn test_create_subgroup_from_list_of_children() {
+        let s1 = Shape::Sphere.create();
+        let s2 = Shape::Sphere.create();
+        let group = Shape::Group(Group::create()).create();
+
+        let new_group = group.make_subgroup(vec![s1, s2]);
+
+        assert_eq!(new_group.children().len(), 2);
+    }
+
+    #[test]
+    fn test_subdividing_a_group_partitions_its_children() {
+        let s1 = Shape::Sphere.create()
+            .with_transform(Matrix::translate(-2.0, -2.0, 0.0));
+        let s2 = Shape::Sphere.create()
+            .with_transform(Matrix::translate(-2.0, 2.0, 0.0));
+        let s3 = Shape::Sphere.create()
+            .with_transform(Matrix::scale(4.0, 4.0, 4.0));
+
+        let mut group = Shape::Group(Group::create()).create()
+            .with_children(vec![s1.clone(), s2.clone(), s3.clone()]);
+
+        let divided_group = group.divide(1);
+
+        println!("{}", group.children().len());
+        assert!(group.children()[0].equals(&s3));
+        assert_eq!(group.children()[1].children().len(), 2);
+        assert!(group.children()[1].children()[0].children()[0].equals(&s1));
+        assert!(group.children()[1].children()[0].children()[1].equals(&s2));
     }
 }

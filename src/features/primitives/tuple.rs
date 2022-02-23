@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::{Formatter, write};
 use std::ops::{Add, Mul, Sub};
 use serde::{Deserialize, Serialize};
 use crate::features::primitives::operations::Operations;
@@ -157,5 +159,11 @@ impl std::ops::Neg for Tuple {
             z: -self.z,
             w: -self.w
         }
+    }
+}
+
+impl fmt::Display for Tuple {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "x: {}, y: {}, z:{}, w: {}", self.x, self.y, self.z, self.w)
     }
 }

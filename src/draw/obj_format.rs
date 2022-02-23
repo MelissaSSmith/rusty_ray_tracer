@@ -57,7 +57,9 @@ impl OBJParser {
                                 for triangle in triangles {
                                     children.push(Shape::Triangle(triangle).create());
                                 }
-                                *groups.get_mut(last_group_touched.as_str()).unwrap() = Shape::Group(Group::create_with_children(children, Matrix::identity())).create();
+                                let group = Shape::Group(Group::create()).create()
+                                    .with_children(children);
+                                *groups.get_mut(last_group_touched.as_str()).unwrap() = group;
                             }
                         }
                         Some("g") => {
@@ -74,7 +76,9 @@ impl OBJParser {
             }
         }
         children.append(&mut groups.values().cloned().collect::<Vec<Object>>());
-        OBJParser::create(ignored_lines, vertices, Shape::Group(Group::create_with_children(children, Matrix::identity())).create())
+        let group = Shape::Group(Group::create()).create()
+            .with_children(children);
+        OBJParser::create(ignored_lines, vertices, group)
     }
 
     fn obj_to_group(parser: OBJParser) -> Object {

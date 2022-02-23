@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::Formatter;
 use std::ops::{Add, Mul, Sub};
 use crate::features::primitives::vector::Vector;
 use serde::{Deserialize, Serialize};
@@ -110,6 +112,12 @@ impl Mul<f64> for Point {
             z: self.z * rhs,
             w: 1.0
         }
+    }
+}
+
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "x: {}, y: {}, z:{}", self.x, self.y, self.z)
     }
 }
 

@@ -1,3 +1,5 @@
+use std::fmt;
+use std::fmt::Formatter;
 use std::ops::{Add, Mul, Sub};
 use serde::{Deserialize, Serialize};
 use crate::features::primitives::operations::Operations;
@@ -153,6 +155,12 @@ impl std::ops::Neg for Vector {
             z: if self.z == 0.0 {self.z} else {-self.z},
             w: 0.0
         }
+    }
+}
+
+impl fmt::Display for Vector {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "x: {}, y: {}, z:{}", self.x, self.y, self.z)
     }
 }
 
