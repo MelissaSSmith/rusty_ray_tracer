@@ -278,6 +278,12 @@ impl Object {
         }
     }
 
+    fn with_parent(self, parent_id: Option<Uuid>) -> Object {
+        Object {
+            parent: parent_id,
+            ..self
+        }    }
+
     pub fn maximum_bound(&self) -> f64 {
         match self.shape() {
             Shape::Cylinder(c) => { c.maximum_bound() },
@@ -316,61 +322,57 @@ impl Object {
         }
     }
 
-    fn partition_children(&self) -> (Vec<Object>, Vec<Object>, Vec<Object>) {
+    fn partition_children(&self) -> Vec<Object> {
         match self.shape() {
             Shape::Group(_) => {
-                let (mut left_children, mut right_children) = (vec![], vec![]);
-                let mut children = self.children();
+                let mut left_children = Vec::with_capacity(self.children().len());
+                let mut right_children = Vec::with_capacity(self.children().len());
+                let mut children = Vec::with_capacity(self.children().len());
+
                 let (left, right) = self.bounds().split();
-                children.retain(|child| {
-                    {
-                        if left.contains_box(child.parent_space_bounds()) {
-                            left_children.push(child.clone());
-                            return false;
-                        }
-                        if right.contains_box(child.parent_space_bounds()) {
-                            right_children.push(child.clone());
-                            return false;
-                        }
-                        return true;
-                    };
-                });
-                (left_children, right_children, children)
+                for child in self.children() {
+                    if left.contains_box(child.parent_space_bounds()) {
+                        left_children.push(child.clone());
+                    } else if right.contains_box(child.parent_space_bounds()) {
+                        right_children.push(child.clone());
+                    } else {
+                        children.push(child);
+                    }
+                }
+
+                if left_children.len() > 0 {
+                    children.push(self.make_subgroup(left_children));
+                }
+                if right_children.len() > 0 {
+                    children.push(self.make_subgroup(right_children));
+                }
+
+                children
             }
-            _ => { (vec![], vec![], self.children()) }
+            _ => { self.children() }
         }
     }
 
     fn make_subgroup(&self, children: Vec<Object>) -> Object {
-        self.clone().with_id(Uuid::new_v4())
+        Shape::Group(Group::create()).create()
+            .with_parent(Some(self.id()))
             .with_children(children)
     }
 
-    pub(crate) fn divide(&self, threshold: i32) -> Object { //todo: return to after smooth triangles
-        match self.shape() {
-            Shape::Group(g) => {
-                let mut new_children = vec![];
-                if threshold <= g.shapes().len() as i32 {
-                    let (left, right, mut leftovers) = self.partition_children();
-
-                    if left.len() > 0 {
-                        new_children.push(self.make_subgroup(left));
-                    }
-                    if right.len() > 0 {
-                        new_children.push(self.make_subgroup(right));
-                    }
-                    new_children.append(&mut leftovers);
-                }
-
-                for mut child in new_children.clone() {
-                    if child.shape_type().eq("Group") {
-                        new_children.push(child.divide(threshold));
-                    }
-                }
-                self.clone().with_children(new_children)
-            }
-            _ => { self.clone() }
+    pub(crate) fn divide(&self, threshold: usize) -> Object {
+        if threshold > self.children().len() {
+            return self.clone();
         }
+
+        let children = self.partition_children();
+        println!("Children: {}", children.len());
+
+        let new_children = children
+            .into_iter()
+            .map(|child| child.divide(threshold))
+            .collect();
+
+        self.clone().with_children(new_children)
     }
 
     fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
@@ -557,9 +559,13 @@ mod tests {
 
         let divided_group = group.divide(1);
 
-        assert_eq!(3, divided_group.children().len());
-        for child in divided_group.children() {
-            println!("{}", child.shape_type());
-        }
+        assert_eq!(2, divided_group.children().len());
+        assert!(divided_group.children()[0].equals(&s3));
+
+        assert_eq!(divided_group.children()[1].shape_type(), "Group");
+        assert_eq!(divided_group.children()[1].children()[0].shape_type(), "Group");
+        assert_eq!(divided_group.children()[1].children()[1].shape_type(), "Group");
+        assert!(divided_group.children()[1].children()[0].children()[0].equals(&s1));
+        assert!(divided_group.children()[1].children()[1].children()[0].equals(&s2));
     }
 }
