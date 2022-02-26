@@ -73,12 +73,12 @@ impl Cone {
 
         let t = (object.minimum_bound() - ray.origin.y()) / ray.direction.y();
         if Cone::check_cap(ray, t, object.minimum_bound()) {
-            intersections.push(Intersection::create(t, object));
+            intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
         let t = (object.maximum_bound() - ray.origin.y()) / ray.direction.y();
         if Cone::check_cap(ray, t, object.maximum_bound()) {
-            intersections.push(Intersection::create(t, object));
+            intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
         intersections
@@ -97,7 +97,7 @@ impl Intersect for Cone {
 
         if a == 0.0 && b != 0.0 {
             let t = -c / (2.0 * b);
-            intersections.push(Intersection::create(t, _object));
+            intersections.push(Intersection::create(t, _object, 0.0, 0.0));
         }
 
         if a != 0.0 {
@@ -111,12 +111,12 @@ impl Intersect for Cone {
 
             let y0 = _ray.origin.y() + t0 * _ray.direction.y();
             if _object.minimum_bound() < y0 && y0 < _object.maximum_bound() {
-                intersections.push(Intersection::create(t0, &_object));
+                intersections.push(Intersection::create(t0, &_object, 0.0, 0.0));
             }
 
             let y1 = _ray.origin.y() + t1 * _ray.direction.y();
             if _object.minimum_bound() < y1 && y1 < _object.maximum_bound() {
-                intersections.push(Intersection::create(t1, &_object));
+                intersections.push(Intersection::create(t1, &_object, 0.0, 0.0));
             }
         }
 

@@ -254,7 +254,7 @@ mod tests {
     fn test_shading_an_intersection() {
         let world = World::create_default();
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
-        let intersection = Intersection::create(4.0, &world.clone().objects()[0]);
+        let intersection = Intersection::create(4.0, &world.clone().objects()[0], 0.0, 0.0);
 
         let computation = intersection.prepare_computations(ray, &vec![], None);
         let color = world.shade_hit(&computation, 1);
@@ -267,7 +267,7 @@ mod tests {
         let mut world = World::create_default();
         world.light = Some(PointLight::create(WHITE, Point::create(0.0, 0.25, 0.0)));
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
-        let intersection = Intersection::create(0.5, &world.clone().objects()[1]);
+        let intersection = Intersection::create(0.5, &world.clone().objects()[1], 0.0, 0.0);
 
         let computation = intersection.prepare_computations(ray, &vec![], None);
         let color = world.shade_hit(&computation, 1);
@@ -369,7 +369,7 @@ mod tests {
         let objects = vec![s1, s2.clone()];
         let world = World::create_world(light, objects);
         let ray = Ray::create(Point::create(0.0, 0.0, 5.0), Vector::create(0.0, 0.0, 1.0));
-        let intersection = Intersection::create(4.0, &s2);
+        let intersection = Intersection::create(4.0, &s2, 0.0, 0.0);
         let computations = intersection.prepare_computations(ray, &vec![], None);
 
         let color = world.shade_hit(&computations, 1);
@@ -384,7 +384,7 @@ mod tests {
         let shape = world.clone().objects()[1].clone();
         shape.material().set_ambient(1.0);
         world.set_object(1, shape.clone());
-        let intersection = Intersection::create(1.0, &shape);
+        let intersection = Intersection::create(1.0, &shape, 0.0, 0.0);
 
         let computation = intersection.prepare_computations(ray, &vec![], None);
 
@@ -406,7 +406,7 @@ mod tests {
         world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let list = vec![Intersection::create(sqrt2, &shape)];
+        let list = vec![Intersection::create(sqrt2, &shape, 0.0, 0.0)];
         let computation = list[0].prepare_computations(ray, &list, None);
 
         let color = world.reflected_color(&computation, 3);
@@ -427,7 +427,7 @@ mod tests {
         world.add_object(shape.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let list = vec![Intersection::create(sqrt2, &shape)];
+        let list = vec![Intersection::create(sqrt2, &shape, 0.0, 0.0)];
         let computation = list[0].prepare_computations(ray, &list, None);
 
         let color = world.shade_hit(&computation, 1);
@@ -469,7 +469,7 @@ mod tests {
         let mut world = World::create_default();
         world.add_object(shape.clone());
 
-        let intersection = Intersection::create(2.0_f64.sqrt(), &shape);
+        let intersection = Intersection::create(2.0_f64.sqrt(), &shape, 0.0, 0.0);
 
         let computation = intersection.prepare_computations(ray, &vec![], None);
 
@@ -483,7 +483,7 @@ mod tests {
         let world = World::create_default();
         let shape = &world.clone().objects()[0];
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
-        let intersections = vec![Intersection::create(4.0, shape), Intersection::create(6.0, shape)];
+        let intersections = vec![Intersection::create(4.0, shape, 0.0, 0.0), Intersection::create(6.0, shape, 0.0, 0.0)];
 
         let computations = intersections[0].prepare_computations(ray, &intersections, None);
         let color = world.refracted_color(&computations, 5);
@@ -500,7 +500,7 @@ mod tests {
                 .with_transparency(1.0)
         );
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
-        let intersections = vec![Intersection::create(4.0, &shape), Intersection::create(6.0, &shape)];
+        let intersections = vec![Intersection::create(4.0, &shape, 0.0, 0.0), Intersection::create(6.0, &shape, 0.0, 0.0)];
 
         let computations = intersections[0].prepare_computations(ray, &intersections, None);
         let color = world.refracted_color(&computations, 0);
@@ -519,7 +519,7 @@ mod tests {
         );
         world.set_object(0, shape.clone());
         let ray = Ray::create(Point::create(0.0, 0.0, sqrt2/2.0), Vector::create(0.0, 1.0, 0.0));
-        let intersections = vec![Intersection::create(-sqrt2/2.0, &shape), Intersection::create(sqrt2/2.0, &shape)];
+        let intersections = vec![Intersection::create(-sqrt2/2.0, &shape, 0.0, 0.0), Intersection::create(sqrt2/2.0, &shape, 0.0, 0.0)];
 
         let computations = intersections[1].prepare_computations(ray, &intersections, None);
         let color = world.refracted_color(&computations, 5);
@@ -544,10 +544,10 @@ mod tests {
 
         let ray = Ray::create(Point::create(0.0, 0.0, 0.1), Vector::create(0.0, 1.0, 0.0));
         let intersections = vec![
-            Intersection::create(-0.9899, &a),
-            Intersection::create(-0.4899, &b),
-            Intersection::create(0.4899, &b),
-            Intersection::create(0.9899, &a)
+            Intersection::create(-0.9899, &a, 0.0, 0.0),
+            Intersection::create(-0.4899, &b, 0.0, 0.0),
+            Intersection::create(0.4899, &b, 0.0, 0.0),
+            Intersection::create(0.9899, &a, 0.0, 0.0)
         ];
 
         let computations = intersections[2].prepare_computations(ray, &intersections, None);
@@ -577,7 +577,7 @@ mod tests {
         world.add_object(ball.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersections = vec![Intersection::create(sqrt2, &floor)];
+        let intersections = vec![Intersection::create(sqrt2, &floor, 0.0, 0.0)];
         let computations = intersections[0].prepare_computations(ray, &intersections, None);
 
         let color = world.shade_hit(&computations, 5);
@@ -606,7 +606,7 @@ mod tests {
         world.add_object(ball.clone());
 
         let ray = Ray::create(Point::create(0.0, 0.0, -3.0), Vector::create(0.0, -sqrt2/2.0, sqrt2/2.0));
-        let intersections = vec![Intersection::create(sqrt2, &floor)];
+        let intersections = vec![Intersection::create(sqrt2, &floor, 0.0, 0.0)];
         let computations = intersections[0].prepare_computations(ray, &intersections, None);
 
         let color = world.shade_hit(&computations, 5);

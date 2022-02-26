@@ -19,13 +19,13 @@ mod world_builder;
 // Command 1: generate image from obj file using a default world `create_object <filename>`
 
 fn main() {
-    println!("Started {} {}", command, filename);
-
     let start = Instant::now();
     let args: Vec<String> = env::args().collect();
 
     let command = &args[1];
     let filename = &args[2];
+
+    println!("Started {} {}", command, filename);
 
     match command.as_str() {
         "create_object" => {

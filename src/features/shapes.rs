@@ -14,6 +14,7 @@ pub mod cone;
 pub mod group;
 pub mod functions;
 pub mod triangle;
+pub mod smooth_triangle;
 
 pub trait Intersect {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection>;
@@ -24,5 +25,9 @@ pub trait Normal {
 }
 
 pub trait NormalAt {
-    fn normal(_object: &Object, _point: &Point, _world: Option<&World>) -> Vector;
+    fn normal(_object: &Object, _point: &Point, _hit: &Intersection, _world: Option<&World>) -> Vector;
+}
+
+pub trait NormalWithIntersection {
+    fn normal(_object: &Object, _point: &Point, _hit: &Intersection) -> Vector;
 }

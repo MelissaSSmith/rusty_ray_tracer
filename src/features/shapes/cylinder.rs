@@ -73,12 +73,12 @@ impl Cylinder {
 
         let t = (object.minimum_bound() - ray.origin.y()) / ray.direction.y();
         if Cylinder::check_cap(ray, t) {
-            intersections.push(Intersection::create(t, object));
+            intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
         let t = (object.maximum_bound() - ray.origin.y()) / ray.direction.y();
         if Cylinder::check_cap(ray, t) {
-            intersections.push(Intersection::create(t, object));
+            intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
         intersections
@@ -104,12 +104,12 @@ impl Intersect for Cylinder {
 
             let y0 = _ray.origin.y() + t0 * _ray.direction.y();
             if _object.minimum_bound() < y0 && y0 < _object.maximum_bound() {
-                intersections.push(Intersection::create(t0, &_object));
+                intersections.push(Intersection::create(t0, &_object, 0.0, 0.0));
             }
 
             let y1 = _ray.origin.y() + t1 * _ray.direction.y();
             if _object.minimum_bound() < y1 && y1 < _object.maximum_bound() {
-                intersections.push(Intersection::create(t1, &_object));
+                intersections.push(Intersection::create(t1, &_object, 0.0, 0.0));
             }
         }
 

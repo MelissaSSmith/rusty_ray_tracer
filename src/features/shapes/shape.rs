@@ -8,13 +8,14 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Intersect, Normal, NormalAt};
+use crate::features::shapes::{Intersect, Normal, NormalAt, NormalWithIntersection};
 use crate::features::shapes::cone::Cone;
 use crate::features::shapes::cube::Cube;
 use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
+use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::triangle::Triangle;
 use crate::features::transformations::Transform;
 use crate::features::world::World;
@@ -28,7 +29,8 @@ pub enum Shape {
     Cylinder(Cylinder),
     Cone(Cone),
     Group(Group),
-    Triangle(Triangle)
+    Triangle(Triangle),
+    SmoothTriangle(SmoothTriangle)
 }
 
 impl Shape {
@@ -41,6 +43,7 @@ impl Shape {
             Shape::Cone(_) => "Cone",
             Shape::Group(_) => "Group",
             Shape::Triangle(_) => "Triangle",
+            Shape::SmoothTriangle(_) => "SmoothTriangle",
             _ => "Object"
         }
     }
@@ -84,6 +87,10 @@ impl Shape {
             Shape::Triangle(t) => {
                 let bounds = BoundingBox::create() + t.point1() + t.point2() + t.point3();
                 Object::create(Shape::Triangle(*t), has_shadow, material, bounds)
+            },
+            Shape::SmoothTriangle(t) => {
+                let bounds = BoundingBox::create() + t.point1() + t.point2() + t.point3();
+                Object::create(Shape::SmoothTriangle(*t), has_shadow, material, bounds)
             },
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }
@@ -249,7 +256,7 @@ impl Object {
         }
     }
 
-    pub fn with_children(self, children: Vec<Object>) -> Object { //todo: need to handle bounding box of groups better. Right now, it is too big
+    pub fn with_children(self, children: Vec<Object>) -> Object {
         match self.shape() {
             Shape::Group(_) => {
                 let group = Group::create_with_children(children, self.transformation(), self.id());
@@ -418,13 +425,14 @@ impl Intersect for Object {
             Shape::Cone(_) => { Cone::intersect(_object, &transformed_ray) }
             Shape::Group(_) => { Group::intersect(_object, _ray) }
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
+            Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
             _ => { vec![] }
         }
     }
 }
 
 impl NormalAt for Object {
-    fn normal(_object: &Object, _point: &Point, _world: Option<&World>) -> Vector {
+    fn normal(_object: &Object, _point: &Point, _hit: &Intersection, _world: Option<&World>) -> Vector {
         let object_point = match _world {
             None => { _object.inverse_transformation() * *_point }
             Some(w) => { Object::world_to_object(_object, _point, w) }
@@ -436,6 +444,7 @@ impl NormalAt for Object {
             Shape::Cylinder(_) => { Cylinder::normal(_object, &object_point) }
             Shape::Cone(_) => { Cone::normal(_object, &object_point) }
             Shape::Triangle(t) => { t.normal_vector() }
+            Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
             _ => { Vector::zero() }
         };
         match _world {
@@ -450,6 +459,7 @@ impl NormalAt for Object {
 #[cfg(test)]
 mod tests {
     use std::f64::consts::PI;
+    use crate::features::intersection::Intersection;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
@@ -515,8 +525,9 @@ mod tests {
         let world = World::create().with_objects(vec![group_1]);
 
         let object = world.get_object_by_id(sphere.id()).unwrap();
+        let intersection = Intersection::create(0.0, &object, 0.0, 0.0);
 
-        let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), Some(&world));
+        let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), &intersection, Some(&world));
 
         assert!(point.equals(Vector::create(0.2857, 0.4286, -0.8571)));
     }

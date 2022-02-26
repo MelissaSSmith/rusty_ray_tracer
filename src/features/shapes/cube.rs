@@ -22,7 +22,7 @@ impl Intersect for Cube {
             return vec![];
         }
 
-        vec![Intersection::create(tmin, &_object), Intersection::create(tmax, &_object)]
+        vec![Intersection::create(tmin, &_object, 0.0, 0.0), Intersection::create(tmax, &_object, 0.0, 0.0)]
     }
 }
 

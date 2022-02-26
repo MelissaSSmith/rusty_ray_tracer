@@ -16,7 +16,7 @@ impl Intersect for Plane {
             return vec![]
         }
         let t = -_ray.origin.y() / _ray.direction.y();
-        vec![Intersection::create(t, _object)]
+        vec![Intersection::create(t, _object, 0.0, 0.0)]
     }
 }
 
@@ -28,6 +28,7 @@ impl Normal for Plane {
 
 #[cfg(test)]
 mod tests {
+    use crate::features::intersection::Intersection;
     use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::plane::Plane;
@@ -39,8 +40,9 @@ mod tests {
     #[test]
     fn test_normal_of_a_plane_is_constant_everywhere() {
         let plane = Shape::Plane.create();
+        let intersection = Intersection::create(0.0, &plane, 0.0, 0.0);
 
-        let n1 = Object::normal(&plane, &Point::zero(), None);
+        let n1 = Object::normal(&plane, &Point::zero(), &intersection, None);
         let n2 = Plane::normal(&plane, &Point::create(10.0, 0.0, -10.0));
         let n3 = Plane::normal(&plane, &Point::create(-5.0, 0.0, 150.0));
 

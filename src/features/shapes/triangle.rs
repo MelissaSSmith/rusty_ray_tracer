@@ -55,7 +55,7 @@ impl Triangle {
         self.normal
     }
 
-    pub fn intersects(&self, _ray: &Ray) -> Vec<f64> {
+    pub fn intersects(&self, _ray: &Ray) -> Vec<f64> { //todo: abstract out into trait
         let dir_cross_edge2 = _ray.direction() * self.edge2();
         let determinant = self.edge1() ^ dir_cross_edge2;
         if determinant.abs() < EPSILON {
@@ -84,7 +84,7 @@ impl Intersect for Triangle {
                 let t_values = t.intersects(_ray);
                 let mut intersections = Vec::<Intersection>::new();
                 for t in t_values {
-                    intersections.push(Intersection::create(t, _object));
+                    intersections.push(Intersection::create(t, _object, 0.0, 0.0));
                 }
                 intersections
             },

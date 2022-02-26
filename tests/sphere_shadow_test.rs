@@ -49,7 +49,7 @@ fn sphere_shadow_test() {
                 None => {}
                 Some(hit) => {
                     let point = ray.position(hit.t);
-                    let normal = Object::normal(&hit.object, &point, None);
+                    let normal = Object::normal(&hit.object, &point, &hit, None);
                     let eye = -ray.direction();
                     let color = hit.object.material().lighting(&light, &hit.object, &point, &eye, &normal, false);
                     canvas.write_pixel(x, y, color);
