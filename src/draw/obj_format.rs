@@ -82,7 +82,7 @@ impl OBJParser {
     }
 
     fn obj_to_group(parser: OBJParser) -> Object {
-        parser.default_group
+        parser.default_group.divide(10)
     }
 
     fn create_vertex(line: String) -> Point {

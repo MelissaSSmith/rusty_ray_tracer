@@ -19,6 +19,8 @@ mod world_builder;
 // Command 1: generate image from obj file using a default world `create_object <filename>`
 
 fn main() {
+    println!("Started {} {}", command, filename);
+
     let start = Instant::now();
     let args: Vec<String> = env::args().collect();
 
@@ -33,7 +35,7 @@ fn main() {
             let world = create_default_world_with_group(group);
             println!("Created World. Time {}", start.elapsed().as_secs());
 
-            let camera = Camera::create(1080, 1080, PI/3.0)
+            let camera = Camera::create(300, 300, PI/3.0) //high def: 1080 1080
                 .with_transform(Matrix::view_transform(
                     Point::create(0.0, 1.5, -8.0),
                     Point::create(0.0, 1.0, 0.0),
@@ -44,11 +46,11 @@ fn main() {
 
             let mut path = PathBuf::from(filename);
             path.set_extension("ppm");
-            canvas.convert_to_ppm_and_save(format!("{}", path.file_name().unwrap().to_str().unwrap())); //
-            println!("DONE. Final Time {}", start.elapsed().as_secs());
+            canvas.convert_to_ppm_and_save(format!("{}", path.file_name().unwrap().to_str().unwrap()));
+            println!("Finished {} {}. Final Time {}", command, filename, start.elapsed().as_secs());
         }
         _ => {
-            println!("{} {}", command, filename);
+            println!("Finished {} {}. Final Time {}", command, filename, start.elapsed().as_secs());
         }
     }
 }

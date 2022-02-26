@@ -193,19 +193,7 @@ impl Object {
     }
 
     pub fn bounds(&self) -> BoundingBox {
-        match self.shape() {
-            Shape::Group(g) => {
-                let mut bounds = BoundingBox::create();
-
-                for child in g.shapes() {
-                    let child_box = child.parent_space_bounds();
-                    bounds = bounds + child_box;
-                }
-
-                bounds.transform(self.transformation())
-            }
-            _ => { self.bounds }
-        }
+        self.bounds
     }
 
     fn parent_space_bounds(&self) -> BoundingBox {
@@ -261,13 +249,27 @@ impl Object {
         }
     }
 
-    pub fn with_children(self, children: Vec<Object>) -> Object {
-        let group = Group::create_with_children(children, self.transformation(), self.id());
-        Object {
-            shape: Shape::Group(group),
-            transformation: Matrix::identity(),
-            inverse_transformation: Matrix::identity(),
-            ..self
+    pub fn with_children(self, children: Vec<Object>) -> Object { //todo: need to handle bounding box of groups better. Right now, it is too big
+        match self.shape() {
+            Shape::Group(_) => {
+                let group = Group::create_with_children(children, self.transformation(), self.id());
+                let mut group_bounds = BoundingBox::create();
+                for child in group.shapes() {
+                    let child_box = child.parent_space_bounds();
+                    group_bounds = group_bounds + child_box;
+                }
+                Object {
+                    shape: Shape::Group(group),
+                    transformation: Matrix::identity(),
+                    inverse_transformation: Matrix::identity(),
+                    bounds: group_bounds,
+                    parent_space_bounds: group_bounds.transform(self.transformation()),
+                    ..self
+                }
+            }
+            _ => {
+                self.clone()
+            }
         }
     }
 
@@ -360,17 +362,22 @@ impl Object {
     }
 
     pub(crate) fn divide(&self, threshold: usize) -> Object {
-        if threshold > self.children().len() {
-            return self.clone();
+        let mut children = self.children();
+        if threshold <= children.len() {
+            children = self.partition_children();
         }
 
-        let children = self.partition_children();
-        println!("Children: {}", children.len());
-
-        let new_children = children
-            .into_iter()
-            .map(|child| child.divide(threshold))
-            .collect();
+        let mut new_children = Vec::with_capacity(children.len());
+        for child in children {
+            match child.shape() {
+                Shape::Group(_) => {
+                    new_children.push(child.divide(threshold));
+                }
+                _ => {
+                    new_children.push(child);
+                }
+            }
+        }
 
         self.clone().with_children(new_children)
     }
@@ -554,7 +561,7 @@ mod tests {
         let s3 = Shape::Sphere.create()
             .with_transform(Matrix::scale(4.0, 4.0, 4.0));
 
-        let mut group = Shape::Group(Group::create()).create()
+        let group = Shape::Group(Group::create()).create()
             .with_children(vec![s1.clone(), s2.clone(), s3.clone()]);
 
         let divided_group = group.divide(1);
@@ -567,5 +574,31 @@ mod tests {
         assert_eq!(divided_group.children()[1].children()[1].shape_type(), "Group");
         assert!(divided_group.children()[1].children()[0].children()[0].equals(&s1));
         assert!(divided_group.children()[1].children()[1].children()[0].equals(&s2));
+    }
+
+    #[test]
+    fn test_subdividing_a_group_with_too_few_children() {
+        let s1 = Shape::Sphere.create()
+            .with_transform(Matrix::translate(-2.0, 0.0, 0.0));
+        let s2 = Shape::Sphere.create()
+            .with_transform(Matrix::translate(2.0, 1.0, 0.0));
+        let s3 = Shape::Sphere.create()
+            .with_transform(Matrix::translate(2.0, -1.0, 0.0));
+        let s4 = Shape::Sphere.create();
+        let subgroup = Shape::Group(Group::create()).create()
+            .with_children(vec![s1.clone(), s2.clone(), s3.clone()]);
+        let group = Shape::Group(Group::create()).create()
+            .with_children(vec![subgroup.clone(), s4.clone()]);
+
+        let divided_group = group.divide(3);
+
+        assert_eq!(2, divided_group.children().len());
+        assert!(divided_group.children()[0].equals(&subgroup));
+        assert!(divided_group.children()[1].equals(&s4));
+
+        assert_eq!(2, divided_group.children()[0].children().len());
+        assert!(divided_group.children()[0].children()[0].children()[0].equals(&s1));
+        assert!(divided_group.children()[0].children()[1].children()[0].equals(&s2));
+        assert!(divided_group.children()[0].children()[1].children()[1].equals(&s3));
     }
 }
