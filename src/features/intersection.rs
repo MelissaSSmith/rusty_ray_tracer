@@ -34,7 +34,7 @@ impl Intersection {
         hit
     }
 
-    pub(crate) fn prepare_computations(&self, _ray: Ray, _intersections: &Vec<Intersection>, _world: Option<&World>) -> Computation {
+    pub fn prepare_computations(&self, _ray: Ray, _intersections: &Vec<Intersection>, _world: Option<&World>) -> Computation {
         let mut computation = Computation::create(self.t, &self.object);
 
         let point = _ray.position(self.t);

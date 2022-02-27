@@ -37,7 +37,7 @@ fn main() {
 
             let camera = Camera::create(300, 300, PI/3.0) //high def: 1080 1080
                 .with_transform(Matrix::view_transform(
-                    Point::create(0.0, 1.5, -8.0),
+                    Point::create(0.0, 1.5, -60.0),
                     Point::create(0.0, 1.0, 0.0),
                     Vector::create(0.0, 1.0, 0.0)
                 ));

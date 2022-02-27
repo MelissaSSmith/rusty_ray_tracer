@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::f64::consts::PI;
 use std::io::{BufRead, BufReader};
 use crate::draw::file_operations::open_file;
 use crate::features::primitives::matrix::Matrix;
@@ -73,7 +74,6 @@ impl OBJParser {
                                 }
                             }
 
-                            //create group
                             if last_group_touched.eq(&String::from("Default")) {
                                 children.append(&mut new_children);
                             } else {
@@ -105,7 +105,9 @@ impl OBJParser {
     }
 
     fn obj_to_group(parser: OBJParser) -> Object {
-        parser.default_group.divide(10)
+        let threshold: usize = (parser.default_group.children().len() as f64 * 0.005) as usize;
+        println!("Threshold for divide: {}", threshold);
+        parser.default_group.divide(threshold)
     }
 
     fn create_vertex(line: String) -> Point {
