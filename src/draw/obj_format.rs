@@ -4,24 +4,32 @@ use crate::draw::file_operations::open_file;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
+use crate::features::primitives::vector::Vector;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::shape::{Object, Shape};
+use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::triangle::Triangle;
 
 #[derive(Clone)]
 pub struct OBJParser {
     ignored_lines: i32,
     vertices: Vec<Point>,
-    default_group: Object
+    default_group: Object,
+    normals: Vec<Vector>
 }
 
+enum FaceVariation {
+    JustVertex,
+    VertexNormals
+}
 
 impl OBJParser {
-    fn create(ignored_lines: i32, vertices: Vec<Point>, group: Object)  -> OBJParser {
+    fn create(ignored_lines: i32, vertices: Vec<Point>, group: Object, normals: Vec<Vector>)  -> OBJParser {
         OBJParser {
             ignored_lines,
             vertices,
-            default_group: group
+            default_group: group,
+            normals
         }
     }
 
@@ -36,36 +44,51 @@ impl OBJParser {
 
         let mut ignored_lines = 0;
         let mut vertices = vec![Point::zero()];
+        let mut normals = vec![Vector::zero()];
         let mut children = vec![];
         let mut groups: HashMap<String, Object> = HashMap::new();
         let mut last_group_touched = String::from("Default");
         for line in reader.lines() {
             match line {
                 Ok(l) => {
-                    match l.get(..1) {
-                        Some("v") => {
+                    match l.get(..2) {
+                        Some("v ") => {
                             vertices.push(OBJParser::create_vertex(l));
                         }
-                        Some("f") => {
-                            let triangles = OBJParser::fan_triangulation(l, &vertices);
+                        Some("f ") => {
+                            let mut new_children = vec![];
+                            let variation = OBJParser::determine_face_variation(&l);
+                            match variation {
+                                FaceVariation::JustVertex => {
+                                    let triangles = OBJParser::fan_triangulation(l, &vertices);
+                                    for triangle in triangles {
+                                        new_children.push(Shape::Triangle(triangle).create());
+                                    }
+                                }
+                                FaceVariation::VertexNormals => {
+                                    let triangles = OBJParser::smooth_fan_triangulation(l, &vertices, &normals);
+                                    for triangle in triangles {
+                                        new_children.push(Shape::SmoothTriangle(triangle).create());
+                                    }
+                                }
+                            }
+
+                            //create group
                             if last_group_touched.eq(&String::from("Default")) {
-                                for triangle in triangles {
-                                    children.push(Shape::Triangle(triangle).create());
-                                }
+                                children.append(&mut new_children);
                             } else {
-                                let mut children = vec![];
-                                for triangle in triangles {
-                                    children.push(Shape::Triangle(triangle).create());
-                                }
                                 let group = Shape::Group(Group::create()).create()
-                                    .with_children(children);
+                                    .with_children(new_children);
                                 *groups.get_mut(last_group_touched.as_str()).unwrap() = group;
                             }
                         }
-                        Some("g") => {
+                        Some("g ") => {
                             let name = OBJParser::parse_group_name(l);
                             groups.insert(name.clone(), Shape::Group(Group::create()).create());
                             last_group_touched = name;
+                        }
+                        Some("vn") => {
+                            normals.push(OBJParser::create_normal(l));
                         }
                         _ => { ignored_lines += 1; }
                     }
@@ -78,7 +101,7 @@ impl OBJParser {
         children.append(&mut groups.values().cloned().collect::<Vec<Object>>());
         let group = Shape::Group(Group::create()).create()
             .with_children(children);
-        OBJParser::create(ignored_lines, vertices, group)
+        OBJParser::create(ignored_lines, vertices, group, normals)
     }
 
     fn obj_to_group(parser: OBJParser) -> Object {
@@ -96,6 +119,19 @@ impl OBJParser {
         let z: f64 = tokens[3].parse().unwrap();
 
         Point::create(x, y, z)
+    }
+
+    fn create_normal(line: String) -> Vector {
+        let mut tokens: Vec<&str> = line.split(" ").collect();
+        if tokens[1] == "" {
+            tokens.remove(1);
+        }
+
+        let x: f64 = tokens[1].parse().unwrap();
+        let y: f64 = tokens[2].parse().unwrap();
+        let z: f64 = tokens[3].parse().unwrap();
+
+        Vector::create(x, y, z)
     }
 
     fn fan_triangulation(line: String, vertices: &Vec<Point>) -> Vec<Triangle> {
@@ -120,6 +156,53 @@ impl OBJParser {
         triangles
     }
 
+    fn smooth_fan_triangulation(line: String, vertices: &Vec<Point>, normals: &Vec<Vector>) -> Vec<SmoothTriangle> {
+        let tokens: Vec<&str> = line.split(" ").collect();
+        let mut triangles = vec![];
+        let mut vertex_normals_indices = Vec::<(usize, usize, usize)>::new();
+
+        for token in tokens {
+            let mut vertex_normal: Vec<&str> = token.split("/").collect();
+            if vertex_normal[0] == "f" {
+                vertex_normal.remove(0);
+            }
+            if vertex_normal.len() < 3 {
+                continue;
+            }
+            let vertex_index = vertex_normal[0].parse::<usize>().unwrap();
+            let texture_index = 0;//vertex_normal[1].parse::<usize>().unwrap();
+            let normal_index = vertex_normal[2].parse::<usize>().unwrap();
+            vertex_normals_indices.push((vertex_index, texture_index, normal_index));
+        }
+
+        for index in 1..vertex_normals_indices.len()-1 {
+            if index >= vertices.len() || index >= normals.len() {
+                break;
+            }
+            let point_index1 = vertex_normals_indices[0].0;
+            let point_index2 = vertex_normals_indices[index].0;
+            let point_index3 = vertex_normals_indices[index+1].0;
+            let normal_index1 = vertex_normals_indices[0].2;
+            let normal_index2 = vertex_normals_indices[index].2;
+            let normal_index3 = vertex_normals_indices[index+1].2;
+
+            let triangle = SmoothTriangle::create(vertices[point_index1],
+                                                  vertices[point_index2], vertices[point_index3],
+                                                  normals[normal_index1], normals[normal_index2], normals[normal_index3]);
+            triangles.push(triangle);
+        }
+
+        triangles
+    }
+
+    fn determine_face_variation(line: &String) -> FaceVariation {
+        if line.contains(&"/") {
+            return FaceVariation::VertexNormals;
+        }
+
+        FaceVariation::JustVertex
+    }
+
     fn parse_group_name(line: String) -> String {
         let tokens: Vec<&str> = line.split(" ").collect();
         tokens[1].to_string()
@@ -132,6 +215,7 @@ mod tests {
     use crate::draw::obj_format::OBJParser;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
+    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
 
     #[test]
@@ -235,6 +319,20 @@ mod tests {
     }
 
     #[test]
+    fn test_obj_file_with_vertex_normal_data() {
+        let file_contents = "\
+        vn 0 0 1 \nvn 0.707 0 -0.707 \nvn 1 2 3 \
+        ";
+        write_to_file(String::from("vertex_normal.txt"), String::from(file_contents));
+
+        let parser = OBJParser::parse_obj_file(&String::from("vertex_normal.txt"));
+
+        assert!(parser.normals[1].equals(Vector::create(0.0, 0.0, 1.0)));
+        assert!(parser.normals[2].equals(Vector::create(0.707, 0.0, -0.707)));
+        assert!(parser.normals[3].equals(Vector::create(1.0, 2.0, 3.0)));
+    }
+
+    #[test]
     fn test_named_groups_in_obj_files() {
         let parser = OBJParser::parse_obj_file(&String::from("./source/obj_files/triangles.obj"));
 
@@ -266,5 +364,28 @@ mod tests {
         let group = OBJParser::obj_to_group(parser);
 
         assert_eq!(2, group.children().len());
+    }
+
+    #[test]
+    fn test_faces_with_normal_vectors() {
+        let parser = OBJParser::parse_obj_file(&String::from("./source/obj_files/normals_file.obj"));
+        let group = OBJParser::obj_to_group(parser.clone());
+
+        assert_eq!(2, group.children().len());
+
+        let t1 = group.children()[0].clone();
+        let t1_shape = match t1.shape() {
+            Shape::SmoothTriangle(t) => t,
+            _ => panic!("Object is not a triangle!")
+        };
+        assert!(parser.vertices[1].equals(t1_shape.point1()));
+        assert!(parser.vertices[2].equals(t1_shape.point2()));
+        assert!(parser.vertices[3].equals(t1_shape.point3()));
+        assert!(parser.normals[3].equals(t1_shape.normal1()));
+        assert!(parser.normals[1].equals(t1_shape.normal2()));
+        assert!(parser.normals[2].equals(t1_shape.normal3()));
+
+        let t2 = group.children()[1].clone();
+        assert!(t1.equals(&t2));
     }
 }

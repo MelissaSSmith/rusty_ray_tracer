@@ -47,15 +47,15 @@ impl SmoothTriangle {
         self.point3
     }
 
-    fn normal1(&self) -> Vector {
+    pub(crate) fn normal1(&self) -> Vector {
         self.normal1
     }
 
-    fn normal2(&self) -> Vector {
+    pub(crate) fn normal2(&self) -> Vector {
         self.normal2
     }
 
-    fn normal3(&self) -> Vector {
+    pub(crate) fn normal3(&self) -> Vector {
         self.normal3
     }
 
