@@ -10,6 +10,7 @@ use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal, NormalAt, NormalWithIntersection};
 use crate::features::shapes::cone::Cone;
+use crate::features::shapes::csg::CSG;
 use crate::features::shapes::cube::Cube;
 use crate::features::shapes::cylinder::Cylinder;
 use crate::features::shapes::group::Group;
@@ -30,7 +31,8 @@ pub enum Shape {
     Cone(Cone),
     Group(Group),
     Triangle(Triangle),
-    SmoothTriangle(SmoothTriangle)
+    SmoothTriangle(SmoothTriangle),
+    CSG(CSG)
 }
 
 impl Shape {
@@ -44,6 +46,7 @@ impl Shape {
             Shape::Group(_) => "Group",
             Shape::Triangle(_) => "Triangle",
             Shape::SmoothTriangle(_) => "SmoothTriangle",
+            Shape::CSG(_) => "CSG",
             _ => "Object"
         }
     }
@@ -91,6 +94,10 @@ impl Shape {
             Shape::SmoothTriangle(t) => {
                 let bounds = BoundingBox::create() + t.point1() + t.point2() + t.point3();
                 Object::create(Shape::SmoothTriangle(*t), has_shadow, material, bounds)
+            },
+            Shape::CSG(csg) => {
+                let bounds = BoundingBox::create();
+                Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }

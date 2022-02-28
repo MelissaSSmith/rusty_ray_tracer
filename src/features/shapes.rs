@@ -15,6 +15,7 @@ pub mod group;
 pub mod functions;
 pub mod triangle;
 pub mod smooth_triangle;
+pub mod csg;
 
 pub trait Intersect {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection>;
