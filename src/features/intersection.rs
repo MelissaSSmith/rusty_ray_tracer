@@ -19,6 +19,10 @@ impl Intersection {
         Intersection{t: _t, object: _shape.clone(), u: _u, v: _v }
     }
 
+    pub fn object(&self) -> Object {
+        self.object.clone()
+    }
+
     pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
         let mut hit: Option<Intersection> = None;
         for intersection in intersections {
@@ -69,7 +73,7 @@ impl Intersection {
 
         let mut containers = SmallVec::<[&Object; 32]>::new();
         for intersection in _intersections {
-            let is_intersection = intersection.equals(hit.clone());
+            let is_intersection = intersection.equals(&hit);
 
             if is_intersection {
                 n1 = Intersection::grab_container_value(&containers);
@@ -122,9 +126,11 @@ impl Intersection {
         r0 + (1.0 - r0) * (1.0 - cos).powi(5)
     }
 
-    fn equals(&self, _intersection: Intersection) -> bool {
+    pub(crate) fn equals(&self, _intersection: &Intersection) -> bool {
         self.t == _intersection.t &&
-            self.object.equals(&_intersection.object)
+            self.object.equals(&_intersection.object) &&
+            self.u == _intersection.u &&
+            self.v == _intersection.v
     }
 }
 
@@ -174,7 +180,7 @@ mod tests {
         let hit = Intersection::hit(intersections);
 
         assert_eq!(hit.is_some(), true);
-        assert!(i1.equals(hit.unwrap()));
+        assert!(i1.equals(&hit.unwrap()));
     }
 
     #[test]
@@ -187,7 +193,7 @@ mod tests {
         let hit = Intersection::hit(intersections);
 
         assert_eq!(hit.is_some(), true);
-        assert!(i2.equals(hit.unwrap()));
+        assert!(i2.equals(&hit.unwrap()));
     }
 
     #[test]
@@ -214,7 +220,7 @@ mod tests {
         let hit = Intersection::hit(intersections);
 
         assert_eq!(hit.is_some(), true);
-        assert!(i4.equals(hit.unwrap()));
+        assert!(i4.equals(&hit.unwrap()));
     }
 
     #[test]

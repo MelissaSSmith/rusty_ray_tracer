@@ -396,6 +396,23 @@ impl Object {
         self.clone().with_children(new_children)
     }
 
+    pub(crate) fn includes(&self, other: &Object) -> bool {
+        match self.shape() {
+            Shape::Group(_) => {
+                let mut includes = false;
+                for child in self.children() {
+                    let includes = includes && child.includes(other);
+                    if includes { break; }
+                }
+                includes
+            }
+            Shape::CSG(c) => {
+                c.left().equals(other) || c.right().equals(other)
+            },
+            _ => { self.equals(other) }
+        }
+    }
+
     fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
         let object_point = match _object.parent() {
             Some(id) => {
@@ -424,7 +441,7 @@ impl Object {
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = _ray.transform(_object.inverse_transformation());
-        match _object.shape {
+        match _object.shape() {
             Shape::Sphere => { Sphere::intersect(_object, &transformed_ray) }
             Shape::Plane => { Plane::intersect(_object, &transformed_ray) }
             Shape::Cube => { Cube::intersect(_object, &transformed_ray) }
@@ -433,6 +450,7 @@ impl Intersect for Object {
             Shape::Group(_) => { Group::intersect(_object, _ray) }
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
+            Shape::CSG(csg) => { csg.intersect(_ray) }
             _ => { vec![] }
         }
     }
