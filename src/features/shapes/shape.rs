@@ -375,7 +375,7 @@ impl Object {
             .with_children(children)
     }
 
-    pub(crate) fn divide(&self, threshold: usize) -> Object {
+    pub fn divide(&self, threshold: usize) -> Object {
         let mut children = self.children();
         if threshold <= children.len() {
             children = self.partition_children();

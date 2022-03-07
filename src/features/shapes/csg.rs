@@ -5,7 +5,7 @@ use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::{Object, Shape};
 
 #[derive(Clone, Copy, PartialOrd, PartialEq, Debug)]
-enum CSGOperation {
+pub enum CSGOperation {
     Union,
     Difference,
     Intersection
@@ -19,7 +19,7 @@ pub struct CSG {
 }
 
 impl CSG {
-    fn create(operation: CSGOperation, left: Object, right: Object) -> CSG {
+    pub fn create(operation: CSGOperation, left: Object, right: Object) -> CSG {
         CSG {
             operation,
             left: Box::new(left),

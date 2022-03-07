@@ -89,6 +89,14 @@ impl Pattern {
         self.inverse_transformation = self.transformation.inverse();
     }
 
+    pub fn with_transform(self, transform: Matrix) -> Pattern {
+        Pattern {
+            transformation: transform,
+            inverse_transformation: transform.inverse(),
+            ..self
+        }
+    }
+
     pub fn pattern_at_object(&self, object: &Object, point: &Point) -> Color {
         let object_point = object.inverse_transformation() * *point;
         let pattern_point = self.inverse_transformation() * object_point;
