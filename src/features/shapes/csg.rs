@@ -1,4 +1,5 @@
 use std::ops::Deref;
+use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
@@ -28,7 +29,7 @@ impl CSG {
     }
 
     fn operation(&self) -> CSGOperation {
-        self.operation.clone()
+        self.operation
     }
 
     pub(crate) fn left(&self) -> Object {
@@ -62,7 +63,7 @@ impl CSG {
         for intersection in intersections {
             let lhit = self.left.includes(&intersection.object());
 
-            if self.intersection_allowed(self.operation(), lhit, inl, inr) {
+            if self.intersection_allowed(self.operation, lhit, inl, inr) {
                 result.push(intersection);
             }
 
@@ -76,19 +77,22 @@ impl CSG {
         result
     }
 
-    pub fn intersect(&self, ray: &Ray) -> Vec<Intersection> {
-        let mut left_intersections = Object::intersect(&self.left(), ray);
-        let mut right_intersections = Object::intersect(&self.right(), ray);
+    pub fn intersect(&self, ray: &Ray, object: &Object) -> Vec<Intersection> {
+        let mut intersections: Vec<Intersection> = vec![];
 
-        left_intersections.append(&mut right_intersections);
+        if BoundingBox::intersects(&object.bounds(), ray) {
+            intersections.append(&mut Object::intersect(&self.left, ray));
+            intersections.append(&mut Object::intersect(&self.right, ray));
+        }
 
-        left_intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
-        self.filter_intersections(left_intersections)
+        intersections.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
+        self.filter_intersections(intersections)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::detect::__is_feature_detected::sha;
     use crate::features::intersection::Intersection;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
@@ -96,7 +100,8 @@ mod tests {
     use crate::features::primitives::vector::Vector;
     use crate::features::ray::Ray;
     use crate::features::shapes::csg::{CSG, CSGOperation};
-    use crate::features::shapes::shape::Shape;
+    use crate::features::shapes::Intersect;
+    use crate::features::shapes::shape::{Object, Shape};
 
     #[test]
     fn test_csg_created_with_an_operation_and_two_shapes() {
@@ -183,7 +188,7 @@ mod tests {
         let csg = CSG::create(CSGOperation::Union, Shape::Sphere.create(), Shape::Cube.create());
         let ray = Ray::create(Point::create(0.0, 2.0, -5.0), Vector::create(0.0, 0.0, 1.0));
 
-        let intersections = csg.intersect(&ray);
+        let intersections = csg.intersect(&ray, &Shape::CSG(csg.clone()).create());
 
         assert_eq!(0, intersections.len());
     }
@@ -196,13 +201,56 @@ mod tests {
         let csg = CSG::create(CSGOperation::Union, s1.clone(), s2.clone());
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
 
-        let intersections = csg.intersect(&ray);
+        let intersections = csg.intersect(&ray, &Shape::CSG(csg.clone()).create());
 
         assert_eq!(2, intersections.len());
         assert_eq!(intersections[0].t, 4.0);
         assert!(intersections[0].object().equals(&s1));
         assert_eq!(intersections[1].t, 6.5);
         assert!(intersections[1].object().equals(&s2));
+    }
+
+    #[test]
+    fn test_csg_object_has_a_bounding_box_that_contains_its_children() {
+        let left = Shape::Sphere.create();
+        let right = Shape::Sphere.create()
+            .with_transform(Matrix::translate(2.0, 3.0, 4.0));
+
+        let csg = CSG::create(CSGOperation::Difference, left, right);
+        let shape = Shape::CSG(csg).create();
+
+        let bounds = shape.bounds();
+
+        assert!(bounds.minimum().equals(Point::create(-1.0, -1.0, -1.0)));
+        assert!(bounds.maximum().equals(Point::create(3.0, 4.0, 5.0)));
+    }
+
+    #[test]
+    fn test_intersecting_ray_does_not_test_children_if_box_is_missed() {
+        let left = Shape::Sphere.create();
+        let right = Shape::Sphere.create();
+
+        let csg = CSG::create(CSGOperation::Difference, left, right);
+        let shape = Shape::CSG(csg).create();
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 1.0, 0.0));
+
+        let intersections = Object::intersect(&shape, &ray);
+
+        assert_eq!(0, intersections.len());
+    }
+
+    #[test]
+    fn test_intersecting_ray_tests_children_if_box_is_hit() {
+        let left = Shape::Sphere.create();
+        let right = Shape::Sphere.create();
+
+        let csg = CSG::create(CSGOperation::Difference, left, right);
+        let shape = Shape::CSG(csg).create();
+        let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
+
+        let intersections = Object::intersect(&shape, &ray);
+
+        assert_eq!(4, intersections.len());
     }
 }
 

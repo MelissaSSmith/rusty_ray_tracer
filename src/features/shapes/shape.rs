@@ -96,7 +96,7 @@ impl Shape {
                 Object::create(Shape::SmoothTriangle(*t), has_shadow, material, bounds)
             },
             Shape::CSG(csg) => {
-                let bounds = BoundingBox::create();
+                let bounds = BoundingBox::create() + csg.left().bounds() + csg.right().bounds().transform(csg.left().transformation()).transform(csg.right().transformation());
                 Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
@@ -218,7 +218,7 @@ impl Object {
         self.has_shadow
     }
 
-    pub fn set_transform(&mut self, _transformation: Matrix) {
+    pub fn set_transform(&mut self, _transformation: Matrix) { //todo: include csg
         match self.shape() {
             Shape::Group(_) => {
                 let group = Group::create_with_children(self.children(), _transformation, self.id());
@@ -298,7 +298,11 @@ impl Object {
         Object {
             parent: parent_id,
             ..self
-        }    }
+        }
+    }
+
+    //todo: with_left
+    //todo: with_right handle transforms on create as well
 
     pub fn maximum_bound(&self) -> f64 {
         match self.shape() {
@@ -407,7 +411,7 @@ impl Object {
                 includes
             }
             Shape::CSG(c) => {
-                c.left().equals(other) || c.right().equals(other)
+                c.left().includes(other) || c.right().includes(other)
             },
             _ => { self.equals(other) }
         }
@@ -450,7 +454,7 @@ impl Intersect for Object {
             Shape::Group(_) => { Group::intersect(_object, _ray) }
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
-            Shape::CSG(csg) => { csg.intersect(_ray) }
+            Shape::CSG(csg) => { csg.intersect(_ray, _object) }
             _ => { vec![] }
         }
     }
@@ -470,7 +474,7 @@ impl NormalAt for Object {
             Shape::Cone(_) => { Cone::normal(_object, &object_point) }
             Shape::Triangle(t) => { t.normal_vector() }
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
-            _ => { Vector::zero() }
+            _ => { panic!("{} has no normal", _object.shape_type()); }
         };
         match _world {
             None => {

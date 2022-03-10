@@ -2,7 +2,7 @@ use std::f64::consts::{FRAC_PI_2, PI};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{BLACK, WHITE};
+use rusty_ray_tracer::features::color::consts::{BLACK, BLUE, RED, WHITE};
 use rusty_ray_tracer::features::light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
@@ -134,7 +134,7 @@ fn dice_test() {
 
     let floor = Shape::Plane.create()
         .with_material(floor_material)
-        .with_transform(Matrix::translate(0.0, 0.0, 10.0) * Matrix::rotate_x(PI/2.0));
+        .with_transform(Matrix::translate(0.0, 0.0, 2.0) * Matrix::rotate_x(PI/2.0));
 
     let material = Material::create()
         .with_color(BLACK)
@@ -153,7 +153,7 @@ fn dice_test() {
         .with_material(material.clone())
         .with_transform(Matrix::translate(0.0, 0.0, -0.8));
     let lens = Shape::CSG(
-        CSG::create(CSGOperation::Intersection, a, b)
+        CSG::create(CSGOperation::Difference, a, b)
     ).create()
         .with_has_shadow(false);
 
@@ -166,7 +166,7 @@ fn dice_test() {
     let dice = dice(material1, material2);
 
     let light_source = PointLight::create(WHITE, Point::create(-9.0, 8.0, -7.0));
-    let objects = vec![floor, lens, dice];
+    let objects = vec![floor, dice];
     let world = World::create_world(light_source, objects);
 
     let canvas = camera.render(world);
