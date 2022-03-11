@@ -257,9 +257,22 @@ impl Object {
     }
 
     pub fn with_has_shadow(self, _has_shadow: bool) -> Object {
-        Object {
-            has_shadow: _has_shadow,
-            ..self
+        match self.shape {
+            Shape::CSG(c) => {
+                let new_csg = CSG::create(c.operation(), c.left().with_has_shadow(_has_shadow), c.right().with_has_shadow(_has_shadow));
+
+                Object {
+                    shape: Shape::CSG(new_csg),
+                    has_shadow: _has_shadow,
+                    ..self
+                }
+            }
+            _ => {
+                Object {
+                    has_shadow: _has_shadow,
+                    ..self
+                }
+            }
         }
     }
 
@@ -403,12 +416,7 @@ impl Object {
     pub(crate) fn includes(&self, other: &Object) -> bool {
         match self.shape() {
             Shape::Group(_) => {
-                let mut includes = false;
-                for child in self.children() {
-                    let includes = includes && child.includes(other);
-                    if includes { break; }
-                }
-                includes
+                self.children().iter().any(|child| child.includes(other))
             }
             Shape::CSG(c) => {
                 c.left().includes(other) || c.right().includes(other)

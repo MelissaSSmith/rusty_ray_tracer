@@ -12,6 +12,16 @@ pub enum CSGOperation {
     Intersection
 }
 
+impl CSGOperation {
+    fn hit_allowed(&self, left_hit: bool, inside_left: bool, inside_right: bool) -> bool {
+        match self {
+            CSGOperation::Union => left_hit && !inside_right || !left_hit && !inside_left,
+            CSGOperation::Difference => left_hit && !inside_right || !left_hit && inside_left,
+            CSGOperation::Intersection => left_hit && inside_right || !left_hit && inside_left
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct CSG {
     operation: CSGOperation,
@@ -28,7 +38,7 @@ impl CSG {
         }
     }
 
-    fn operation(&self) -> CSGOperation {
+    pub(crate) fn operation(&self) -> CSGOperation {
         self.operation
     }
 
@@ -43,13 +53,13 @@ impl CSG {
     fn intersection_allowed(&self, operation: CSGOperation, left_hit: bool, inside_left: bool, inside_right: bool) -> bool {
         match operation {
             CSGOperation::Union => {
-                (left_hit && !inside_right) || (!left_hit && !inside_left)
+                left_hit && !inside_right || !left_hit && !inside_left
             }
             CSGOperation::Difference => {
-                (left_hit && !inside_right) || (!left_hit && inside_left)
+                left_hit && !inside_right || !left_hit && inside_left
             }
             CSGOperation::Intersection => {
-                (left_hit && inside_right) || (!left_hit && inside_left)
+                left_hit && inside_right || !left_hit && inside_left
             }
         }
     }
@@ -58,23 +68,20 @@ impl CSG {
         let mut inl = false;
         let mut inr = false;
 
-        let mut result = Vec::<Intersection>::new();
+        intersections.into_iter()
+            .filter(|intersection| {
+                let left_hit = self.left.includes(&intersection.object());
+                let filter = self.operation.hit_allowed(left_hit, inl, inr);
 
-        for intersection in intersections {
-            let lhit = self.left.includes(&intersection.object());
+                if left_hit {
+                    inl = !inl;
+                } else {
+                    inr = !inr;
+                }
 
-            if self.intersection_allowed(self.operation, lhit, inl, inr) {
-                result.push(intersection);
-            }
-
-            if lhit {
-                inl = !inl;
-            } else {
-                inr = !inr;
-            }
-        }
-
-        result
+                filter
+            })
+            .collect()
     }
 
     pub fn intersect(&self, ray: &Ray, object: &Object) -> Vec<Intersection> {
@@ -149,7 +156,7 @@ mod tests {
         ];
 
         for test in tests {
-            let result = csg.intersection_allowed(test.0, test.1, test.2, test.3);
+            let result = test.0.hit_allowed(test.1, test.2, test.3);
 
             assert_eq!(result, test.4);
         }
