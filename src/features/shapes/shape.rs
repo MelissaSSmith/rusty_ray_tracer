@@ -148,6 +148,8 @@ pub struct Object {
     id: Uuid,
     transformation: Matrix,
     inverse_transformation: Matrix,
+    cumulative_transform: Matrix,
+    cumulative_inverse_transform: Matrix,
     material: Material,
     shape: Shape,
     has_shadow: bool,
@@ -163,6 +165,8 @@ impl Object {
             id: Uuid::new_v4(),
             transformation: transform,
             inverse_transformation: transform.inverse(),
+            cumulative_transform: transform,
+            cumulative_inverse_transform: transform.inverse(),
             material,
             shape: shape_type,
             has_shadow,
@@ -175,7 +179,8 @@ impl Object {
     pub fn equals(&self, other: &Object) -> bool {
         self.shape_type() == other.shape_type() &&
             self.material().equals(other.material()) &&
-            self.transformation().equals(other.transformation())
+            self.transformation().equals(other.transformation()) &&
+            self.cumulative_transform().equals(other.cumulative_transform())
     }
 
     pub fn id(&self)  -> Uuid {
@@ -188,6 +193,14 @@ impl Object {
 
     pub fn inverse_transformation(&self) -> Matrix {
         self.inverse_transformation
+    }
+
+    fn cumulative_transform(&self) -> Matrix {
+        self.cumulative_transform
+    }
+
+    fn inverse_cumulative_transform(&self) -> Matrix {
+        self.cumulative_inverse_transform
     }
 
     pub fn material(&self) -> Material {
@@ -223,6 +236,7 @@ impl Object {
             Shape::Group(_) => {
                 let group = Group::create_with_children(self.children(), _transformation, self.id());
                 self.shape = Shape::Group(group);
+
             }
             _ => {
                 self.transformation = _transformation;
@@ -241,12 +255,41 @@ impl Object {
     }
 
     pub fn with_transform(self, _transform: Matrix) -> Object { //todo: handle group children. Otherwise order matters
-        Object {
-            transformation: _transform,
-            inverse_transformation: _transform.inverse(),
-            parent_space_bounds: self.bounds.transform(_transform),
-            ..self
+        match self.shape {
+            Shape::CSG(c) => {
+                let new_csg = CSG::create(c.operation(),
+                                          c.left().with_transform(_transform),
+                                          c.right().with_transform(_transform));
+
+                Object {
+                    shape: Shape::CSG(new_csg),
+                    transformation: _transform,
+                    inverse_transformation: _transform.inverse(),
+                    parent_space_bounds: self.bounds.transform(_transform),
+                    ..self
+                }
+            }
+            Shape::Group(ref g) => {
+                let group = Group::create_with_children(g.shapes(), _transform, self.id());
+
+                Object {
+                    shape: Shape::Group(group),
+                    cumulative_transform: _transform,
+                    inverse_transformation: _transform.inverse(),
+                    parent_space_bounds: self.bounds.transform(_transform),
+                    ..self
+                }
+            }
+            _ => {
+                Object {
+                    transformation: _transform,
+                    inverse_transformation: _transform.inverse(),
+                    parent_space_bounds: self.bounds.transform(_transform),
+                    ..self
+                }
+            }
         }
+
     }
 
     pub fn with_material(self, _material: Material) -> Object {
@@ -279,7 +322,7 @@ impl Object {
     pub fn with_children(self, children: Vec<Object>) -> Object {
         match self.shape() {
             Shape::Group(_) => {
-                let group = Group::create_with_children(children, self.transformation(), self.id());
+                let group = Group::create_with_children(children, self.cumulative_transform(), self.id());
                 let mut group_bounds = BoundingBox::create();
                 for child in group.shapes() {
                     let child_box = child.parent_space_bounds();
