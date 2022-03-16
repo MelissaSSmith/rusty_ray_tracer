@@ -36,7 +36,7 @@ fn dice(material1: Material, material2: Material) -> Object {
                            dice_side3(material2.clone()).with_transform(Matrix::rotate_z(PI/2.0)));
     let body = CSG::create(CSGOperation::Difference,
                            Shape::CSG(body).create(),
-                           dice_side4(material2.clone()).with_transform(Matrix::rotate_z(-PI/2.0)));  //todo: group transforms aren't working
+                           dice_side4(material2.clone()).with_transform(Matrix::rotate_z(-PI/2.0)));
 
     Shape::CSG(body).create()
 }

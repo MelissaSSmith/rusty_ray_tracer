@@ -153,7 +153,6 @@ pub struct Object {
     material: Material,
     shape: Shape,
     has_shadow: bool,
-    parent: Option<Uuid>,
     bounds: BoundingBox,
     parent_space_bounds: BoundingBox
 }
@@ -170,7 +169,6 @@ impl Object {
             material,
             shape: shape_type,
             has_shadow,
-            parent: None,
             bounds,
             parent_space_bounds: bounds.transform(transform)
         }
@@ -215,10 +213,6 @@ impl Object {
         self.shape.clone()
     }
 
-    pub fn parent(&self) -> Option<Uuid> {
-        self.parent
-    }
-
     pub fn bounds(&self) -> BoundingBox {
         self.bounds
     }
@@ -231,32 +225,30 @@ impl Object {
         self.has_shadow
     }
 
-    pub fn set_transform(&mut self, _transformation: Matrix) { //todo: include csg
+    pub fn set_transform(&mut self, _transformation: Matrix) {
+        self.cumulative_transform = _transformation;
+        self.cumulative_inverse_transform = self.cumulative_transform().inverse();
+        self.parent_space_bounds = self.bounds.transform(_transformation);
         match self.shape() {
             Shape::Group(_) => {
-                self.cumulative_transform = _transformation;
-                self.cumulative_inverse_transform = self.cumulative_transform().inverse();
-
-                let group = Group::create_with_children(self.children(), self.cumulative_transform(), self.id());
+                let group = Group::create_with_children(self.children(), self.cumulative_transform());
                 self.shape = Shape::Group(group);
 
+            }
+            Shape::CSG(csg) => {
+                let left = csg.left().with_transform(_transformation);
+                let right = csg.right().with_transform(_transformation);
+                self.shape = Shape::CSG(CSG::create(csg.operation(), left, right));
             }
             _ => {
                 self.transformation = _transformation;
                 self.inverse_transformation = _transformation.inverse();
-                self.cumulative_transform = _transformation;
-                self.cumulative_inverse_transform = self.cumulative_transform().inverse();
-                self.parent_space_bounds = self.bounds.transform(_transformation);
             }
         }
     }
 
     pub fn set_material(&mut self, _material: Material) {
         self.material = _material;
-    }
-
-    pub(crate) fn set_parent_id(&mut self, parent_id: Uuid) {
-        self.parent = Some(parent_id);
     }
 
     pub fn with_transform(self, _transform: Matrix) -> Object {
@@ -277,7 +269,7 @@ impl Object {
                 }
             }
             Shape::Group(ref g) => {
-                let group = Group::create_with_children(g.shapes(), _transform, self.id());
+                let group = Group::create_with_children(g.shapes(), _transform);
 
                 Object {
                     shape: Shape::Group(group),
@@ -331,7 +323,7 @@ impl Object {
     pub fn with_children(self, children: Vec<Object>) -> Object {
         match self.shape() {
             Shape::Group(_) => {
-                let group = Group::create_with_children(children, self.cumulative_transform(), self.id());
+                let group = Group::create_with_children(children, self.cumulative_transform());
                 let mut group_bounds = BoundingBox::create();
                 for child in group.shapes() {
                     let child_box = child.parent_space_bounds();
@@ -355,13 +347,6 @@ impl Object {
     fn with_id(self, id: Uuid) -> Object {
         Object {
             id,
-            ..self
-        }
-    }
-
-    fn with_parent(self, parent_id: Option<Uuid>) -> Object {
-        Object {
-            parent: parent_id,
             ..self
         }
     }
@@ -433,7 +418,6 @@ impl Object {
 
     fn make_subgroup(&self, children: Vec<Object>) -> Object {
         Shape::Group(Group::create()).create()
-            .with_parent(Some(self.id()))
             .with_children(children)
     }
 

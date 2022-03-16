@@ -16,9 +16,9 @@ impl Group {
         Group { children: vec![] }
     }
 
-    pub fn create_with_children(children: Vec<Object>, transform: Matrix, parent_id: Uuid) -> Group {
+    pub fn create_with_children(children: Vec<Object>, transform: Matrix) -> Group {
         Group {
-            children: Group::transform_children(children, transform, parent_id)
+            children: Group::transform_children(children, transform)
         }
     }
 
@@ -26,11 +26,10 @@ impl Group {
         self.children.clone()
     }
 
-    fn transform_children(children: Vec<Object>, transform: Matrix, parent_id: Uuid) -> Vec<Object> {
+    fn transform_children(children: Vec<Object>, transform: Matrix) -> Vec<Object> {
         let mut transformed_children = vec![];
         for mut child in children {
             child.set_transform(transform * child.transformation());
-            child.set_parent_id(parent_id);
             transformed_children.push(child);
         }
 
@@ -75,13 +74,6 @@ mod tests {
     }
 
     #[test]
-    fn test_shape_has_optional_parent() {
-        let shape = Shape::Object.create();
-
-        assert!(shape.parent().is_none());
-    }
-
-    #[test]
     fn test_add_a_child_to_a_group() {
         let object = Shape::Object.create();
 
@@ -90,7 +82,6 @@ mod tests {
 
         assert_eq!(group.children().len(), 1);
         assert!(group.children()[0].equals(&object));
-        assert!(group.children()[0].parent().is_some() && group.children()[0].parent().unwrap() == group.id());
     }
 
     #[test]
