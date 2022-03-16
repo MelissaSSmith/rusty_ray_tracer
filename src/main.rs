@@ -35,12 +35,12 @@ fn main() {
             let world = create_default_world_with_group(group);
             println!("Created World. Time {}", start.elapsed().as_secs());
 
-            let camera = Camera::create(300, 300, PI/3.0) //high def: 1080 1080
+            let camera = Camera::create(300, 300, PI/2.0) //high def: 1080 1080
                 .with_transform(Matrix::view_transform(
-                    Point::create(0.0, 1.5, -60.0),
+                    Point::create(0.0, 2.5, -20.0),
                     Point::create(0.0, 1.0, 0.0),
-                    Vector::create(0.0, 1.0, 0.0)
-                ));
+                    Vector::create(2.0, 3.0, 0.0)
+                ) * Matrix::rotate_x(-PI/2.0) * Matrix::rotate_y(PI/8.0));
             let canvas = camera.render(world);
             println!("Rendered World. Time {}", start.elapsed().as_secs());
 

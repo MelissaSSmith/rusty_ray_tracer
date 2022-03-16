@@ -27,16 +27,16 @@ fn dice(material1: Material, material2: Material) -> Object {
                            dice_side6(material2.clone()).with_transform(Matrix::scale(1.0, -1.0, 1.0)));
     let body = CSG::create(CSGOperation::Difference,
                            Shape::CSG(body).create(),
-                           dice_side1(material2.clone()).with_transform(Matrix::rotate_x(PI/2.0)));
+                           dice_side2(material2.clone()).with_transform(Matrix::rotate_x(PI/2.0)));
     let body = CSG::create(CSGOperation::Difference,
                            Shape::CSG(body).create(),
-                           dice_side1(material2.clone()).with_transform(Matrix::rotate_x(-PI/2.0)));
+                           dice_side5(material2.clone()).with_transform(Matrix::rotate_x(-PI/2.0)));
     let body = CSG::create(CSGOperation::Difference,
                            Shape::CSG(body).create(),
-                           dice_side1(material2.clone()).with_transform(Matrix::rotate_z(PI/2.0)));
+                           dice_side3(material2.clone()).with_transform(Matrix::rotate_z(PI/2.0)));
     let body = CSG::create(CSGOperation::Difference,
                            Shape::CSG(body).create(),
-                           dice_side1(material2.clone()).with_transform(Matrix::rotate_z(-PI/2.0)));
+                           dice_side4(material2.clone()).with_transform(Matrix::rotate_z(-PI/2.0)));  //todo: group transforms aren't working
 
     Shape::CSG(body).create()
 }
@@ -155,6 +155,7 @@ fn dice_test() {
     let lens = Shape::CSG(
         CSG::create(CSGOperation::Union, a, b)
     ).create()
+        .with_transform(Matrix::scale(2.0, 2.0, 2.0))
         .with_has_shadow(false);
 
     let material1 = Material::create()
@@ -166,7 +167,7 @@ fn dice_test() {
     let dice = dice(material1, material2);
 
     let light_source = PointLight::create(WHITE, Point::create(-9.0, 8.0, -7.0));
-    let objects = vec![floor, lens, dice];
+    let objects = vec![floor, dice];
     let world = World::create_world(light_source, objects);
 
     let canvas = camera.render(world);

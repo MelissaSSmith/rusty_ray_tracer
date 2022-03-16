@@ -234,13 +234,18 @@ impl Object {
     pub fn set_transform(&mut self, _transformation: Matrix) { //todo: include csg
         match self.shape() {
             Shape::Group(_) => {
-                let group = Group::create_with_children(self.children(), _transformation, self.id());
+                self.cumulative_transform = _transformation;
+                self.cumulative_inverse_transform = self.cumulative_transform().inverse();
+
+                let group = Group::create_with_children(self.children(), self.cumulative_transform(), self.id());
                 self.shape = Shape::Group(group);
 
             }
             _ => {
                 self.transformation = _transformation;
                 self.inverse_transformation = _transformation.inverse();
+                self.cumulative_transform = _transformation;
+                self.cumulative_inverse_transform = self.cumulative_transform().inverse();
                 self.parent_space_bounds = self.bounds.transform(_transformation);
             }
         }
@@ -254,9 +259,9 @@ impl Object {
         self.parent = Some(parent_id);
     }
 
-    pub fn with_transform(self, _transform: Matrix) -> Object { //todo: handle group children. Otherwise order matters
+    pub fn with_transform(self, _transform: Matrix) -> Object {
         match self.shape {
-            Shape::CSG(c) => {
+            Shape::CSG(ref c) => {
                 let new_csg = CSG::create(c.operation(),
                                           c.left().with_transform(_transform),
                                           c.right().with_transform(_transform));
@@ -265,6 +270,8 @@ impl Object {
                     shape: Shape::CSG(new_csg),
                     transformation: _transform,
                     inverse_transformation: _transform.inverse(),
+                    cumulative_transform: _transform * self.cumulative_transform(),
+                    cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
                     ..self
                 }
@@ -274,8 +281,8 @@ impl Object {
 
                 Object {
                     shape: Shape::Group(group),
-                    cumulative_transform: _transform,
-                    inverse_transformation: _transform.inverse(),
+                    cumulative_transform: _transform * self.cumulative_transform(),
+                    cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
                     ..self
                 }
@@ -284,6 +291,8 @@ impl Object {
                 Object {
                     transformation: _transform,
                     inverse_transformation: _transform.inverse(),
+                    cumulative_transform: _transform * self.cumulative_transform(),
+                    cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
                     ..self
                 }
@@ -469,27 +478,13 @@ impl Object {
     }
 
     fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
-        let object_point = match _object.parent() {
-            Some(id) => {
-                let parent = world.get_object_by_id(id).expect("Object not found!");
-                Object::world_to_object(&parent, &point, world)
-            }
-            None => *point,
-        };
-
-        _object.inverse_transformation() * object_point
+        _object.inverse_cumulative_transform() * *point
     }
 
     fn normal_to_world(_object: &Object, normal: &Vector, world: &World) -> Vector {
-        let world_normal = (_object.inverse_transformation().transpose() * *normal).normalize();
+        let world_normal = (_object.inverse_cumulative_transform().transpose() * *normal).normalize();
 
-        match _object.parent() {
-            None => { world_normal }
-            Some(id) => {
-                let parent = world.get_object_by_id(id).expect("Object not found!");
-                Object::normal_to_world(&parent, &world_normal, world)
-            }
-        }
+        Vector::create(world_normal.x(), world_normal.y(), world_normal.z()).normalize()
     }
 }
 
@@ -556,16 +551,19 @@ mod tests {
         let group_2 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::scale(2.0, 2.0, 2.0))
             .with_children(vec![sphere.clone()]);
-        let group_1 = Shape::Group(Group::create()).create()
+        let mut group_1 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
+        group_1.set_transform(Matrix::identity());
 
-        let world = World::create().with_objects(vec![group_1]);
+        let world = World::create();
 
-        let object = world.get_object_by_id(sphere.id()).unwrap();
+        let sphere = group_1.children()[0].clone().children()[0].clone();
+        println!("Shape: {}", sphere.shape_type());
 
-        let point = Object::world_to_object(&object, &Point::create(-2.0, 0.0, -10.0), &world);
+        let point = Object::world_to_object(&sphere, &Point::create(-2.0, 0.0, -10.0), &world);
 
+        println!("Point: {}", point);
         assert!(point.equals(Point::create(0.0, 0.0, -1.0)));
     }
 
