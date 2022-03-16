@@ -41,7 +41,7 @@ impl Intersect for Group {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
 
-        if BoundingBox::intersects(&_object.bounds(), _ray) {
+        if BoundingBox::intersects(&_object.parent_space_bounds(), _ray) {
             for shape in  _object.children() {
                 intersections.append(&mut Object::intersect(&shape, _ray));
             }

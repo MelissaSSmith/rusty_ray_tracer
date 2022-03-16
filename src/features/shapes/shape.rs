@@ -217,7 +217,7 @@ impl Object {
         self.bounds
     }
 
-    fn parent_space_bounds(&self) -> BoundingBox {
+    pub(crate) fn parent_space_bounds(&self) -> BoundingBox {
         self.parent_space_bounds
     }
 
@@ -392,7 +392,7 @@ impl Object {
                 let mut right_children = Vec::with_capacity(self.children().len());
                 let mut children = Vec::with_capacity(self.children().len());
 
-                let (left, right) = self.bounds().split();
+                let (left, right) = self.parent_space_bounds().split();
                 for child in self.children() {
                     if left.contains_box(child.parent_space_bounds()) {
                         left_children.push(child.clone());

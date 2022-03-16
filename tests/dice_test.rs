@@ -117,7 +117,7 @@ fn dice_body(material: Material) -> Object {
 #[test]
 //#[ignore]
 fn dice_test() {
-    let camera = Camera::create(300, 300, PI/3.0)
+    let camera = Camera::create(400, 400, PI/3.0)
         .with_transform(Matrix::view_transform(
             Point::create(0.0, 0.0, -3.5),
             Point::create(0.0, 0.0, 0.0),

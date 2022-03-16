@@ -87,7 +87,7 @@ impl CSG {
     pub fn intersect(&self, ray: &Ray, object: &Object) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
 
-        if BoundingBox::intersects(&object.bounds(), ray) {
+        if BoundingBox::intersects(&object.parent_space_bounds(), ray) {
             intersections.append(&mut Object::intersect(&self.left, ray));
             intersections.append(&mut Object::intersect(&self.right, ray));
         }
