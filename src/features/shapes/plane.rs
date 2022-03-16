@@ -42,7 +42,7 @@ mod tests {
         let plane = Shape::Plane.create();
         let intersection = Intersection::create(0.0, &plane, 0.0, 0.0);
 
-        let n1 = Object::normal(&plane, &Point::zero(), &intersection, None);
+        let n1 = Object::normal(&plane, &Point::zero(), &intersection);
         let n2 = Plane::normal(&plane, &Point::create(10.0, 0.0, -10.0));
         let n3 = Plane::normal(&plane, &Point::create(-5.0, 0.0, 150.0));
 

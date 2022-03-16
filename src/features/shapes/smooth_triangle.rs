@@ -4,7 +4,7 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Intersect, NormalWithIntersection};
+use crate::features::shapes::{Intersect, NormalAt};
 use crate::features::shapes::shape::{Object, Shape};
 
 #[derive(Clone, Copy)]
@@ -105,7 +105,7 @@ impl Intersect for SmoothTriangle {
     }
 }
 
-impl NormalWithIntersection for SmoothTriangle {
+impl NormalAt for SmoothTriangle {
     fn normal(_object: &Object, _point: &Point, _hit: &Intersection) -> Vector {
         match _object.shape() {
             Shape::SmoothTriangle(t) => {
@@ -178,7 +178,7 @@ mod tests {
         let intersection = Intersection::create(1.0, &shape, 0.45, 0.25);
         let ray = Ray::create(Point::create(-0.2, 0.3, -2.0), Vector::create(0.0, 0.0, 1.0));
 
-        let normal = Object::normal(&shape, &Point::zero(), &intersection, None);
+        let normal = Object::normal(&shape, &Point::zero(), &intersection);
 
         assert!(normal.equals(Vector::create(-0.5547, 0.83205, 0.0)));
     }

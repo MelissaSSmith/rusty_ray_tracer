@@ -99,7 +99,6 @@ impl CSG {
 
 #[cfg(test)]
 mod tests {
-    use std::detect::__is_feature_detected::sha;
     use crate::features::intersection::Intersection;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;

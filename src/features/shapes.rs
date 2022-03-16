@@ -26,9 +26,5 @@ pub trait Normal {
 }
 
 pub trait NormalAt {
-    fn normal(_object: &Object, _point: &Point, _hit: &Intersection, _world: Option<&World>) -> Vector;
-}
-
-pub trait NormalWithIntersection {
     fn normal(_object: &Object, _point: &Point, _hit: &Intersection) -> Vector;
 }

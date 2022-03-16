@@ -8,7 +8,7 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
-use crate::features::shapes::{Intersect, Normal, NormalAt, NormalWithIntersection};
+use crate::features::shapes::{Intersect, Normal, NormalAt};
 use crate::features::shapes::cone::Cone;
 use crate::features::shapes::csg::CSG;
 use crate::features::shapes::cube::Cube;
@@ -477,11 +477,11 @@ impl Object {
         }
     }
 
-    fn world_to_object(_object: &Object, point: &Point, world: &World) -> Point {
+    fn world_to_object(_object: &Object, point: &Point) -> Point {
         _object.inverse_cumulative_transform() * *point
     }
 
-    fn normal_to_world(_object: &Object, normal: &Vector, world: &World) -> Vector {
+    fn normal_to_world(_object: &Object, normal: &Vector) -> Vector {
         let world_normal = (_object.inverse_cumulative_transform().transpose() * *normal).normalize();
 
         Vector::create(world_normal.x(), world_normal.y(), world_normal.z()).normalize()
@@ -507,11 +507,9 @@ impl Intersect for Object {
 }
 
 impl NormalAt for Object {
-    fn normal(_object: &Object, _point: &Point, _hit: &Intersection, _world: Option<&World>) -> Vector {
-        let object_point = match _world {
-            None => { _object.inverse_transformation() * *_point }
-            Some(w) => { Object::world_to_object(_object, _point, w) }
-        };
+    fn normal(_object: &Object, _point: &Point, _hit: &Intersection) -> Vector {
+        let object_point = Object::world_to_object(_object, _point);
+
         let object_normal = match _object.shape {
             Shape::Sphere => { Sphere::normal(_object, &object_point) }
             Shape::Plane => { Plane::normal(_object, &object_point) }
@@ -522,12 +520,8 @@ impl NormalAt for Object {
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
             _ => { panic!("{} has no normal", _object.shape_type()); }
         };
-        match _world {
-            None => {
-                (_object.inverse_transformation().transpose() * object_normal).normalize()
-            }
-            Some(w) => { Object::normal_to_world(_object, &object_normal, w) }
-        }
+
+        Object::normal_to_world(_object, &object_normal)
     }
 }
 
@@ -561,7 +555,7 @@ mod tests {
         let sphere = group_1.children()[0].clone().children()[0].clone();
         println!("Shape: {}", sphere.shape_type());
 
-        let point = Object::world_to_object(&sphere, &Point::create(-2.0, 0.0, -10.0), &world);
+        let point = Object::world_to_object(&sphere, &Point::create(-2.0, 0.0, -10.0));
 
         println!("Point: {}", point);
         assert!(point.equals(Point::create(0.0, 0.0, -1.0)));
@@ -584,7 +578,7 @@ mod tests {
 
         let sqrt_3 = f64::sqrt(3.0)/3.0;
 
-        let normal = Object::normal_to_world(&object, &Vector::create(sqrt_3, sqrt_3, sqrt_3), &world);
+        let normal = Object::normal_to_world(&object, &Vector::create(sqrt_3, sqrt_3, sqrt_3));
 
         assert!(normal.equals(Vector::create(0.2857, 0.4286, -0.8571)));
     }
@@ -605,7 +599,7 @@ mod tests {
         let object = world.get_object_by_id(sphere.id()).unwrap();
         let intersection = Intersection::create(0.0, &object, 0.0, 0.0);
 
-        let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), &intersection, Some(&world));
+        let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), &intersection);
 
         assert!(point.equals(Vector::create(0.2857, 0.4286, -0.8571)));
     }
