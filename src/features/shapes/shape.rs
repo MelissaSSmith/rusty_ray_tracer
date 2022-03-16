@@ -400,13 +400,6 @@ impl Object {
         }
     }
 
-    pub fn get_object_by_id(&self, id:Uuid) -> Option<Object> {
-        match self.shape() {
-            Shape::Group(g) => { g.get_object_by_id(id) }
-            _ => { None }
-        }
-    }
-
     fn partition_children(&self) -> Vec<Object> {
         match self.shape() {
             Shape::Group(_) => {
@@ -550,8 +543,6 @@ mod tests {
             .with_children(vec![group_2]);
         group_1.set_transform(Matrix::identity());
 
-        let world = World::create();
-
         let sphere = group_1.children()[0].clone().children()[0].clone();
         println!("Shape: {}", sphere.shape_type());
 
@@ -572,9 +563,7 @@ mod tests {
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
 
-        let world = World::create().with_objects(vec![group_1]);
-
-        let object = world.get_object_by_id(sphere.id()).unwrap();
+        let object = group_1.children()[0].clone().children()[0].clone();
 
         let sqrt_3 = f64::sqrt(3.0)/3.0;
 
@@ -594,9 +583,7 @@ mod tests {
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
 
-        let world = World::create().with_objects(vec![group_1]);
-
-        let object = world.get_object_by_id(sphere.id()).unwrap();
+        let object = group_1.children()[0].clone().children()[0].clone();
         let intersection = Intersection::create(0.0, &object, 0.0, 0.0);
 
         let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), &intersection);

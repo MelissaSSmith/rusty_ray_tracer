@@ -26,20 +26,6 @@ impl Group {
         self.children.clone()
     }
 
-    pub fn get_object_by_id(&self, id: Uuid) -> Option<Object> {
-        for object in &self.children {
-            if object.id() == id {
-                return Some(object.clone());
-            }
-
-            if let Some(container) = object.get_object_by_id(id) {
-                return Some(container);
-            }
-        }
-
-        None
-    }
-
     fn transform_children(children: Vec<Object>, transform: Matrix, parent_id: Uuid) -> Vec<Object> {
         let mut transformed_children = vec![];
         for mut child in children {

@@ -85,20 +85,6 @@ impl World {
         self.color_at_impl(ray, self.recursion_limit)
     }
 
-    pub fn get_object_by_id(&self, id: Uuid) -> Option<Object> {
-        for object in &self.objects {
-            if object.id() == id {
-                return Some(object.clone());
-            }
-
-            if let Some(container) = object.get_object_by_id(id) {
-                return Some(container);
-            }
-        }
-
-        None
-    }
-
     fn intersect(&self, _ray: Ray) -> Vec<Intersection>{
         let mut intersections = vec![];
         for object in self.objects.iter() {
