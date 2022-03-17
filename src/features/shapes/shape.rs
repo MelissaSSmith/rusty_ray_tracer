@@ -145,7 +145,6 @@ impl Shape {
 
 #[derive(Clone)]
 pub struct Object {
-    id: Uuid,
     transformation: Matrix,
     inverse_transformation: Matrix,
     cumulative_transform: Matrix,
@@ -161,7 +160,6 @@ impl Object {
     fn create(shape_type: Shape, has_shadow: bool, material: Material, bounds: BoundingBox) -> Object {
         let transform = Matrix::identity();
         Object {
-            id: Uuid::new_v4(),
             transformation: transform,
             inverse_transformation: transform.inverse(),
             cumulative_transform: transform,
@@ -179,10 +177,6 @@ impl Object {
             self.material().equals(other.material()) &&
             self.transformation().equals(other.transformation()) &&
             self.cumulative_transform().equals(other.cumulative_transform())
-    }
-
-    pub fn id(&self)  -> Uuid {
-        self.id
     }
 
     pub fn transformation(&self) -> Matrix {
@@ -341,13 +335,6 @@ impl Object {
             _ => {
                 self.clone()
             }
-        }
-    }
-
-    fn with_id(self, id: Uuid) -> Object {
-        Object {
-            id,
-            ..self
         }
     }
 
