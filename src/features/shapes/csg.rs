@@ -50,6 +50,20 @@ impl CSG {
         self.right.deref().clone()
     }
 
+    pub(crate) fn with_left(self, left: Object) -> CSG {
+        CSG {
+            left: Box::new(left),
+            ..self
+        }
+    }
+
+    pub(crate) fn with_right(self, right: Object) -> CSG {
+        CSG {
+            right: Box::new(right),
+            ..self
+        }
+    }
+
     fn intersection_allowed(&self, operation: CSGOperation, left_hit: bool, inside_left: bool, inside_right: bool) -> bool {
         match operation {
             CSGOperation::Union => {

@@ -1,4 +1,5 @@
 use std::f64::consts::{FRAC_PI_2, PI};
+use rand::{Rng, thread_rng};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
@@ -115,9 +116,9 @@ fn dice_body(material: Material) -> Object {
 }
 
 #[test]
-//#[ignore]
+#[ignore]
 fn dice_test() {
-    let camera = Camera::create(400, 400, PI/3.0)
+    let camera = Camera::create(1080, 1080, PI/3.0)
         .with_transform(Matrix::view_transform(
             Point::create(0.0, 0.0, -3.5),
             Point::create(0.0, 0.0, 0.0),
@@ -155,19 +156,38 @@ fn dice_test() {
     let lens = Shape::CSG(
         CSG::create(CSGOperation::Union, a, b)
     ).create()
-        .with_transform(Matrix::scale(2.0, 2.0, 2.0))
         .with_has_shadow(false);
 
-    let material1 = Material::create()
-        .with_color(Color::create(0.2, 0.8, 1.0))
-        .with_diffuse(1.0);
-    let material2 = Material::create()
-        .with_color(Color::create(0.8, 0.8, 1.0))
-        .with_diffuse(1.0);
-    let dice = dice(material1, material2);
+    let mut dices = vec![];
+    for i in -2..=2 {
+        for j in -4..=4 {
+            let mut rnd = thread_rng();
+            let hue = rnd.gen_range(0.0, 1.0);
+            let material1 = Material::create()
+                .with_color(Color::create(hue, 0.8, 1.0))
+                .with_diffuse(1.0);
+            let material2 = Material::create()
+                .with_color(Color::create(hue, 0.8, 1.0))
+                .with_diffuse(1.0);
+            let size = rnd.gen_range(0.05, 0.1);
+            let pos_x = i as f64 * 0.4 + rnd.gen_range(-0.1, 0.1);
+            let pos_y = j as f64 * 0.4 + rnd.gen_range(-0.1, 0.1);
 
-    let light_source = PointLight::create(WHITE, Point::create(-9.0, 8.0, -7.0));
-    let objects = vec![floor, dice];
+            let radians = rnd.gen_range(0.0, 2.0 * PI);
+            //let rotax: [f64; 3] = rnd.gen();
+            //let rotax: Vector = rotax.into();
+
+            dices.push(dice(material1, material2).with_transform(
+                Matrix::translate(pos_x, pos_y, 1.8)
+                    * Matrix::rotate_x(radians)
+                    * Matrix::scale(size, size, size),
+            ));
+        }
+    }
+    let dice_group = Shape::Group(Group::create()).create().with_children(dices);
+
+    let light_source = PointLight::create(WHITE, Point::create(0.0, 8.0, -7.0));
+    let objects = vec![floor, dice_group, lens];
     let world = World::create_world(light_source, objects);
 
     let canvas = camera.render(world);

@@ -1,4 +1,3 @@
-use uuid::Uuid;
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::computation::Computation;

@@ -1,4 +1,3 @@
-use uuid::Uuid;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::primitives::matrix::Matrix;
@@ -54,7 +53,6 @@ impl Intersect for Group {
 
 #[cfg(test)]
 mod tests {
-    use uuid::Uuid;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;

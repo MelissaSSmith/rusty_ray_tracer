@@ -1,5 +1,4 @@
 use std::ops::Add;
-use uuid::Uuid;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
@@ -19,7 +18,6 @@ use crate::features::shapes::plane::Plane;
 use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::triangle::Triangle;
 use crate::features::transformations::Transform;
-use crate::features::world::World;
 
 #[derive(Clone)]
 pub enum Shape {
@@ -225,7 +223,7 @@ impl Object {
         self.parent_space_bounds = self.bounds.transform(_transformation);
         match self.shape() {
             Shape::Group(_) => {
-                let group = Group::create_with_children(self.children(), self.cumulative_transform());
+                let group = Group::create_with_children(self.children(), _transformation);
                 self.shape = Shape::Group(group);
 
             }
@@ -248,28 +246,38 @@ impl Object {
     pub fn with_transform(self, _transform: Matrix) -> Object {
         match self.shape {
             Shape::CSG(ref c) => {
-                let new_csg = CSG::create(c.operation(),
-                                          c.left().with_transform(_transform),
-                                          c.right().with_transform(_transform));
+                let left = c.left().with_transform(_transform * c.left().transformation());
+                let right = c.right().with_transform(_transform * c.right().transformation());
+                let new_csg = c.clone()
+                    .with_left(left)
+                    .with_right(right);
+                let mut new_bounds = BoundingBox::create();
+                new_bounds = new_bounds + new_csg.left().parent_space_bounds();
+                new_bounds = new_bounds + new_csg.right().parent_space_bounds();
 
                 Object {
                     shape: Shape::CSG(new_csg),
-                    transformation: _transform,
-                    inverse_transformation: _transform.inverse(),
                     cumulative_transform: _transform * self.cumulative_transform(),
                     cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
+                    bounds: new_bounds,
                     ..self
                 }
             }
             Shape::Group(ref g) => {
                 let group = Group::create_with_children(g.shapes(), _transform);
+                let mut group_bounds = BoundingBox::create();
+                for child in group.shapes() {
+                    let child_box = child.parent_space_bounds();
+                    group_bounds = group_bounds + child_box;
+                }
 
                 Object {
                     shape: Shape::Group(group),
                     cumulative_transform: _transform * self.cumulative_transform(),
                     cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
+                    bounds: group_bounds,
                     ..self
                 }
             }
@@ -515,11 +523,9 @@ mod tests {
         group_1.set_transform(Matrix::identity());
 
         let sphere = group_1.children()[0].clone().children()[0].clone();
-        println!("Shape: {}", sphere.shape_type());
 
         let point = Object::world_to_object(&sphere, &Point::create(-2.0, 0.0, -10.0));
 
-        println!("Point: {}", point);
         assert!(point.equals(Point::create(0.0, 0.0, -1.0)));
     }
 
@@ -540,6 +546,7 @@ mod tests {
 
         let normal = Object::normal_to_world(&object, &Vector::create(sqrt_3, sqrt_3, sqrt_3));
 
+        println!("Normal: {}", normal);
         assert!(normal.equals(Vector::create(0.2857, 0.4286, -0.8571)));
     }
 
