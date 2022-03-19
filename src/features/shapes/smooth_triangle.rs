@@ -176,7 +176,6 @@ mod tests {
         let triangle = SmoothTriangle::create(p1, p2, p3, n1, n2, n3);
         let shape = Shape::SmoothTriangle(triangle).create();
         let intersection = Intersection::create(1.0, &shape, 0.45, 0.25);
-        let ray = Ray::create(Point::create(-0.2, 0.3, -2.0), Vector::create(0.0, 0.0, 1.0));
 
         let normal = Object::normal(&shape, &Point::zero(), &intersection);
 

@@ -115,7 +115,7 @@ impl PixelSize {
 
 #[cfg(test)]
 mod tests {
-    use std::f64::consts::PI;
+    use core::f64::consts::PI;
     use crate::features::camera::Camera;
     use crate::features::color::Color;
     use crate::features::primitives::matrix::Matrix;

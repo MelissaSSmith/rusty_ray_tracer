@@ -36,7 +36,7 @@ impl Normal for Sphere {
 
 #[cfg(test)]
 mod tests {
-    use std::f64::consts::{FRAC_1_SQRT_2, PI};
+    use core::f64::consts::{FRAC_1_SQRT_2, PI};
     use crate::features::intersection::Intersection;
     use crate::features::material::Material;
     use crate::features::primitives::matrix::Matrix;

@@ -1,5 +1,5 @@
 use std::env;
-use std::f64::consts::PI;
+use core::f64::consts::PI;
 use std::path::PathBuf;
 use std::time::Instant;
 use crate::draw::obj_format::OBJParser;

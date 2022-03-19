@@ -132,7 +132,7 @@ impl Matrix{
     }
 }
 
-impl std::ops::Mul for Matrix {
+impl core::ops::Mul for Matrix {
     type Output = Matrix;
 
     fn mul(self, rhs: Matrix) -> Self::Output {
@@ -155,7 +155,7 @@ impl std::ops::Mul for Matrix {
 
 /* ---------------------------------------------------------------------------------------------- */
 
-impl<T> std::ops::Mul<T> for Matrix where T: TupleTrait,
+impl<T> core::ops::Mul<T> for Matrix where T: TupleTrait,
 {
     type Output = T;
 

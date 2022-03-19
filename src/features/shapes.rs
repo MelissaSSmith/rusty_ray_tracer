@@ -3,7 +3,6 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
-use crate::features::world::World;
 
 pub mod sphere;
 pub mod plane;

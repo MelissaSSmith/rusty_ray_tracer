@@ -1,4 +1,4 @@
-use std::ops::Div;
+use core::ops::Div;
 use dashmap::DashMap;
 use crate::features::color::Color;
 use crate::features::color::consts::BLACK;

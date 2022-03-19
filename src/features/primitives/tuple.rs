@@ -1,11 +1,10 @@
-use std::fmt;
-use std::fmt::{Formatter, write};
-use std::ops::{Add, Mul, Sub};
-use serde::{Deserialize, Serialize};
+use core::fmt;
+use core::fmt::Formatter;
+use core::ops::{Add, Mul, Sub};
 use crate::features::primitives::operations::Operations;
 use crate::features::primitives::tuple_trait::Tuple as TupleTrait;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Tuple {
     x: f64,
     y: f64,
@@ -105,7 +104,7 @@ impl Mul<f64> for Tuple {
     }
 }
 
-impl std::ops::Mul<Tuple> for f64 {
+impl core::ops::Mul<Tuple> for f64 {
     type Output = Tuple;
 
     fn mul(self, rhs: Tuple) -> Self::Output {
@@ -114,7 +113,7 @@ impl std::ops::Mul<Tuple> for f64 {
 }
 
 // "Cross" product
-impl std::ops::Mul for Tuple {
+impl core::ops::Mul for Tuple {
     type Output = Tuple;
 
     fn mul(self, rhs: Tuple) -> Self::Output {
@@ -128,7 +127,7 @@ impl std::ops::Mul for Tuple {
 }
 
 // "Dot" product (or "scalar" product)
-impl std::ops::BitXor for Tuple {
+impl core::ops::BitXor for Tuple {
     type Output = f64;
 
     fn bitxor(self, rhs: Tuple) -> Self::Output {
@@ -136,7 +135,7 @@ impl std::ops::BitXor for Tuple {
     }
 }
 
-impl std::ops::Div<f64> for Tuple {
+impl core::ops::Div<f64> for Tuple {
     type Output = Tuple;
 
     fn div(self, rhs: f64) -> Self::Output {
@@ -149,7 +148,7 @@ impl std::ops::Div<f64> for Tuple {
     }
 }
 
-impl std::ops::Neg for Tuple {
+impl core::ops::Neg for Tuple {
     type Output = Tuple;
 
     fn neg(self) -> Self::Output {

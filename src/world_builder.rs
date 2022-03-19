@@ -1,4 +1,4 @@
-use std::f64::consts::{FRAC_PI_2, PI};
+use core::f64::consts::{FRAC_PI_2, PI};
 use crate::features::color::Color;
 use crate::features::color::consts::WHITE;
 use crate::features::light::PointLight;

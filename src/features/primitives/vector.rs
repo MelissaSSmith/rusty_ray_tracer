@@ -1,11 +1,10 @@
-use std::fmt;
-use std::fmt::Formatter;
-use std::ops::{Add, Mul, Sub};
-use serde::{Deserialize, Serialize};
+use core::fmt;
+use core::fmt::Formatter;
+use core::ops::{Add, Mul, Sub};
 use crate::features::primitives::operations::Operations;
 use crate::features::primitives::tuple_trait::Tuple;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vector {
     x: f64,
     y: f64,
@@ -101,7 +100,7 @@ impl Mul<f64> for Vector {
     }
 }
 
-impl std::ops::Mul<Vector> for f64 {
+impl core::ops::Mul<Vector> for f64 {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Self::Output {
@@ -110,7 +109,7 @@ impl std::ops::Mul<Vector> for f64 {
 }
 
 // "Cross" product
-impl std::ops::Mul for Vector {
+impl core::ops::Mul for Vector {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Self::Output {
@@ -124,7 +123,7 @@ impl std::ops::Mul for Vector {
 }
 
 // "Dot" product (or "scalar" product)
-impl std::ops::BitXor for Vector {
+impl core::ops::BitXor for Vector {
     type Output = f64;
 
     fn bitxor(self, rhs: Vector) -> Self::Output {
@@ -132,7 +131,7 @@ impl std::ops::BitXor for Vector {
     }
 }
 
-impl std::ops::Div<f64> for Vector {
+impl core::ops::Div<f64> for Vector {
     type Output = Vector;
 
     fn div(self, rhs: f64) -> Self::Output {
@@ -145,7 +144,7 @@ impl std::ops::Div<f64> for Vector {
     }
 }
 
-impl std::ops::Neg for Vector {
+impl core::ops::Neg for Vector {
     type Output = Vector;
 
     fn neg(self) -> Self::Output {
@@ -166,7 +165,7 @@ impl fmt::Display for Vector {
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Div;
+    use core::ops::Div;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
 

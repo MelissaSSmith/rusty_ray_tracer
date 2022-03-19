@@ -1,9 +1,9 @@
-use std::ops::Deref;
+use core::ops::Deref;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
-use crate::features::shapes::shape::{Object, Shape};
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone, Copy, PartialOrd, PartialEq, Debug)]
 pub enum CSGOperation {
@@ -61,20 +61,6 @@ impl CSG {
         CSG {
             right: Box::new(right),
             ..self
-        }
-    }
-
-    fn intersection_allowed(&self, operation: CSGOperation, left_hit: bool, inside_left: bool, inside_right: bool) -> bool {
-        match operation {
-            CSGOperation::Union => {
-                left_hit && !inside_right || !left_hit && !inside_left
-            }
-            CSGOperation::Difference => {
-                left_hit && !inside_right || !left_hit && inside_left
-            }
-            CSGOperation::Intersection => {
-                left_hit && inside_right || !left_hit && inside_left
-            }
         }
     }
 
@@ -137,10 +123,6 @@ mod tests {
 
     #[test]
     fn test_evaluate_rule_for_a_csg_operation() {
-        let s1 = Shape::Sphere.create();
-        let s2 = Shape::Cube.create();
-        let csg = CSG::create(CSGOperation::Union, s1.clone(), s2.clone());
-
         let tests = vec![
             (CSGOperation::Union, true, true, true, false),
             (CSGOperation::Union, true, true, false, true),

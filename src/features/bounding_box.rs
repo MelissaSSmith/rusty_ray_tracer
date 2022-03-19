@@ -1,4 +1,4 @@
-use std::ops::Add;
+use core::ops::Add;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
@@ -162,7 +162,7 @@ impl Add<Point> for BoundingBox {
 
 #[cfg(test)]
 mod tests {
-    use std::f64::consts::PI;
+    use core::f64::consts::PI;
     use crate::features::bounding_box::BoundingBox;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;

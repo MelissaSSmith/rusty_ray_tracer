@@ -1,4 +1,4 @@
-use std::f64::consts::{FRAC_PI_2, PI};
+use core::f64::consts::{FRAC_PI_2, PI};
 use rand::{Rng, thread_rng};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;

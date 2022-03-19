@@ -1,4 +1,3 @@
-use std::ops::Add;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
@@ -499,7 +498,7 @@ impl NormalAt for Object {
 
 #[cfg(test)]
 mod tests {
-    use std::f64::consts::PI;
+    use core::f64::consts::PI;
     use crate::features::intersection::Intersection;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
@@ -508,7 +507,6 @@ mod tests {
     use crate::features::shapes::group::Group;
     use crate::features::shapes::{NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
-    use crate::features::world::World;
 
     #[test]
     fn test_convert_a_point_from_world_object_space() {
@@ -582,7 +580,7 @@ mod tests {
 
     #[test]
     fn test_subdividing_a_primitive_does_nothing() {
-        let mut shape = Shape::Sphere.create();
+        let shape = Shape::Sphere.create();
 
         let divided_object = shape.divide(1);
 

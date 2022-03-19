@@ -1,8 +1,6 @@
 use std::collections::HashMap;
-use std::f64::consts::PI;
 use std::io::{BufRead, BufReader};
 use crate::draw::file_operations::open_file;
-use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;

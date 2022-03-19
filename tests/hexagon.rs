@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use core::f64::consts::PI;
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::consts::{RED, WHITE};
