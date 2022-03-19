@@ -1,5 +1,7 @@
+#![no_std]
+
 use std::env;
-use std::f64::consts::PI;
+use core::f64::consts::PI;
 use std::path::PathBuf;
 use std::time::Instant;
 use crate::draw::obj_format::OBJParser;
@@ -18,9 +20,11 @@ mod world_builder;
 
 // Command 1: generate image from obj file using a default world `create_object <filename>`
 
+// build for gpu `rustc src/main.rs --emit=asm --target=nvptx64-nvidia-cuda`
+
 fn main() {
     let start = Instant::now();
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<&str> = env::args().collect();
 
     let command = &args[1];
     let filename = &args[2];

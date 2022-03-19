@@ -499,7 +499,7 @@ impl NormalAt for Object {
 
 #[cfg(test)]
 mod tests {
-    use std::f64::consts::PI;
+    use core::f64::consts::PI;
     use crate::features::intersection::Intersection;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::point::Point;
