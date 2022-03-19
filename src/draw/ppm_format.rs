@@ -3,27 +3,22 @@ use crate::draw::file_operations::{open_new_file, write_line_to_file};
 use crate::features::canvas::Canvas;
 
 trait PPMFormat {
-    fn create_header(&self) -> String;
-    fn create_termination() -> String;
+    fn create_header(&self) -> &str;
     fn write_to_ppm(&self, file: &File);
 }
 
 pub trait PPMFile {
-    fn convert_to_ppm_and_save(&self, file_name: String);
+    fn convert_to_ppm_and_save(&self, file_name: &str);
 }
 
 impl PPMFormat for Canvas {
-    fn create_header(&self) -> String {
-        format!("P3\n{} {}\n255", self.width, self.height)
-    }
-
-    fn create_termination() -> String {
-        String::from("\n")
+    fn create_header(&self) -> &str {
+        &*format!("P3\n{} {}\n255", self.width, self.height)
     }
 
     fn write_to_ppm(&self, file: &File) {
         for h in 0..self.height {
-            let mut line_array = Vec::<String>::new();
+            let mut line_array = Vec::<&str>::new();
             for w in 0..self.width {
                 let pixel = self.get_pixel(w, h);
                 let scaled_color = pixel.scale_color();
@@ -38,11 +33,11 @@ impl PPMFormat for Canvas {
 }
 
 impl PPMFile for Canvas {
-    fn convert_to_ppm_and_save(&self, file_name: String) {
+    fn convert_to_ppm_and_save(&self, file_name: &str) {
         let file = open_new_file(file_name);
         write_line_to_file(&file, self.create_header());
         self.write_to_ppm(&file);
-        write_line_to_file(&file, Canvas::create_termination());
+        write_line_to_file(&file, &"\n");
     }
 }
 

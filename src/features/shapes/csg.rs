@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use core::ops::Deref;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::ray::Ray;

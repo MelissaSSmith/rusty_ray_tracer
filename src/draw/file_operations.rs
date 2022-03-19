@@ -2,7 +2,7 @@ use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 
-pub fn write_to_file(file_name: String, file_data: String) {
+pub fn write_to_file(file_name: &str, file_data: &str) {
     let path = Path::new(&file_name);
     let display = path.display();
 
@@ -17,7 +17,7 @@ pub fn write_to_file(file_name: String, file_data: String) {
     };
 }
 
-pub fn open_new_file(file_name: String) -> File {
+pub fn open_new_file(file_name: &str) -> File {
     let path = Path::new(&file_name);
 
     OpenOptions::new()
@@ -27,12 +27,12 @@ pub fn open_new_file(file_name: String) -> File {
         .open(path).unwrap()
 }
 
-pub fn open_file(file_name: String) -> File {
+pub fn open_file(file_name: &str) -> File {
     let path = Path::new(file_name.as_str());
     File::open(path).expect("file not found!")
 }
 
-pub fn write_line_to_file(mut file: &File, line: String) {
+pub fn write_line_to_file(mut file: &File, line: &str) {
     if let Err(why) = writeln!(file, "{}", line) {
         panic!("couldn't write to file: {}", why);
     }

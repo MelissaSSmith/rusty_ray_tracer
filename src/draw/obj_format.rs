@@ -1,8 +1,6 @@
 use std::collections::HashMap;
-use core::f64::consts::PI;
 use std::io::{BufRead, BufReader};
 use crate::draw::file_operations::open_file;
-use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
@@ -34,13 +32,13 @@ impl OBJParser {
         }
     }
 
-    pub fn parse(file_name: &String) -> Object {
+    pub fn parse(file_name: &str) -> Object {
         let parser = OBJParser::parse_obj_file(file_name);
         OBJParser::obj_to_group(parser)
     }
 
-    fn parse_obj_file(file_name: &String) -> OBJParser {
-        let file = open_file(file_name.to_string());
+    fn parse_obj_file(file_name: &str) -> OBJParser {
+        let file = open_file(file_name);
         let reader = BufReader::new(file);
 
         let mut ignored_lines = 0;
@@ -110,7 +108,7 @@ impl OBJParser {
         parser.default_group.divide(threshold)
     }
 
-    fn create_vertex(line: String) -> Point {
+    fn create_vertex(line: &str) -> Point {
         let mut tokens: Vec<&str> = line.split(" ").collect();
         if tokens[1] == "" {
             tokens.remove(1);
@@ -123,7 +121,7 @@ impl OBJParser {
         Point::create(x, y, z)
     }
 
-    fn create_normal(line: String) -> Vector {
+    fn create_normal(line: &str) -> Vector {
         let mut tokens: Vec<&str> = line.split(" ").collect();
         if tokens[1] == "" {
             tokens.remove(1);
@@ -136,7 +134,7 @@ impl OBJParser {
         Vector::create(x, y, z)
     }
 
-    fn fan_triangulation(line: String, vertices: &Vec<Point>) -> Vec<Triangle> {
+    fn fan_triangulation(line: &str, vertices: &Vec<Point>) -> Vec<Triangle> {
         let tokens: Vec<&str> = line.split(" ").collect();
         let mut triangles = vec![];
 
@@ -158,7 +156,7 @@ impl OBJParser {
         triangles
     }
 
-    fn smooth_fan_triangulation(line: String, vertices: &Vec<Point>, normals: &Vec<Vector>) -> Vec<SmoothTriangle> {
+    fn smooth_fan_triangulation(line: &str, vertices: &Vec<Point>, normals: &Vec<Vector>) -> Vec<SmoothTriangle> {
         let tokens: Vec<&str> = line.split(" ").collect();
         let mut triangles = vec![];
         let mut vertex_normals_indices = Vec::<(usize, usize, usize)>::new();
@@ -197,7 +195,7 @@ impl OBJParser {
         triangles
     }
 
-    fn determine_face_variation(line: &String) -> FaceVariation {
+    fn determine_face_variation(line: &str) -> FaceVariation {
         if line.contains(&"/") {
             return FaceVariation::VertexNormals;
         }
@@ -205,9 +203,9 @@ impl OBJParser {
         FaceVariation::JustVertex
     }
 
-    fn parse_group_name(line: String) -> String {
+    fn parse_group_name(line: &str) -> &str {
         let tokens: Vec<&str> = line.split(" ").collect();
-        tokens[1].to_string()
+        tokens[1]
     }
 }
 

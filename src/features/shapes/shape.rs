@@ -1,4 +1,3 @@
-use std::ops::Add;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;

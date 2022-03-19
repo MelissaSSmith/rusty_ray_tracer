@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Sub};
+use core::ops::{Add, Mul, Sub};
 use crate::features::primitives::operations::Operations;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -32,8 +32,8 @@ impl Color {
         new_number.round()
     }
 
-    pub fn format_color_string(&self) -> String {
-        format!("{} {} {}", self.red, self.green, self.blue)
+    pub fn format_color_string(&self) -> &str {
+        &format!("{} {} {}", self.red, self.green, self.blue)
     }
 
     pub fn equals(&self, other_color: Color) -> bool {
@@ -79,7 +79,7 @@ impl Mul<f64> for Color {
     }
 }
 
-impl std::ops::Mul<Color> for f64 {
+impl core::ops::Mul<Color> for f64 {
     type Output = Color;
 
     fn mul(self, rhs: Color) -> Self::Output {
@@ -87,7 +87,7 @@ impl std::ops::Mul<Color> for f64 {
     }
 }
 
-impl std::ops::Mul for Color {
+impl core::ops::Mul for Color {
     type Output = Color;
 
     fn mul(self, rhs: Color) -> Self::Output {

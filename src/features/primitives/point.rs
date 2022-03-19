@@ -1,12 +1,11 @@
-use std::fmt;
-use std::fmt::Formatter;
-use std::ops::{Add, Mul, Sub};
+use core::fmt;
+use core::fmt::Formatter;
+use core::ops::{Add, Mul, Sub};
 use crate::features::primitives::vector::Vector;
-use serde::{Deserialize, Serialize};
 use crate::features::primitives::operations::Operations;
 use crate::features::primitives::tuple_trait::Tuple;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     x: f64,
     y: f64,
