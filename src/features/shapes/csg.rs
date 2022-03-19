@@ -3,7 +3,7 @@ use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
-use crate::features::shapes::shape::{Object, Shape};
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone, Copy, PartialOrd, PartialEq, Debug)]
 pub enum CSGOperation {

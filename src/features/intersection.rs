@@ -3,8 +3,7 @@ use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::ray::Ray;
 use smallvec::SmallVec;
 use crate::features::shapes::{NormalAt};
-use crate::features::shapes::shape::{Object, Shape};
-use crate::features::world::World;
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone)] //todo: encapsulate t and object
 pub struct Intersection {

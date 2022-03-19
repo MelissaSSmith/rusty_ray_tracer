@@ -6,12 +6,12 @@ use crate::features::color::consts::BLACK;
 pub struct Canvas {
     pub width: i32,
     pub height: i32,
-    pub(crate) pixels: DashMap<String, Color>
+    pub(crate) pixels: DashMap<str, Color>
 }
 
 impl Canvas {
     pub fn create(_width: i32, _height: i32) -> Canvas {
-        let default_pixels = DashMap::<String, Color>::new();
+        let default_pixels = DashMap::<str, Color>::new();
         for x in 0.._width {
             for y in 0.._height {
                 let key = Canvas::create_key(x, y);
@@ -25,7 +25,7 @@ impl Canvas {
         }
     }
 
-    fn create_key(x: i32, y: i32) -> String {
+    fn create_key(x: i32, y: i32) -> str {
         format!("{}.{}", x, y)
     }
 
@@ -44,16 +44,16 @@ impl Canvas {
         pixel.value()
     }
 
-    pub fn pixels(&self) -> DashMap<String, Color> {
+    pub fn pixels(&self) -> DashMap<&str, Color> {
         self.pixels.clone()
     }
 
-    pub fn get_x_y(&self, key: &String) -> (i32, i32) {
+    pub fn get_x_y(&self, key: &str) -> (i32, i32) {
         let x_y: Vec<&str> = key.split(".").collect();
         (x_y[0].parse().unwrap(), x_y[1].parse().unwrap())
     }
 
-    pub fn format_pixel_line(line_array: Vec<String>) -> String {
+    pub fn format_pixel_line(line_array: Vec<&str>) -> &str {
         let max_line_length = 70;
         let mut line_string: String = line_array.join(" ");
         if line_string.len() > max_line_length {

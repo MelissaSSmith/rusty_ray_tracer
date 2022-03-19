@@ -507,7 +507,6 @@ mod tests {
     use crate::features::shapes::group::Group;
     use crate::features::shapes::{NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
-    use crate::features::world::World;
 
     #[test]
     fn test_convert_a_point_from_world_object_space() {
