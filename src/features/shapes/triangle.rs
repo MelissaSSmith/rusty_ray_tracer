@@ -120,12 +120,12 @@ mod tests {
             Point::create(1.0, 0.0, 0.0)
         );
 
-        assert!(triangle.point1().equals(Point::create(0.0, 1.0, 0.0)));
-        assert!(triangle.point2().equals(Point::create(-1.0, 0.0, 0.0)));
-        assert!(triangle.point3().equals(Point::create(1.0, 0.0, 0.0)));
-        assert!(triangle.edge1().equals(Vector::create(-1.0, -1.0, 0.0)));
-        assert!(triangle.edge2().equals(Vector::create(1.0, -1.0, 0.0)));
-        assert!(triangle.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+        assert_eq!(triangle.point1(), Point::create(0.0, 1.0, 0.0));
+        assert_eq!(triangle.point2(), Point::create(-1.0, 0.0, 0.0));
+        assert_eq!(triangle.point3(), Point::create(1.0, 0.0, 0.0));
+        assert_eq!(triangle.edge1(), Vector::create(-1.0, -1.0, 0.0));
+        assert_eq!(triangle.edge2(), Vector::create(1.0, -1.0, 0.0));
+        assert_eq!(triangle.normal_vector(), Vector::create(0.0, 0.0, -1.0));
     }
 
     #[test]
@@ -139,8 +139,8 @@ mod tests {
 
         let bounds = object.bounds();
 
-        assert!(bounds.minimum().equals(Point::create(-3.0, -1.0, -4.0)));
-        assert!(bounds.maximum().equals(Point::create(6.0, 7.0, 2.0)));
+        assert_eq!(bounds.minimum(), Point::create(-3.0, -1.0, -4.0));
+        assert_eq!(bounds.maximum(), Point::create(6.0, 7.0, 2.0));
     }
 
     #[test]
@@ -156,9 +156,9 @@ mod tests {
         let n2 = Triangle::normal(&object, &Point::create(-0.5, 0.75, 0.0));
         let n3 = Triangle::normal(&object, &Point::create(0.5, 0.25, 0.0));
 
-        assert!(triangle.normal_vector().equals(n1));
-        assert!(triangle.normal_vector().equals(n2));
-        assert!(triangle.normal_vector().equals(n3));
+        assert_eq!(triangle.normal_vector(), n1);
+        assert_eq!(triangle.normal_vector(), n2);
+        assert_eq!(triangle.normal_vector(), n3);
     }
 
     #[test]

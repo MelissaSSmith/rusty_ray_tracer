@@ -228,7 +228,7 @@ mod tests {
     fn test_create_default_world() {
         let world = World::create_default();
 
-        assert!(world.clone().light().unwrap().position.equals(Point::create(-10.0, 10.0, -10.0)));
+        assert_eq!(world.clone().light().unwrap().position, Point::create(-10.0, 10.0, -10.0));
         assert!(world.clone().light().unwrap().intensity.equals(WHITE));
         assert_eq!(2, world.clone().objects().len());
     }

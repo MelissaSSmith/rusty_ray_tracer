@@ -200,7 +200,7 @@ mod tests {
         for test in tests {
             let normal = Cylinder::normal(&cylinder, &test.0);
 
-            assert!(normal.equals(test.1));
+            assert_eq!(normal, test.1);
         }
     }
 
@@ -294,7 +294,7 @@ mod tests {
         for test in tests {
             let normal = Cylinder::normal(&cylinder, &test.0);
 
-            assert!(normal.equals(test.1));
+            assert_eq!(normal, test.1);
         }
     }
 
@@ -302,8 +302,8 @@ mod tests {
     fn test_unbounded_cylinder_has_a_bounding_box() {
         let cylinder = Shape::Cylinder(Cylinder::create()).create();
 
-        assert!(cylinder.bounds().minimum().equals(Point::create(-1.0, f64::NEG_INFINITY, -1.0)));
-        assert!(cylinder.bounds().maximum().equals(Point::create(1.0, f64::INFINITY, 1.0)));
+        assert_eq!(cylinder.bounds().minimum(), Point::create(-1.0, f64::NEG_INFINITY, -1.0));
+        assert_eq!(cylinder.bounds().maximum(), Point::create(1.0, f64::INFINITY, 1.0));
     }
 
     #[test]
@@ -314,7 +314,7 @@ mod tests {
                 .with_minimum_bound(-5.0)
         ).create();
 
-        assert!(cylinder.bounds().minimum().equals(Point::create(-1.0, -5.0, -1.0)));
-        assert!(cylinder.bounds().maximum().equals(Point::create(1.0, 3.0, 1.0)));
+        assert_eq!(cylinder.bounds().minimum(), Point::create(-1.0, -5.0, -1.0));
+        assert_eq!(cylinder.bounds().maximum(), Point::create(1.0, 3.0, 1.0));
     }
 }

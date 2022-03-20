@@ -68,8 +68,8 @@ impl Pattern {
     }
 
     pub fn equals(&self, other_pattern: &Pattern) -> bool {
-        self.transformation.equals(other_pattern.clone().transformation) &&
-            self.inverse_transformation.equals(other_pattern.clone().inverse_transformation) //todo: add patterns
+        self.transformation.eq(&other_pattern.transformation) &&
+            self.inverse_transformation.eq(&other_pattern.inverse_transformation) //todo: add patterns
     }
 
     pub fn transformation(&self) -> Matrix {

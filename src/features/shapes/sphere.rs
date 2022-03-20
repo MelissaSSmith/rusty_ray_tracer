@@ -133,7 +133,7 @@ mod tests {
         let sphere = Shape::Sphere.create();
         let identity_matrix = Matrix::identity();
 
-        assert!(sphere.transformation().equals(identity_matrix));
+        assert_eq!(sphere.transformation(), identity_matrix);
     }
 
     #[test]
@@ -143,7 +143,7 @@ mod tests {
 
         sphere.set_transform(transform);
 
-        assert!(sphere.transformation().equals(Matrix::translate(2.0, 3.0, 4.0)));
+        assert_eq!(sphere.transformation(), Matrix::translate(2.0, 3.0, 4.0));
     }
 
     #[test]
@@ -181,7 +181,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(1.0, 0.0, 0.0), &intersection);
 
-        assert!(normal.equals(Vector::create(1.0, 0.0, 0.0)));
+        assert_eq!(normal, Vector::create(1.0, 0.0, 0.0));
     }
 
     #[test]
@@ -191,7 +191,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(0.0, 1.0, 0.0), &intersection);
 
-        assert!(normal.equals(Vector::create(0.0, 1.0, 0.0)));
+        assert_eq!(normal, Vector::create(0.0, 1.0, 0.0));
     }
 
     #[test]
@@ -201,7 +201,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(0.0, 0.0, 1.0), &intersection);
 
-        assert!(normal.equals(Vector::create(0.0, 0.0, 1.0)));
+        assert_eq!(normal, Vector::create(0.0, 0.0, 1.0));
     }
 
     #[test]
@@ -211,7 +211,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0), &intersection);
 
-        assert!(normal.equals(Vector::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0)));
+        assert_eq!(normal, Vector::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0));
     }
 
     #[test]
@@ -221,7 +221,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0, 3.0_f64.sqrt()/3.0), &intersection);
 
-        assert!(normal.equals(normal.normalize()));
+        assert_eq!(normal, normal.normalize());
     }
 
     #[test]
@@ -232,7 +232,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(0.0, 1.70711, -FRAC_1_SQRT_2), &intersection);
 
-        assert!(normal.equals(Vector::create(0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2)));
+        assert_eq!(normal, Vector::create(0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2));
     }
 
     #[test]
@@ -243,7 +243,7 @@ mod tests {
 
         let normal = Object::normal(&sphere, &Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0), &intersection);
 
-        assert!(normal.equals(Vector::create(0.0, 0.97014, -0.24254)));
+        assert_eq!(normal, Vector::create(0.0, 0.97014, -0.24254));
     }
 
     #[test]
@@ -278,7 +278,7 @@ mod tests {
     fn test_sphere_has_a_bounding_box() {
         let sphere = Shape::Sphere.create();
 
-        assert!(sphere.bounds().minimum().equals(Point::create(-1.0, -1.0, -1.0)));
-        assert!(sphere.bounds().maximum().equals(Point::create(1.0, 1.0, 1.0)));
+        assert_eq!(sphere.bounds().minimum(), Point::create(-1.0, -1.0, -1.0));
+        assert_eq!(sphere.bounds().maximum(), Point::create(1.0, 1.0, 1.0));
     }
 }

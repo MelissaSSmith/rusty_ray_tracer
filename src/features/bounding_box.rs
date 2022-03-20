@@ -175,8 +175,8 @@ mod tests {
     fn test_create_an_empty_bounding_box() {
         let bound_box = BoundingBox::create();
 
-        assert!(bound_box.minimum().equals(Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY)));
-        assert!(bound_box.maximum().equals(Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY)));
+        assert_eq!(bound_box.minimum(), Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY));
+        assert_eq!(bound_box.maximum(), Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY));
     }
 
     #[test]
@@ -185,8 +185,8 @@ mod tests {
             .with_minimum(Point::create(-1.0, -2.0, -3.0))
             .with_maximum(Point::create(3.0, 2.0, 1.0));
 
-        assert!(bound_box.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
-        assert!(bound_box.maximum().equals(Point::create(3.0, 2.0, 1.0)));
+        assert_eq!(bound_box.minimum(), Point::create(-1.0, -2.0, -3.0));
+        assert_eq!(bound_box.maximum(), Point::create(3.0, 2.0, 1.0));
     }
 
     #[test]
@@ -196,8 +196,8 @@ mod tests {
 
         let bound_box = BoundingBox::create() + point_1 + point_2;
 
-        assert!(bound_box.minimum().equals(Point::create(-5.0, 0.0, -3.0)));
-        assert!(bound_box.maximum().equals(Point::create(7.0, 2.0, 0.0)));
+        assert_eq!(bound_box.minimum(), Point::create(-5.0, 0.0, -3.0));
+        assert_eq!(bound_box.maximum(), Point::create(7.0, 2.0, 0.0));
     }
 
     #[test]
@@ -211,8 +211,8 @@ mod tests {
 
         let bound_box = bound_box_1 + bound_box_2;
 
-        assert!(bound_box.minimum().equals(Point::create(-5.0, -7.0, -2.0)));
-        assert!(bound_box.maximum().equals(Point::create(14.0, 4.0, 8.0)));
+        assert_eq!(bound_box.minimum(), Point::create(-5.0, -7.0, -2.0));
+        assert_eq!(bound_box.maximum(), Point::create(14.0, 4.0, 8.0));
     }
 
     #[test]
@@ -273,8 +273,8 @@ mod tests {
 
         let new_bounds = bounds.transform(matrix);
 
-        assert!(new_bounds.minimum().equals(Point::create(-1.414214, -1.707107, -1.707107)));
-        assert!(new_bounds.maximum().equals(Point::create(1.414214, 1.707107, 1.707107)));
+        assert_eq!(new_bounds.minimum(), Point::create(-1.414214, -1.707107, -1.707107));
+        assert_eq!(new_bounds.maximum(), Point::create(1.414214, 1.707107, 1.707107));
     }
 
     #[test]
@@ -349,10 +349,10 @@ mod tests {
 
         let (left, right) = bounds.split();
 
-        assert!(left.minimum().equals(Point::create(-1.0, -4.0, -5.0)));
-        assert!(left.maximum().equals(Point::create(4.0, 6.0, 5.0)));
-        assert!(right.minimum().equals(Point::create(4.0, -4.0, -5.0)));
-        assert!(right.maximum().equals(Point::create(9.0, 6.0, 5.0)));
+        assert_eq!(left.minimum(), Point::create(-1.0, -4.0, -5.0));
+        assert_eq!(left.maximum(), Point::create(4.0, 6.0, 5.0));
+        assert_eq!(right.minimum(), Point::create(4.0, -4.0, -5.0));
+        assert_eq!(right.maximum(), Point::create(9.0, 6.0, 5.0));
     }
 
     #[test]
@@ -363,10 +363,10 @@ mod tests {
 
         let (left, right) = bounds.split();
 
-        assert!(left.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
-        assert!(left.maximum().equals(Point::create(4.0, 5.5, 3.0)));
-        assert!(right.minimum().equals(Point::create(4.0, -2.0, -3.0)));
-        assert!(right.maximum().equals(Point::create(9.0, 5.5, 3.0)));
+        assert_eq!(left.minimum(), Point::create(-1.0, -2.0, -3.0));
+        assert_eq!(left.maximum(), Point::create(4.0, 5.5, 3.0));
+        assert_eq!(right.minimum(), Point::create(4.0, -2.0, -3.0));
+        assert_eq!(right.maximum(), Point::create(9.0, 5.5, 3.0));
     }
 
     #[test]
@@ -377,10 +377,10 @@ mod tests {
 
         let (left, right) = bounds.split();
 
-        assert!(left.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
-        assert!(left.maximum().equals(Point::create(5.0, 3.0, 3.0)));
-        assert!(right.minimum().equals(Point::create(-1.0, 3.0, -3.0)));
-        assert!(right.maximum().equals(Point::create(5.0, 8.0, 3.0)));
+        assert_eq!(left.minimum(), Point::create(-1.0, -2.0, -3.0));
+        assert_eq!(left.maximum(), Point::create(5.0, 3.0, 3.0));
+        assert_eq!(right.minimum(), Point::create(-1.0, 3.0, -3.0));
+        assert_eq!(right.maximum(), Point::create(5.0, 8.0, 3.0));
     }
 
     #[test]
@@ -391,9 +391,9 @@ mod tests {
 
         let (left, right) = bounds.split();
 
-        assert!(left.minimum().equals(Point::create(-1.0, -2.0, -3.0)));
-        assert!(left.maximum().equals(Point::create(5.0, 3.0, 2.0)));
-        assert!(right.minimum().equals(Point::create(-1.0, -2.0, 2.0)));
-        assert!(right.maximum().equals(Point::create(5.0, 3.0, 7.0)));
+        assert_eq!(left.minimum(), Point::create(-1.0, -2.0, -3.0));
+        assert_eq!(left.maximum(), Point::create(5.0, 3.0, 2.0));
+        assert_eq!(right.minimum(), Point::create(-1.0, -2.0, 2.0));
+        assert_eq!(right.maximum(), Point::create(5.0, 3.0, 7.0));
     }
 }

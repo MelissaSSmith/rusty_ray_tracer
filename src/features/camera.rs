@@ -132,7 +132,7 @@ mod tests {
         assert_eq!(camera.h_size, 160);
         assert_eq!(camera.v_size, 120);
         assert_eq!(camera.field_of_view, PI/2.0);
-        assert!(camera.transform.equals(Matrix::identity()));
+        assert_eq!(camera.transform, Matrix::identity());
     }
 
     #[test]
@@ -155,8 +155,8 @@ mod tests {
 
         let ray = camera.ray_for_pixel(100, 50);
 
-        assert!(ray.direction.equals(Vector::create(0.0, 0.0, -1.0)));
-        assert!(ray.origin.equals(Point::zero()));
+        assert_eq!(ray.direction, Vector::create(0.0, 0.0, -1.0));
+        assert_eq!(ray.origin, Point::zero());
     }
 
     #[test]
@@ -165,8 +165,8 @@ mod tests {
 
         let ray = camera.ray_for_pixel(0, 0);
 
-        assert!(ray.direction.equals(Vector::create(0.66519, 0.33259, -0.66851)));
-        assert!(ray.origin.equals(Point::zero()));
+        assert_eq!(ray.direction, Vector::create(0.66519, 0.33259, -0.66851));
+        assert_eq!(ray.origin, Point::zero());
     }
 
     #[test]
@@ -176,8 +176,8 @@ mod tests {
 
         let ray = camera.ray_for_pixel(100, 50);
 
-        assert!(ray.direction.equals(Vector::create(2.0_f64.sqrt()/2.0, 0.0, -2.0_f64.sqrt()/2.0)));
-        assert!(ray.origin.equals(Point::create(0.0, 2.0, -5.0)));
+        assert_eq!(ray.direction, Vector::create(2.0_f64.sqrt()/2.0, 0.0, -2.0_f64.sqrt()/2.0));
+        assert_eq!(ray.origin, Point::create(0.0, 2.0, -5.0));
     }
 
     #[test]

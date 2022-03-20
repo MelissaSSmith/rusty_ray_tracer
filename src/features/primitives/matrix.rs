@@ -43,23 +43,6 @@ impl Matrix{
         self.matrix[x][y] = val;
     }
 
-    pub(crate) fn equals(&self, _matrix: Matrix) -> bool {
-        let mut equals = true;
-
-        for row in 0..4 {
-            for column in 0..4 {
-                let value = self.get(row, column);
-                let other_value = _matrix.get(row, column);
-                if value.equals(other_value) == false {
-                    equals = false;
-                    break;
-                }
-            }
-        }
-
-        equals
-    }
-
     pub fn transpose(&self) -> Matrix {
         let columns = [
             [
@@ -170,6 +153,25 @@ impl<T> core::ops::Mul<T> for Matrix where T: TupleTrait,
     }
 }
 
+impl PartialEq for Matrix {
+    fn eq(&self, other: &Self) -> bool {
+        let mut equals = true;
+
+        for row in 0..4 {
+            for column in 0..4 {
+                let value = self.get(row, column);
+                let other_value = other.get(row, column);
+                if value.equals(other_value) == false {
+                    equals = false;
+                    break;
+                }
+            }
+        }
+
+        equals
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::features::primitives::matrix::Matrix;
@@ -234,7 +236,7 @@ mod tests {
         let vec_4 = [13.5, 14.5, 15.5, 16.5];
         let m2 = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(m1.equals(m2));
+        assert_eq!(m1, m2);
     }
 
     #[test]
@@ -251,7 +253,7 @@ mod tests {
         let vec_4 = [13.5, 14.5, 15.5, 16.5];
         let m2 = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert_eq!(false, m1.equals(m2));
+        assert_ne!(m1, m2);
     }
 
     #[test]
@@ -276,7 +278,7 @@ mod tests {
         let vec_4 = [16.0, 26.0, 46.0, 42.0];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(expected.equals(result));
+        assert_eq!(expected, result);
     }
 
     #[test]
@@ -315,7 +317,7 @@ mod tests {
 
         let result = m1 * m2;
 
-        assert!(m1.equals(result));
+        assert_eq!(m1, result);
     }
 
     #[test]
@@ -353,7 +355,7 @@ mod tests {
         let vec_4 = [0.0, 8.0, 3.0, 8.0];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(expected.equals(result));
+        assert_eq!(expected, result);
     }
 
     #[test]
@@ -366,7 +368,7 @@ mod tests {
 
         let result = m2.transpose();
 
-        assert!(m2.equals(result));
+        assert_eq!(m2, result);
     }
 
     #[test]
@@ -398,7 +400,7 @@ mod tests {
         let vec_4 = [0.0, 0.0, 0.0, 0.0];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(result.equals(expected));
+        assert_eq!(result, expected);
     }
 
     #[test]
@@ -417,7 +419,7 @@ mod tests {
         let vec_4 = [0.0, 0.0, 0.0, 0.0];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(result.equals(expected));
+        assert_eq!(result, expected);
     }
 
     #[test]
@@ -539,7 +541,7 @@ mod tests {
         let vec_4 = [-0.52256, -0.81391, -0.30075, 0.30639];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(expected.equals(inverse_m));
+        assert_eq!(expected, inverse_m);
     }
 
     #[test]
@@ -558,7 +560,7 @@ mod tests {
         let vec_4 = [-0.69231, -0.69231, -0.76923, -1.92308];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(expected.equals(inverse_m));
+        assert_eq!(expected, inverse_m);
     }
 
     #[test]
@@ -577,7 +579,7 @@ mod tests {
         let vec_4 = [0.17778, 0.06667, -0.26667, 0.33333];
         let expected = Matrix::create([vec_1, vec_2, vec_3, vec_4]);
 
-        assert!(expected.equals(inverse_m));
+        assert_eq!(expected, inverse_m);
     }
 
     #[test]
@@ -598,6 +600,6 @@ mod tests {
 
         let product = c * b.inverse();
 
-        assert!(a.equals(product));
+        assert_eq!(a, product);
     }
 }

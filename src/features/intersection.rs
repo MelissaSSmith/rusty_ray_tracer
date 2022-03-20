@@ -231,9 +231,9 @@ mod tests {
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert_eq!(4.0, computation.t());
-        assert!(computation.point().equals(Point::create(0.0, 0.0, -1.0)));
-        assert!(computation.eye_vector().equals(Vector::create(0.0, 0.0, -1.0)));
-        assert!(computation.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+        assert_eq!(computation.point(), Point::create(0.0, 0.0, -1.0));
+        assert_eq!(computation.eye_vector(), Vector::create(0.0, 0.0, -1.0));
+        assert_eq!(computation.normal_vector(), Vector::create(0.0, 0.0, -1.0));
     }
 
     #[test]
@@ -256,9 +256,9 @@ mod tests {
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         assert_eq!(true, computation.inside());
-        assert!(computation.point().equals(Point::create(0.0, 0.0, 1.0)));
-        assert!(computation.eye_vector().equals(Vector::create(0.0, 0.0, -1.0)));
-        assert!(computation.normal_vector().equals(Vector::create(0.0, 0.0, -1.0)));
+        assert_eq!(computation.point(), Point::create(0.0, 0.0, 1.0));
+        assert_eq!(computation.eye_vector(), Vector::create(0.0, 0.0, -1.0));
+        assert_eq!(computation.normal_vector(), Vector::create(0.0, 0.0, -1.0));
     }
 
     #[test]
@@ -285,7 +285,7 @@ mod tests {
         let computation = intersection.prepare_computations(ray, &vec![]);
 
         let reflect = computation.reflect_vector();
-        assert!(reflect.equals(Vector::create(0.0, sqrt_2/2.0, sqrt_2/2.0)));
+        assert_eq!(reflect, Vector::create(0.0, sqrt_2/2.0, sqrt_2/2.0));
     }
 
     #[test]
@@ -414,6 +414,6 @@ mod tests {
 
         let comps = intersection.prepare_computations(ray, &intersections);
 
-        assert!(comps.normal_vector().equals(Vector::create(-0.5547, 0.83205, 0.0)));
+        assert_eq!(comps.normal_vector(), Vector::create(-0.5547, 0.83205, 0.0));
     }
 }

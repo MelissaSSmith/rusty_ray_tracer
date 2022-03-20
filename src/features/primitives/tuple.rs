@@ -28,10 +28,6 @@ impl Tuple {
             w: vec[3]
         }
     }
-
-    pub fn equals(&self, _tuple: Tuple) -> bool {
-        self.x.equals(_tuple.x) && self.y.equals(_tuple.y) && self.z.equals(_tuple.z) && self.w.equals(_tuple.w)
-    }
 }
 
 impl TupleTrait for Tuple {
@@ -164,5 +160,11 @@ impl core::ops::Neg for Tuple {
 impl fmt::Display for Tuple {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "x: {}, y: {}, z:{}, w: {}", self.x, self.y, self.z, self.w)
+    }
+}
+
+impl PartialEq for Tuple {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.equals(other.x) && self.y.equals(other.y) && self.z.equals(other.z) && self.w.equals(other.w)
     }
 }

@@ -46,9 +46,9 @@ mod tests {
         let n2 = Plane::normal(&plane, &Point::create(10.0, 0.0, -10.0));
         let n3 = Plane::normal(&plane, &Point::create(-5.0, 0.0, 150.0));
 
-        assert!(n1.equals(Vector::create(0.0, 1.0, 0.0)));
-        assert!(n2.equals(Vector::create(0.0, 1.0, 0.0)));
-        assert!(n3.equals(Vector::create(0.0, 1.0, 0.0)));
+        assert_eq!(n1, Vector::create(0.0, 1.0, 0.0));
+        assert_eq!(n2, Vector::create(0.0, 1.0, 0.0));
+        assert_eq!(n3, Vector::create(0.0, 1.0, 0.0));
     }
 
     #[test]
@@ -97,7 +97,7 @@ mod tests {
     fn test_plane_has_a_bounding_box() {
         let plane = Shape::Plane.create();
 
-        assert!(plane.bounds().minimum().equals(Point::create(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY)));
-        assert!(plane.bounds().maximum().equals(Point::create(f64::INFINITY, 0.0, f64::INFINITY)));
+        assert_eq!(plane.bounds().minimum(), Point::create(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY));
+        assert_eq!(plane.bounds().maximum(), Point::create(f64::INFINITY, 0.0, f64::INFINITY));
     }
 }

@@ -231,7 +231,7 @@ mod tests {
         for test in tests {
             let normal = Cone::normal(&cone, &test.0);
 
-            assert!(normal.equals(test.1));
+            assert_eq!(normal, test.1);
         }
     }
 
@@ -239,8 +239,8 @@ mod tests {
     fn test_unbounded_cone_has_a_bounding_box() {
         let cone = Shape::Cone(Cone::create()).create();
 
-        assert!(cone.bounds().minimum().equals(Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY)));
-        assert!(cone.bounds().maximum().equals(Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY)));
+        assert_eq!(cone.bounds().minimum(), Point::create(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY));
+        assert_eq!(cone.bounds().maximum(), Point::create(f64::INFINITY, f64::INFINITY, f64::INFINITY));
     }
 
     #[test]
@@ -251,7 +251,7 @@ mod tests {
                 .with_maximum_bound(3.0)
         ).create();
 
-        assert!(cone.bounds().minimum().equals(Point::create(-5.0, -5.0, -5.0)));
-        assert!(cone.bounds().maximum().equals(Point::create(5.0, 3.0, 5.0)));
+        assert_eq!(cone.bounds().minimum(), Point::create(-5.0, -5.0, -5.0));
+        assert_eq!(cone.bounds().maximum(), Point::create(5.0, 3.0, 5.0));
     }
 }

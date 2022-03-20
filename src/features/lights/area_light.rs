@@ -57,6 +57,10 @@ impl AreaLight {
     fn position(&self) -> Point {
         self.position
     }
+
+    fn point_on_light(&self, u: usize, v: usize) -> Point {
+        todo!()
+    }
 }
 
 #[cfg(test)]
@@ -75,13 +79,13 @@ mod tests {
 
         let light = AreaLight::create(corner, v1, 4, v2, 2, WHITE);
 
-        assert!(light.corner().equals(corner));
-        assert!(light.u_vec().equals(Vector::create(0.5, 0.0, 0.0)));
+        assert_eq!(light.corner(), corner);
+        assert_eq!(light.u_vec(), Vector::create(0.5, 0.0, 0.0));
         assert_eq!(light.u_steps(), 4);
-        assert!(light.v_vec().equals(Vector::create(0.0, 0.0, 0.5)));
+        assert_eq!(light.v_vec(), Vector::create(0.0, 0.0, 0.5));
         assert_eq!(light.v_steps(), 2);
         assert_eq!(light.samples(), 8);
-        assert!(light.position().equals(Point::create(1.0, 0.0, 0.5)));
+        assert_eq!(light.position(), Point::create(1.0, 0.0, 0.5));
     }
 
     #[test]
@@ -93,7 +97,17 @@ mod tests {
         let light = AreaLight::create(corner, v1, 4, v2, 2, WHITE);
 
         let tests = vec![
-            (0, 0, Point::create(0.25, 0.0, 0.25))
+            (0, 0, Point::create(0.25, 0.0, 0.25)),
+            (1, 0, Point::create(0.75, 0.0, 0.25)),
+            (0, 1, Point::create(0.25, 0.0, 0.75)),
+            (2, 0, Point::create(1.25, 0.0, 0.25)),
+            (3, 1, Point::create(1.75, 0.0, 0.75))
         ];
+
+        for test in tests {
+            let point = light.point_on_light(test.0, test.1);
+
+            assert_eq!(point, test.2);
+        }
     }
 }

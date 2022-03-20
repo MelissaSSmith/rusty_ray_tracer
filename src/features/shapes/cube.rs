@@ -114,7 +114,7 @@ mod tests {
         for test in tests {
             let normal = Cube::normal(&cube, &test.0);
 
-            assert!(normal.equals(test.1));
+            assert_eq!(normal, test.1);
         }
     }
 
@@ -122,7 +122,7 @@ mod tests {
     fn test_cube_has_a_bounding_box() {
         let cube = Shape::Cube.create();
 
-        assert!(cube.bounds().minimum().equals(Point::create(-1.0, -1.0, -1.0)));
-        assert!(cube.bounds().maximum().equals(Point::create(1.0, 1.0, 1.0)));
+        assert_eq!(cube.bounds().minimum(), Point::create(-1.0, -1.0, -1.0));
+        assert_eq!(cube.bounds().maximum(), Point::create(1.0, 1.0, 1.0));
     }
 }

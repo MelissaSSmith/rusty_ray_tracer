@@ -172,8 +172,8 @@ impl Object {
     pub fn equals(&self, other: &Object) -> bool {
         self.shape_type() == other.shape_type() &&
             self.material().equals(other.material()) &&
-            self.transformation().equals(other.transformation()) &&
-            self.cumulative_transform().equals(other.cumulative_transform())
+            self.transformation().eq(&other.transformation()) &&
+            self.cumulative_transform().eq(&other.cumulative_transform())
     }
 
     pub fn transformation(&self) -> Matrix {
@@ -524,7 +524,7 @@ mod tests {
 
         let point = Object::world_to_object(&sphere, &Point::create(-2.0, 0.0, -10.0));
 
-        assert!(point.equals(Point::create(0.0, 0.0, -1.0)));
+        assert_eq!(point, Point::create(0.0, 0.0, -1.0));
     }
 
     #[test]
@@ -544,8 +544,7 @@ mod tests {
 
         let normal = Object::normal_to_world(&object, &Vector::create(sqrt_3, sqrt_3, sqrt_3));
 
-        println!("Normal: {}", normal);
-        assert!(normal.equals(Vector::create(0.2857, 0.4286, -0.8571)));
+        assert_eq!(normal, Vector::create(0.2857, 0.4286, -0.8571));
     }
 
     #[test]
@@ -564,7 +563,7 @@ mod tests {
 
         let point = Object::normal(&object, &Point::create(1.7321, 1.1547, -5.5774), &intersection);
 
-        assert!(point.equals(Vector::create(0.2857, 0.4286, -0.8571)));
+        assert_eq!(point, Vector::create(0.2857, 0.4286, -0.8571));
     }
 
     #[test]
@@ -574,8 +573,8 @@ mod tests {
 
         let bounds = shape.parent_space_bounds();
 
-        assert!(bounds.minimum().equals(Point::create(0.5, -5.0, 1.0)));
-        assert!(bounds.maximum().equals(Point::create(1.5, -1.0, 9.0)));
+        assert_eq!(bounds.minimum(), Point::create(0.5, -5.0, 1.0));
+        assert_eq!(bounds.maximum(), Point::create(1.5, -1.0, 9.0));
     }
 
     #[test]

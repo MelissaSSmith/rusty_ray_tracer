@@ -27,7 +27,7 @@ mod tests {
 
         let light = PointLight::create(intensity, position);
 
-        assert!(light.position.equals(position));
+        assert_eq!(light.position, position);
         assert!(light.intensity.equals(intensity));
     }
 }

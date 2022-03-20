@@ -242,10 +242,10 @@ mod tests {
         let parser = OBJParser::parse_obj_file(&String::from("vertex_records.txt"));
 
         assert_eq!(0, parser.ignored_lines);
-        assert!(parser.vertices[1].equals(Point::create(-1.0, 1.0, 0.0)));
-        assert!(parser.vertices[2].equals(Point::create(-1.0, 0.5, 0.0)));
-        assert!(parser.vertices[3].equals(Point::create(1.0, 0.0, 0.0)));
-        assert!(parser.vertices[4].equals(Point::create(1.0, 1.0, 0.0)));
+        assert_eq!(parser.vertices[1], Point::create(-1.0, 1.0, 0.0));
+        assert_eq!(parser.vertices[2], Point::create(-1.0, 0.5, 0.0));
+        assert_eq!(parser.vertices[3], Point::create(1.0, 0.0, 0.0));
+        assert_eq!(parser.vertices[4], Point::create(1.0, 1.0, 0.0));
     }
 
     #[test]
@@ -264,18 +264,18 @@ mod tests {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        assert!(parser.vertices[1].equals(t1_shape.point1()));
-        assert!(parser.vertices[2].equals(t1_shape.point2()));
-        assert!(parser.vertices[3].equals(t1_shape.point3()));
+        assert_eq!(parser.vertices[1], t1_shape.point1());
+        assert_eq!(parser.vertices[2], t1_shape.point2());
+        assert_eq!(parser.vertices[3], t1_shape.point3());
 
         let t2 = parser.default_group.children()[1].clone();
         let t2_shape = match t2.shape() {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        assert!(parser.vertices[1].equals(t2_shape.point1()));
-        assert!(parser.vertices[3].equals(t2_shape.point2()));
-        assert!(parser.vertices[4].equals(t2_shape.point3()));
+        assert_eq!(parser.vertices[1], t2_shape.point1());
+        assert_eq!(parser.vertices[3], t2_shape.point2());
+        assert_eq!(parser.vertices[4], t2_shape.point3());
     }
 
     #[test]
@@ -295,27 +295,27 @@ mod tests {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        assert!(parser.vertices[1].equals(t1_shape.point1()));
-        assert!(parser.vertices[2].equals(t1_shape.point2()));
-        assert!(parser.vertices[3].equals(t1_shape.point3()));
+        assert_eq!(parser.vertices[1], t1_shape.point1());
+        assert_eq!(parser.vertices[2], t1_shape.point2());
+        assert_eq!(parser.vertices[3], t1_shape.point3());
 
         let t2 = parser.default_group.children()[1].clone();
         let t2_shape = match t2.shape() {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        assert!(parser.vertices[1].equals(t2_shape.point1()));
-        assert!(parser.vertices[3].equals(t2_shape.point2()));
-        assert!(parser.vertices[4].equals(t2_shape.point3()));
+        assert_eq!(parser.vertices[1], t2_shape.point1());
+        assert_eq!(parser.vertices[3], t2_shape.point2());
+        assert_eq!(parser.vertices[4], t2_shape.point3());
 
         let t3 = parser.default_group.children()[2].clone();
         let t3_shape = match t3.shape() {
             Shape::Triangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        assert!(parser.vertices[1].equals(t3_shape.point1()));
-        assert!(parser.vertices[4].equals(t3_shape.point2()));
-        assert!(parser.vertices[5].equals(t3_shape.point3()));
+        assert_eq!(parser.vertices[1], t3_shape.point1());
+        assert_eq!(parser.vertices[4], t3_shape.point2());
+        assert_eq!(parser.vertices[5], t3_shape.point3());
     }
 
     #[test]
@@ -327,9 +327,9 @@ mod tests {
 
         let parser = OBJParser::parse_obj_file(&String::from("vertex_normal.txt"));
 
-        assert!(parser.normals[1].equals(Vector::create(0.0, 0.0, 1.0)));
-        assert!(parser.normals[2].equals(Vector::create(0.707, 0.0, -0.707)));
-        assert!(parser.normals[3].equals(Vector::create(1.0, 2.0, 3.0)));
+        assert_eq!(parser.normals[1], Vector::create(0.0, 0.0, 1.0));
+        assert_eq!(parser.normals[2], Vector::create(0.707, 0.0, -0.707));
+        assert_eq!(parser.normals[3], Vector::create(1.0, 2.0, 3.0));
     }
 
     #[test]
@@ -378,12 +378,12 @@ mod tests {
             Shape::SmoothTriangle(t) => t,
             _ => panic!("Object is not a triangle!")
         };
-        assert!(parser.vertices[1].equals(t1_shape.point1()));
-        assert!(parser.vertices[2].equals(t1_shape.point2()));
-        assert!(parser.vertices[3].equals(t1_shape.point3()));
-        assert!(parser.normals[3].equals(t1_shape.normal1()));
-        assert!(parser.normals[1].equals(t1_shape.normal2()));
-        assert!(parser.normals[2].equals(t1_shape.normal3()));
+        assert_eq!(parser.vertices[1], t1_shape.point1());
+        assert_eq!(parser.vertices[2], t1_shape.point2());
+        assert_eq!(parser.vertices[3], t1_shape.point3());
+        assert_eq!(parser.normals[3], t1_shape.normal1());
+        assert_eq!(parser.normals[1], t1_shape.normal2());
+        assert_eq!(parser.normals[2], t1_shape.normal3());
 
         let t2 = group.children()[1].clone();
         assert!(t1.equals(&t2));

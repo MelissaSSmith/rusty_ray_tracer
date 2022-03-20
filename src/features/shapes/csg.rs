@@ -223,8 +223,8 @@ mod tests {
 
         let bounds = shape.bounds();
 
-        assert!(bounds.minimum().equals(Point::create(-1.0, -1.0, -1.0)));
-        assert!(bounds.maximum().equals(Point::create(3.0, 4.0, 5.0)));
+        assert_eq!(bounds.minimum(), Point::create(-1.0, -1.0, -1.0));
+        assert_eq!(bounds.maximum(), Point::create(3.0, 4.0, 5.0));
     }
 
     #[test]

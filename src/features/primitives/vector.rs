@@ -24,10 +24,6 @@ impl Vector {
     pub fn reflect(&self, normal: Vector) -> Vector {
         *self - (normal * 2.0) * (*self ^ normal)
     }
-
-    pub fn equals(&self, _vector: Vector) -> bool {
-        self.x.equals_low_epsilon(_vector.x) && self.y.equals_low_epsilon(_vector.y) && self.z.equals_low_epsilon(_vector.z)
-    }
 }
 
 impl Tuple for Vector {
@@ -163,6 +159,12 @@ impl fmt::Display for Vector {
     }
 }
 
+impl PartialEq for Vector {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.equals_low_epsilon(other.x) && self.y.equals_low_epsilon(other.y) && self.z.equals_low_epsilon(other.z)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use core::ops::Div;
@@ -177,7 +179,7 @@ mod tests {
         let new_vector = vector_a + vector_b;
 
         let expected_vector = Vector::create(1.0, 1.0, 6.0);
-        assert!(expected_vector.equals(new_vector));
+        assert_eq!(expected_vector, new_vector);
     }
 
     #[test]
@@ -188,7 +190,7 @@ mod tests {
         let vector = vector_a - vector_b;
 
         let expected_vector = Vector::create(-2.0, -4.0, -6.0);
-        assert!(expected_vector.equals(vector));
+        assert_eq!(expected_vector, vector);
     }
 
     #[test]
@@ -199,7 +201,7 @@ mod tests {
         let vector = vector_a * scalar;
 
         let expected_vector = Vector::create(3.5, -7.0, 10.5);
-        assert!(expected_vector.equals(vector));
+        assert_eq!(expected_vector, vector);
     }
 
     #[test]
@@ -209,7 +211,7 @@ mod tests {
         let vector = -vector_a;
 
         let expected_vector = Vector::create(-1.0, 2.0, -3.0);
-        assert!(expected_vector.equals(vector));
+        assert_eq!(expected_vector, vector);
     }
 
     #[test]
@@ -266,7 +268,7 @@ mod tests {
         let normalized_vector = vector.normalize();
 
         let expected_vector = Vector::create(1.0, 0.0, 0.0);
-        assert!(expected_vector.equals(normalized_vector));
+        assert_eq!(expected_vector, normalized_vector);
     }
 
     #[test]
@@ -309,7 +311,7 @@ mod tests {
         let cross_a_b = vector_a * vector_b;
 
         let expected_vector = Vector::create(-1.0, 2.0, -1.0);
-        assert!(expected_vector.equals(cross_a_b));
+        assert_eq!(expected_vector, cross_a_b);
     }
 
     #[test]
@@ -320,7 +322,7 @@ mod tests {
         let cross_b_a = vector_b * vector_a;
 
         let expected_vector = Vector::create(1.0, -2.0, 1.0);
-        assert!(expected_vector.equals(cross_b_a));
+        assert_eq!(expected_vector, cross_b_a);
     }
 
     #[test]
@@ -330,7 +332,7 @@ mod tests {
 
         let reflection = vector.reflect(normal);
 
-        assert!(reflection.equals(Vector::create(1.0, 1.0, 0.0)));
+        assert_eq!(reflection, Vector::create(1.0, 1.0, 0.0));
     }
 
     #[test]
@@ -340,6 +342,6 @@ mod tests {
 
         let reflection = vector.reflect(normal);
 
-        assert!(reflection.equals(Vector::create(1.0, 0.0, 0.0)));
+        assert_eq!(reflection, Vector::create(1.0, 0.0, 0.0));
     }
 }

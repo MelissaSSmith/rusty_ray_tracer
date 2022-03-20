@@ -139,12 +139,12 @@ mod tests {
 
         let triangle = SmoothTriangle::create(p1, p2, p3, n1, n2, n3);
 
-        assert!(triangle.point1().equals(p1));
-        assert!(triangle.point2().equals(p2));
-        assert!(triangle.point3().equals(p3));
-        assert!(triangle.normal1().equals(n1));
-        assert!(triangle.normal2().equals(n2));
-        assert!(triangle.normal3().equals(n3));
+        assert_eq!(triangle.point1(), p1);
+        assert_eq!(triangle.point2(), p2);
+        assert_eq!(triangle.point3(), p3);
+        assert_eq!(triangle.normal1(), n1);
+        assert_eq!(triangle.normal2(), n2);
+        assert_eq!(triangle.normal3(), n3);
     }
 
     #[test]
@@ -179,6 +179,6 @@ mod tests {
 
         let normal = Object::normal(&shape, &Point::zero(), &intersection);
 
-        assert!(normal.equals(Vector::create(-0.5547, 0.83205, 0.0)));
+        assert_eq!(normal, Vector::create(-0.5547, 0.83205, 0.0));
     }
 }

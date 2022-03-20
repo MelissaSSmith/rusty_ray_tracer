@@ -67,7 +67,7 @@ mod tests {
     fn test_create_a_new_group() {
         let group = Shape::Group(Group::create()).create();
 
-        assert!(group.transformation().equals(Matrix::identity()));
+        assert_eq!(group.transformation(), Matrix::identity());
         assert_eq!(group.children().len(), 0);
     }
 
@@ -141,8 +141,8 @@ mod tests {
 
         let bounds = group.bounds();
 
-        assert!(bounds.minimum().equals(Point::create(-4.5, -3.0, -5.0)));
-        assert!(bounds.maximum().equals(Point::create(4.0, 7.0, 4.5)));
+        assert_eq!(bounds.minimum(), Point::create(-4.5, -3.0, -5.0));
+        assert_eq!(bounds.maximum(), Point::create(4.0, 7.0, 4.5));
     }
 
     #[test]

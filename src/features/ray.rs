@@ -47,8 +47,8 @@ mod tests {
 
         let ray = Ray::create(origin, direction);
 
-        assert!(ray.origin.equals(origin));
-        assert!(ray.direction.equals(direction));
+        assert_eq!(ray.origin, origin);
+        assert_eq!(ray.direction, direction);
     }
 
     #[test]
@@ -58,16 +58,16 @@ mod tests {
         let ray = Ray::create(origin, direction);
 
         let point_1 = ray.position(0.0);
-        assert!(Point::create(2.0,3.0,4.0).equals(point_1));
+        assert_eq!(Point::create(2.0,3.0,4.0), point_1);
 
         let point_2 = ray.position(1.0);
-        assert!(Point::create(3.0,3.0,4.0).equals(point_2));
+        assert_eq!(Point::create(3.0,3.0,4.0), point_2);
 
         let point_3 = ray.position(-1.0);
-        assert!(Point::create(1.0,3.0,4.0).equals(point_3));
+        assert_eq!(Point::create(1.0,3.0,4.0), point_3);
 
         let point_4 = ray.position(2.5);
-        assert!(Point::create(4.5,3.0,4.0).equals(point_4));
+        assert_eq!(Point::create(4.5,3.0,4.0), point_4);
     }
 
     #[test]
@@ -79,8 +79,8 @@ mod tests {
 
         let new_ray = ray.transform(matrix);
 
-        assert!(new_ray.origin.equals(Point::create(4.0, 6.0, 8.0)));
-        assert!(new_ray.direction.equals(Vector::create(0.0, 1.0, 0.0)));
+        assert_eq!(new_ray.origin, Point::create(4.0, 6.0, 8.0));
+        assert_eq!(new_ray.direction, Vector::create(0.0, 1.0, 0.0));
     }
 
     #[test]
@@ -92,7 +92,7 @@ mod tests {
 
         let new_ray = ray.transform(matrix);
 
-        assert!(new_ray.origin.equals(Point::create(2.0, 6.0, 12.0)));
-        assert!(new_ray.direction.equals(Vector::create(0.0, 3.0, 0.0)));
+        assert_eq!(new_ray.origin, Point::create(2.0, 6.0, 12.0));
+        assert_eq!(new_ray.direction, Vector::create(0.0, 3.0, 0.0));
     }
 }

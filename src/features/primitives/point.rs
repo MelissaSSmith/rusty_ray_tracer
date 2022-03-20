@@ -13,12 +13,6 @@ pub struct Point {
     w: f64
 }
 
-impl Point {
-    pub(crate) fn equals(&self, _point: Point) -> bool {
-        self.x.equals(_point.x) && self.y.equals(_point.y) && self.z.equals(_point.z)
-    }
-}
-
 impl Tuple for Point {
     fn create(x: f64, y: f64, z: f64) -> Self {
         Point{ x, y, z, w: 1.0 }
@@ -120,6 +114,12 @@ impl fmt::Display for Point {
     }
 }
 
+impl PartialEq for Point {
+    fn eq(&self, other: &Self) -> bool {
+        self.x.equals(other.x) && self.y.equals(other.y) && self.z.equals(other.z)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::features::primitives::tuple_trait::Tuple;
@@ -133,7 +133,7 @@ mod tests {
         let new_point = point + vector;
 
         let expected_point = Point::create(1.0, 1.0, 6.0);
-        assert!(expected_point.equals(new_point));
+        assert_eq!(expected_point, new_point);
     }
 
     #[test]
@@ -144,7 +144,7 @@ mod tests {
         let vector = point_a - point_b;
 
         let expected_vector = Vector::create(-2.0, -4.0, -6.0);
-        assert!(expected_vector.equals(vector));
+        assert_eq!(expected_vector, vector);
     }
 
     #[test]
@@ -155,6 +155,6 @@ mod tests {
         let point = point_a - vector_a;
 
         let expected_point = Point::create(-2.0, -4.0, -6.0);
-        assert!(expected_point.equals(point));
+        assert_eq!(expected_point, point);
     }
 }

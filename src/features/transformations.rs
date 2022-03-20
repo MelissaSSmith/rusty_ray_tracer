@@ -94,7 +94,7 @@ mod tests {
 
         let expected_point = Point::create(2.0, 1.0, 7.0);
 
-        assert!(expected_point.equals(translation))
+        assert_eq!(expected_point, translation)
     }
 
     #[test]
@@ -107,7 +107,7 @@ mod tests {
 
         let expected_point = Point::create(-8.0, 7.0, 3.0);
 
-        assert!(expected_point.equals(translation))
+        assert_eq!(expected_point, translation)
     }
 
     #[test]
@@ -117,7 +117,7 @@ mod tests {
 
         let translation = transform * vector;
 
-        assert!(vector.equals(translation))
+        assert_eq!(vector, translation)
     }
 
     #[test]
@@ -128,7 +128,7 @@ mod tests {
         let scaled_point = transform * point;
 
         let expected_point = Point::create(-8.0, 18.0, 32.0);
-        assert!(expected_point.equals(scaled_point));
+        assert_eq!(expected_point, scaled_point);
     }
 
     #[test]
@@ -139,7 +139,7 @@ mod tests {
         let scaled_vector = transform * vector;
 
         let expected_vector = Vector::create(-8.0, 18.0, 32.0);
-        assert!(expected_vector.equals(scaled_vector));
+        assert_eq!(expected_vector, scaled_vector);
     }
 
     #[test]
@@ -151,7 +151,7 @@ mod tests {
         let scaled_vector = inverse * vector;
 
         let expected_vector = Vector::create(-2.0, 2.0, 2.0);
-        assert!(expected_vector.equals(scaled_vector));
+        assert_eq!(expected_vector, scaled_vector);
     }
 
     #[test]
@@ -162,7 +162,7 @@ mod tests {
         let scaled_point = transform * point;
 
         let expected_point = Point::create(-2.0, 3.0, 4.0);
-        assert!(expected_point.equals(scaled_point));
+        assert_eq!(expected_point, scaled_point);
     }
 
     #[test]
@@ -174,7 +174,7 @@ mod tests {
         let rotated_point = half_quarter * point;
 
         let expected_half_quarter_point = Point::create(0.0, 2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0);
-        assert!(expected_half_quarter_point.equals(rotated_point));
+        assert_eq!(expected_half_quarter_point, rotated_point);
 
         let point = Point::create(0.0, 1.0, 0.0);
         let full_quarter_radians = PI / 2.0;
@@ -183,7 +183,7 @@ mod tests {
         let rotated_point = full_quarter * point;
 
         let expected_half_quarter_point = Point::create(0.0, 0.0, 1.0);
-        assert!(expected_half_quarter_point.equals(rotated_point));
+        assert_eq!(expected_half_quarter_point, rotated_point);
     }
 
     #[test]
@@ -196,7 +196,7 @@ mod tests {
         let rotated_point = inverse * point;
 
         let expected_half_quarter_point = Point::create(0.0, 2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0);
-        assert!(expected_half_quarter_point.equals(rotated_point));
+        assert_eq!(expected_half_quarter_point, rotated_point);
     }
 
     #[test]
@@ -208,7 +208,7 @@ mod tests {
         let rotated_point = half_quarter * point;
 
         let expected_half_quarter_point = Point::create(2.0_f64.sqrt()/2.0, 0.0, 2.0_f64.sqrt()/2.0);
-        assert!(expected_half_quarter_point.equals(rotated_point));
+        assert_eq!(expected_half_quarter_point, rotated_point);
 
         let point = Point::create(0.0, 0.0, 1.0);
         let full_quarter_radians = PI / 2.0;
@@ -217,7 +217,7 @@ mod tests {
         let rotated_point = full_quarter * point;
 
         let expected_full_quarter_point = Point::create(1.0, 0.0, 0.0);
-        assert!(expected_full_quarter_point.equals(rotated_point));
+        assert_eq!(expected_full_quarter_point, rotated_point);
     }
 
     #[test]
@@ -229,7 +229,7 @@ mod tests {
         let rotated_point = half_quarter * point;
 
         let expected_half_quarter_point = Point::create(-2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0, 0.0);
-        assert!(expected_half_quarter_point.equals(rotated_point));
+        assert_eq!(expected_half_quarter_point, rotated_point);
 
         let point = Point::create(0.0, 1.0, 0.0);
         let full_quarter_radians = PI / 2.0;
@@ -238,7 +238,7 @@ mod tests {
         let rotated_point = full_quarter * point;
 
         let expected_half_quarter_point = Point::create(-1.0, 0.0, 0.0);
-        assert!(expected_half_quarter_point.equals(rotated_point));
+        assert_eq!(expected_half_quarter_point, rotated_point);
     }
 
     #[test]
@@ -249,7 +249,7 @@ mod tests {
         let sheared_point = transform * point;
 
         let expected_point = Point::create(5.0, 3.0, 4.0);
-        assert!(expected_point.equals(sheared_point));
+        assert_eq!(expected_point, sheared_point);
     }
 
     #[test]
@@ -260,7 +260,7 @@ mod tests {
         let sheared_point = transform * point;
 
         let expected_point = Point::create(6.0, 3.0, 4.0);
-        assert!(expected_point.equals(sheared_point));
+        assert_eq!(expected_point, sheared_point);
     }
 
     #[test]
@@ -271,7 +271,7 @@ mod tests {
         let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 5.0, 4.0);
-        assert!(expected_point.equals(sheared_point));
+        assert_eq!(expected_point, sheared_point);
     }
 
     #[test]
@@ -282,7 +282,7 @@ mod tests {
         let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 7.0, 4.0);
-        assert!(expected_point.equals(sheared_point));
+        assert_eq!(expected_point, sheared_point);
     }
 
     #[test]
@@ -293,7 +293,7 @@ mod tests {
         let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 3.0, 6.0);
-        assert!(expected_point.equals(sheared_point));
+        assert_eq!(expected_point, sheared_point);
     }
 
     #[test]
@@ -304,7 +304,7 @@ mod tests {
         let sheared_point = transform * point;
 
         let expected_point = Point::create(2.0, 3.0, 7.0);
-        assert!(expected_point.equals(sheared_point));
+        assert_eq!(expected_point, sheared_point);
     }
 
     #[test]
@@ -316,15 +316,15 @@ mod tests {
 
         let transformed_point = a * point;
         let expected_point = Point::create(1.0, -1.0, 0.0);
-        assert!(expected_point.equals(transformed_point));
+        assert_eq!(expected_point, transformed_point);
 
         let transformed_point = b * transformed_point;
         let expected_point = Point::create(5.0, -5.0, 0.0);
-        assert!(expected_point.equals(transformed_point));
+        assert_eq!(expected_point, transformed_point);
 
         let transformed_point = c * transformed_point;
         let expected_point = Point::create(15.0, 0.0, 7.0);
-        assert!(expected_point.equals(transformed_point));
+        assert_eq!(expected_point, transformed_point);
     }
 
     #[test]
@@ -334,10 +334,10 @@ mod tests {
         let b = Matrix::scale(5.0, 5.0, 5.0);
         let c = Matrix::translate(10.0, 5.0, 7.0);
 
-        let transformed_point = c * b * a * point; //todo fix
+        let transformed_point = c * b * a * point;
 
         let expected_point = Point::create(15.0, 0.0, 7.0);
-        assert!(expected_point.equals(transformed_point));
+        assert_eq!(expected_point, transformed_point);
     }
 
     #[test]
@@ -348,7 +348,7 @@ mod tests {
 
         let matrix = Matrix::view_transform(from, to, up);
 
-        assert!(matrix.equals(Matrix::identity()));
+        assert_eq!(matrix, Matrix::identity());
     }
 
     #[test]
@@ -359,7 +359,7 @@ mod tests {
 
         let matrix = Matrix::view_transform(from, to, up);
 
-        assert!(matrix.equals(Matrix::scale(-1.0, 1.0, -1.0)));
+        assert_eq!(matrix, Matrix::scale(-1.0, 1.0, -1.0));
     }
 
     #[test]
@@ -370,7 +370,7 @@ mod tests {
 
         let matrix = Matrix::view_transform(from, to, up);
 
-        assert!(matrix.equals(Matrix::translate(0.0, 0.0, -8.0)));
+        assert_eq!(matrix, Matrix::translate(0.0, 0.0, -8.0));
     }
 
     #[test]
@@ -385,6 +385,6 @@ mod tests {
         let vec_2 = [0.76772, 0.60609, 0.12122, -2.82843];
         let vec_3 = [-0.35857, 0.59761, -0.71714, 0.0];
         let vec_4 = [0.0, 0.0, 0.0, 1.0];
-        assert!(matrix.equals(Matrix::create([vec_1, vec_2, vec_3, vec_4])));
+        assert_eq!(matrix, Matrix::create([vec_1, vec_2, vec_3, vec_4]));
     }
 }

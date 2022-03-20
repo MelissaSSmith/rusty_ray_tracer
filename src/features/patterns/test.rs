@@ -32,7 +32,7 @@ mod tests {
     fn test_default_pattern_transformation() {
         let pattern = TestPattern::create();
 
-        assert!(pattern.transformation.equals(Matrix::identity()));
+        assert_eq!(pattern.transformation, Matrix::identity());
     }
 
     #[test]
@@ -40,7 +40,7 @@ mod tests {
         let mut pattern = TestPattern::create();
         pattern.transform(Matrix::translate(1.0, 2.0, 3.0));
 
-        assert!(pattern.transformation.equals(Matrix::translate(1.0, 2.0, 3.0)));
+        assert_eq!(pattern.transformation, Matrix::translate(1.0, 2.0, 3.0));
     }
 
     #[test]
