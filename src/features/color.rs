@@ -1,7 +1,7 @@
 use core::ops::{Add, Mul, Sub};
 use crate::features::primitives::operations::Operations;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq,  Debug)]
 pub struct Color {
     pub(crate) red: f64,
     pub(crate) green: f64,

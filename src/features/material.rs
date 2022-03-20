@@ -159,12 +159,12 @@ impl Material {
         self.refractive_index
     }
 
-    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, in_shadow: bool) -> Color {
+    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, intensity: f64) -> Color {
         let color = self.pattern.pattern_at_object(object, position);
 
         let effective_color = color * light.intensity;
         let ambient = effective_color * self.ambient;
-        if in_shadow {
+        if intensity == 0.0 {
             return ambient;
         }
 
@@ -184,7 +184,7 @@ impl Material {
             }
         }
 
-        ambient + diffuse + specular
+        ambient + (diffuse * intensity) + (specular * intensity)
     }
 }
 
@@ -200,6 +200,7 @@ mod tests {
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
+    use crate::features::world::World;
 
     #[test]
     fn test_default_material() {
@@ -222,7 +223,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
         assert!(result.equals(Color::create(1.9, 1.9, 1.9)));
     }
@@ -235,7 +236,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
         assert!(result.equals(Color::create(1.0, 1.0, 1.0)));
     }
@@ -248,7 +249,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
 
-        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
         assert!(result.equals(Color::create(0.7364, 0.7364, 0.7364)));
     }
@@ -261,7 +262,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
 
-        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
         assert!(result.equals(Color::create(1.6364, 1.6364, 1.6364)));
     }
@@ -274,7 +275,7 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, 10.0));
 
-        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, false);
+        let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
         assert!(result.equals(Color::create(0.1, 0.1, 0.1)));
     }
@@ -286,7 +287,7 @@ mod tests {
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
-        let in_shadow = true;
+        let in_shadow = 0.0;
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, in_shadow);
 
@@ -304,10 +305,43 @@ mod tests {
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
 
-        let c1 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(0.9, 0.0, 0.0), &eye_vector, &normal_vector, false);
-        let c2 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(1.1, 0.0, 0.0), &eye_vector, &normal_vector, false);
+        let c1 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(0.9, 0.0, 0.0), &eye_vector, &normal_vector, 1.0);
+        let c2 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(1.1, 0.0, 0.0), &eye_vector, &normal_vector, 1.0);
 
         assert!(c1.equals(WHITE));
         assert!(c2.equals(BLACK));
+    }
+
+    #[test]
+    fn test_lighting_uses_light_intensity_to_attenuate_color() {
+        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
+        let world = World::create_default()
+            .with_light(light);
+        let objects = world.objects();
+        let first_object = objects[0].clone()
+            .with_material(
+                Material::create()
+                    .with_ambient(0.1)
+                    .with_diffuse(0.9)
+                    .with_specular(0.0)
+                    .with_color(WHITE)
+            );
+        let world = world.with_objects(vec![first_object.clone(), objects[1].clone()]);
+
+        let point = Point::create(0.0, 0.0, -1.0);
+        let eye_vector = Vector::create(0.0, 0.0, -1.0);
+        let normal_vector = Vector::create(0.0, 0.0, -1.0);
+
+        let tests = vec![
+            (1.0, WHITE),
+            (0.5, Color::create(0.55, 0.55, 0.55)),
+            (0.0, Color::create(0.1, 0.1, 0.1))
+        ];
+
+        for test in tests {
+            let result = first_object.material().lighting(&world.light().unwrap(), &first_object, &point, &eye_vector, &normal_vector, test.0);
+
+            assert_eq!(test.1, result);
+        }
     }
 }

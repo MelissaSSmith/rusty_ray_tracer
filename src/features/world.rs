@@ -52,11 +52,11 @@ impl World {
         }
     }
 
-    pub fn objects(self) -> Vec<Object> {
-        self.objects
+    pub fn objects(&self) -> Vec<Object> {
+        self.objects.clone()
     }
 
-    pub fn light(self) -> Option<PointLight> {
+    pub fn light(&self) -> Option<PointLight> {
         self.light
     }
 
@@ -80,6 +80,13 @@ impl World {
         }
     }
 
+    pub fn with_light(self, light: PointLight) -> World {
+        World {
+            light: Some(light),
+            ..self
+        }
+    }
+
     pub fn color_at(&self, ray: &Ray) -> Color {
         self.color_at_impl(ray, self.recursion_limit)
     }
@@ -97,7 +104,7 @@ impl World {
     }
 
     fn shade_hit(&self, computation: &Computation, remaining: u8) -> Color {
-        let shadowed = self.is_shadowed(computation.over_point());
+        let shadowed = self.intensity_at(self.light.unwrap(), computation.over_point());
 
         let surface_color = computation.clone().object().material().lighting(
             &self.light.unwrap(),
@@ -165,23 +172,28 @@ impl World {
         }
     }
 
-    fn is_shadowed(&self, point: Point) -> bool {
-        return match self.light {
-            None => { true }
-            Some(light) => {
-                let v = light.position - point;
-                let distance = v.magnitude();
-                let direction = v.normalize();
+    fn intensity_at(&self, light: PointLight, point: Point) -> f64{
+        let is_shadowed = self.is_shadowed(light.position, point);
 
-                let ray = Ray::create(point, direction);
-                let intersections = self.intersect(ray);
-                let hit = Intersection::hit(intersections);
-                match hit {
-                    None => { false }
-                    Some(h) => {
-                        h.t < distance && h.object.has_shadow()
-                    }
-                }
+        if is_shadowed {
+            return 0.0;
+        }
+
+        1.0
+    }
+
+    fn is_shadowed(&self, light_point: Point, point: Point) -> bool {
+        let v = light_point - point;
+        let distance = v.magnitude();
+        let direction = v.normalize();
+
+        let ray = Ray::create(point, direction);
+        let intersections = self.intersect(ray);
+        let hit = Intersection::hit(intersections);
+        match hit {
+            None => { false }
+            Some(h) => {
+                h.t < distance && h.object.has_shadow()
             }
         }
     }
@@ -303,46 +315,6 @@ mod tests {
         let color = world.color_at(&ray);
 
         assert!(color.equals(WHITE));
-    }
-
-    #[test]
-    fn test_no_shadow_when_nothing_is_collinear_with_point_and_light() {
-        let world = World::create_default();
-        let point = Point::create(0.0, 10.0, 0.0);
-
-        let result = world.is_shadowed(point);
-
-        assert_eq!(result, false);
-    }
-
-    #[test]
-    fn test_shadow_when_an_object_is_between_the_point_and_the_light() {
-        let world = World::create_default();
-        let point = Point::create(10.0, -10.0, 10.0);
-
-        let result = world.is_shadowed(point);
-
-        assert_eq!(result, true);
-    }
-
-    #[test]
-    fn test_no_shadow_when_an_object_is_behind_the_light() {
-        let world = World::create_default();
-        let point = Point::create(-20.0, 20.0, -20.0);
-
-        let result = world.is_shadowed(point);
-
-        assert_eq!(result, false);
-    }
-
-    #[test]
-    fn test_no_shadow_when_an_object_is_behind_the_point() {
-        let world = World::create_default();
-        let point = Point::create(-2.0, 2.0, -2.0);
-
-        let result = world.is_shadowed(point);
-
-        assert_eq!(result, false);
     }
 
     #[test]
@@ -597,5 +569,48 @@ mod tests {
         let color = world.shade_hit(&computations, 5);
 
         assert!(color.equals(Color::create(0.93391, 0.69643, 0.69243)));
+    }
+
+    #[test]
+    fn test_is_shadow_for_occlusion_between_two_points() {
+        let world = World::create_default();
+        let light_position = Point::create(-10.0, -10.0, -10.0);
+
+        let tests = vec![
+            (Point::create(-10.0, -10.0, 10.0), false),
+            (Point::create(10.0, 10.0, 10.0), true),
+            (Point::create(-20.0, -20.0, -20.0), false),
+            (Point::create(-5.0, -5.0, -5.0), false)
+        ];
+
+        for test in tests {
+            let point = test.0;
+            let is_shadowed = world.is_shadowed(light_position, point);
+
+            assert_eq!(is_shadowed, test.1);
+        }
+    }
+
+    #[test]
+    fn test_point_lights_evaluate_the_light_intensity_at_a_given_point() {
+        let world = World::create_default();
+        let light = world.light().unwrap();
+
+        let tests = vec![
+            (Point::create(0.0, 1.0001, 0.0), 1.0),
+            (Point::create(-1.0001, 0.0, 0.0), 1.0),
+            (Point::create(0.0, 0.0, -1.0001), 1.0),
+            (Point::create(0.0, 0.0, 1.0001), 0.0),
+            (Point::create(1.0001, 0.0, 0.0), 0.0),
+            (Point::create(0.0, -1.0001, 0.0), 0.0),
+            (Point::create(0.0, 0.0, 0.0), 0.0)
+        ];
+
+        for test in tests {
+            let point = test.0;
+            let intensity = world.intensity_at(light, point);
+
+            assert_eq!(intensity, test.1);
+        }
     }
 }
