@@ -2,6 +2,7 @@ use crate::features::color::Color;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
+use crate::features::sequence::Sequence;
 use crate::features::world::World;
 
 #[derive(Clone, Copy)]
@@ -13,7 +14,8 @@ pub struct AreaLight {
     v_steps: usize,
     samples: usize,
     position: Point,
-    color: Color
+    color: Color,
+    jitter: Sequence
 }
 
 impl AreaLight {
@@ -27,7 +29,8 @@ impl AreaLight {
             v_steps,
             samples: u_steps * v_steps,
             position,
-            color
+            color,
+            jitter: Sequence::one(0.5)
         }
     }
 
@@ -59,13 +62,24 @@ impl AreaLight {
         self.position
     }
 
-    fn point_on_light(&self, u: usize, v: usize) -> Point {
-        self.corner() +
-            self.u_vec() * (u as f64 + 0.5) +
-            self.v_vec() * (v as f64 + 0.5)
+    fn jitter(&self) -> Sequence {
+        self.jitter
     }
 
-    fn intensity_at(&self, point: &Point, world: &World) -> f64 {
+    fn with_jitter(self, jitter: Sequence) -> AreaLight {
+        AreaLight {
+            jitter,
+            ..self
+        }
+    }
+
+    fn point_on_light(&mut self, u: usize, v: usize) -> Point {
+        self.corner() +
+            self.u_vec() * (u as f64 + self.jitter.next()) +
+            self.v_vec() * (v as f64 + self.jitter.next())
+    }
+
+    fn intensity_at(&mut self, point: &Point, world: &World) -> f64 {
         let mut total = 0.0;
 
         for v in 0..self.v_steps() {
@@ -88,6 +102,7 @@ mod tests {
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
+    use crate::features::sequence::Sequence;
     use crate::features::world::World;
 
     #[test]
@@ -113,7 +128,7 @@ mod tests {
         let v1 = Vector::create(2.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 0.0, 1.0);
 
-        let light = AreaLight::create(corner, v1, 4, v2, 2, WHITE);
+        let mut light = AreaLight::create(corner, v1, 4, v2, 2, WHITE);
 
         let tests = vec![
             (0, 0, Point::create(0.25, 0.0, 0.25)),
@@ -136,7 +151,7 @@ mod tests {
         let corner = Point::create(-0.5, -0.5, -5.0);
         let v1 = Vector::create(1.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 1.0, 0.0);
-        let light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
+        let mut light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
         world.set_light(0, Light::create_area_light(light));
 
         let tests = vec![
@@ -152,5 +167,46 @@ mod tests {
 
             assert_eq!(intensity, test.1);
         }
+    }
+
+    #[test]
+    fn test_finding_a_single_point_on_a_jittered_area_light() {
+        let corner = Point::zero();
+        let v1 = Vector::create(2.0, 0.0, 0.0);
+        let v2 = Vector::create(0.0, 0.0, 1.0);
+        let mut light = AreaLight::create(corner, v1, 4, v2, 2, WHITE)
+            .with_jitter(Sequence::two(0.3, 0.7));
+
+        let tests = vec![
+            (0, 0, Point::create(0.15, 0.0, 0.35)),
+            (1, 0, Point::create(0.65, 0.0, 0.35)),
+            (0, 1, Point::create(0.15, 0.0, 0.85)),
+            (2, 0, Point::create(1.15, 0.0, 0.35)),
+            (3, 1, Point::create(1.65, 0.0, 0.85))
+        ];
+
+        for test in tests {
+            let point = light.point_on_light(test.0, test.1);
+
+            assert_eq!(point, test.2);
+        }
+    }
+
+    #[test]
+    fn test_area_light_with_jittered_samples() {
+        let world = World::create_default();
+        let corner = Point::create(-0.5, -0.5, -5.0);
+        let v1 = Vector::create(1.0, 0.0, 0.0);
+        let v2 = Vector::create(0.0, 1.0, 0.0);
+        let mut light = AreaLight::create(corner, v1, 2, v2, 2, WHITE)
+            .with_jitter(Sequence::five(0.7, 0.3, 0.9, 0.1, 0.5));
+
+        let tests = vec![
+            (Point::create(0.0, 0.0, 2.0), 0.0),
+            (Point::create(1.0, -1.0, 2.0), 0.5),
+            (Point::create(1.5, 0.0, 2.0), 0.75),
+            (Point::create(1.25, 1.25, 3.0), 0.75),
+            (Point::create(0.0, 0.0, -2.0), 1.0)
+        ];
     }
 }

@@ -12,4 +12,5 @@ pub mod patterns;
 pub mod primitives;
 pub mod bounding_box;
 pub mod lights;
+pub mod sequence;
 
