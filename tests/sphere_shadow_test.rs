@@ -4,6 +4,7 @@ use rusty_ray_tracer::features::canvas::Canvas;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::WHITE;
 use rusty_ray_tracer::features::intersection::Intersection;
+use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
@@ -35,7 +36,7 @@ fn sphere_shadow_test() {
 
     //light source
     let light_position = Point::create(-10.0, 10.0, -10.0);
-    let light = PointLight::create(WHITE, light_position);
+    let light = Light::create_point_light(PointLight::create(WHITE, light_position));
 
     for y in 0..canvas_pixels {
         let world_y = half - pixel_size * y as f64;

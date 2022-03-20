@@ -248,7 +248,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
@@ -261,7 +261,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, -2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 

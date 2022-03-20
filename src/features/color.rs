@@ -1,4 +1,6 @@
+use core::fmt;
 use core::ops::{Add, Mul, Sub};
+use std::fmt::Formatter;
 use crate::features::primitives::operations::Operations;
 
 #[derive(Clone, Copy, PartialEq,  Debug)]
@@ -96,6 +98,12 @@ impl core::ops::Mul for Color {
             green: self.green * rhs.green,
             blue: self.blue * rhs.blue
         }
+    }
+}
+
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "red: {}, green: {}, blue:{}", self.red, self.green, self.blue)
     }
 }
 
