@@ -3,7 +3,7 @@ use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::{BLUE, GREEN, RED, WHITE};
-use rusty_ray_tracer::features::light::PointLight;
+use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::{Pattern, TwoColorCreate};

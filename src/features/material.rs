@@ -1,6 +1,6 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
-use crate::features::light::PointLight;
+use crate::features::lights::point_light::PointLight;
 use crate::features::patterns::{OneColorCreate, Pattern};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
@@ -192,7 +192,7 @@ impl Material {
 mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
-    use crate::features::light::PointLight;
+    use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::patterns::TwoColorCreate;

@@ -2,7 +2,7 @@ use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::computation::Computation;
 use crate::features::intersection::Intersection;
-use crate::features::light::PointLight;
+use crate::features::lights::point_light::PointLight;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
@@ -204,7 +204,7 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::intersection::Intersection;
-    use crate::features::light::PointLight;
+    use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;

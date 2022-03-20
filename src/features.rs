@@ -3,7 +3,6 @@ pub mod ray;
 pub mod shapes;
 pub mod intersection;
 pub mod color;
-pub mod light;
 pub mod material;
 pub mod world;
 pub mod computation;
@@ -12,4 +11,5 @@ pub mod canvas;
 pub mod patterns;
 pub mod primitives;
 pub mod bounding_box;
+pub mod lights;
 

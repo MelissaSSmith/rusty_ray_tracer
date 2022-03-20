@@ -1,5 +1,5 @@
 use crate::features::color::consts::WHITE;
-use crate::features::light::PointLight;
+use crate::features::lights::point_light::PointLight;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::shapes::shape::Object;
