@@ -1,6 +1,6 @@
 use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
-use crate::features::lights::point_light::PointLight;
+use crate::features::lights::Light;
 use crate::features::patterns::{OneColorCreate, Pattern};
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
@@ -159,10 +159,10 @@ impl Material {
         self.refractive_index
     }
 
-    pub fn lighting(&self, light: &PointLight, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, intensity: f64) -> Color {
+    pub fn lighting(&self, light: &Light, object: &Object, position: &Point, eye_vector: &Vector, normal_vector: &Vector, intensity: f64) -> Color {
         let color = self.pattern.pattern_at_object(object, position);
 
-        let effective_color = color * light.intensity;
+        let effective_color = color * light.intensity();
         let ambient = effective_color * self.ambient;
         if intensity == 0.0 {
             return ambient;
@@ -171,7 +171,7 @@ impl Material {
         let mut diffuse = BLACK;
         let mut specular = BLACK;
 
-        let light_vector = (light.position - *position).normalize();
+        let light_vector = (light.position() - *position).normalize();
         let light_dot_normal = light_vector ^ *normal_vector;
         if light_dot_normal > 0.0 {
             diffuse = effective_color * self.diffuse * light_dot_normal;
@@ -180,7 +180,7 @@ impl Material {
             let reflection_dot_eye = reflection_vector ^ *eye_vector;
             if reflection_dot_eye > 0.0 {
                 let factor = reflection_dot_eye.powf(self.shininess);
-                specular = light.intensity * self.specular * factor
+                specular = light.intensity() * self.specular * factor
             }
         }
 
@@ -192,6 +192,7 @@ impl Material {
 mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
+    use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::stripe::StripePattern;
@@ -221,7 +222,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
@@ -234,7 +235,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, 2.0_f64.sqrt()/2.0, 2.0_f64.sqrt()/2.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
@@ -247,7 +248,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
@@ -260,7 +261,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, -2.0_f64.sqrt()/2.0, -2.0_f64.sqrt()/2.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 10.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
@@ -273,7 +274,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, 10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, 10.0)));
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, 1.0);
 
@@ -286,7 +287,7 @@ mod tests {
         let position = Point::zero();
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
         let in_shadow = 0.0;
 
         let result = material.lighting(&light, &Shape::Sphere.create(), &position, &eye_vector, &normal_vector, in_shadow);
@@ -303,7 +304,7 @@ mod tests {
             .with_pattern(StripePattern::create(WHITE, BLACK));
         let eye_vector = Vector::create(0.0, 0.0, -1.0);
         let normal_vector = Vector::create(0.0, 0.0, -1.0);
-        let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0)));
 
         let c1 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(0.9, 0.0, 0.0), &eye_vector, &normal_vector, 1.0);
         let c2 = material.lighting(&light, &Shape::Sphere.create(), &Point::create(1.1, 0.0, 0.0), &eye_vector, &normal_vector, 1.0);
@@ -316,7 +317,7 @@ mod tests {
     fn test_lighting_uses_light_intensity_to_attenuate_color() {
         let light = PointLight::create(WHITE, Point::create(0.0, 0.0, -10.0));
         let world = World::create_default()
-            .with_light(light);
+            .with_point_light(light);
         let objects = world.objects();
         let first_object = objects[0].clone()
             .with_material(
@@ -339,7 +340,7 @@ mod tests {
         ];
 
         for test in tests {
-            let result = first_object.material().lighting(&world.light().unwrap(), &first_object, &point, &eye_vector, &normal_vector, test.0);
+            let result = first_object.material().lighting(&world.lights()[0], &first_object, &point, &eye_vector, &normal_vector, test.0);
 
             assert_eq!(test.1, result);
         }

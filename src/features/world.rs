@@ -2,6 +2,7 @@ use crate::features::color::Color;
 use crate::features::color::consts::{BLACK, WHITE};
 use crate::features::computation::Computation;
 use crate::features::intersection::Intersection;
+use crate::features::lights::Light;
 use crate::features::lights::point_light::PointLight;
 use crate::features::material::Material;
 use crate::features::primitives::matrix::Matrix;
@@ -14,14 +15,14 @@ use crate::features::shapes::shape::{Object, Shape};
 #[derive(Clone)]
 pub struct World {
     objects: Vec<Object>,
-    light: Option<PointLight>,
+    lights: Vec<Light>,
     recursion_limit: u8
 }
 
 impl World {
     pub fn create() -> Self {
         Self {
-            light: None,
+            lights: vec![],
             objects: vec![],
             recursion_limit: 5
         }
@@ -30,7 +31,7 @@ impl World {
     pub fn create_world(light: PointLight, objects: Vec<Object>) -> Self {
         Self {
             objects,
-            light: Some(light),
+            lights: vec![Light::create_point_light(light)],
             recursion_limit: 5
         }
     }
@@ -46,7 +47,7 @@ impl World {
             .with_transform(Matrix::scale(0.5, 0.5, 0.5));
         let light = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
         Self {
-            light: Some(light),
+            lights: vec![Light::create_point_light(light)],
             objects: vec![s1, s2],
             recursion_limit: 5
         }
@@ -56,12 +57,8 @@ impl World {
         self.objects.clone()
     }
 
-    pub fn light(&self) -> Option<PointLight> {
-        self.light
-    }
-
-    pub fn set_light(&mut self, light: PointLight) {
-        self.light = Some(light);
+    pub fn lights(&self) -> Vec<Light> {
+        self.lights.clone()
     }
 
     pub fn set_object(&mut self, index: usize, object: Object) {
@@ -69,8 +66,17 @@ impl World {
         self.objects.insert(index, object);
     }
 
+    pub fn set_light(&mut self, index: usize, light: Light) {
+        let _ = self.lights.remove(index);
+        self.lights.insert(index, light);
+    }
+
     pub fn add_object(&mut self, object: Object) {
         self.objects.push(object)
+    }
+
+    pub fn add_light(&mut self, light: Light) {
+        self.lights.push(light)
     }
 
     pub fn with_objects(self, objects: Vec<Object>) -> World {
@@ -80,9 +86,16 @@ impl World {
         }
     }
 
-    pub fn with_light(self, light: PointLight) -> World {
+    pub fn with_lights(self, lights: Vec<Light>) -> World {
         World {
-            light: Some(light),
+            lights,
+            ..self
+        }
+    }
+
+    pub fn with_point_light(self, light: PointLight) -> World {
+        World {
+            lights: vec![Light::create_point_light(light)],
             ..self
         }
     }
@@ -104,10 +117,10 @@ impl World {
     }
 
     fn shade_hit(&self, computation: &Computation, remaining: u8) -> Color {
-        let shadowed = self.intensity_at(self.light.unwrap(), computation.over_point());
+        let shadowed = self.intensity_at(self.lights()[0], computation.over_point());
 
         let surface_color = computation.clone().object().material().lighting(
-            &self.light.unwrap(),
+            &self.lights()[0],
             &computation.clone().object(),
             &computation.over_point(),
             &computation.eye_vector(),
@@ -172,8 +185,8 @@ impl World {
         }
     }
 
-    fn intensity_at(&self, light: PointLight, point: Point) -> f64{
-        let is_shadowed = self.is_shadowed(light.position, point);
+    fn intensity_at(&self, light: Light, point: Point) -> f64{
+        let is_shadowed = self.is_shadowed(light.position(), point);
 
         if is_shadowed {
             return 0.0;
@@ -204,6 +217,7 @@ mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
     use crate::features::intersection::Intersection;
+    use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::EmptyCreate;
@@ -221,15 +235,17 @@ mod tests {
         let world = World::create();
 
         assert_eq!(0, world.objects.len());
-        assert!(world.light.is_none())
+        assert_eq!(0, world.lights.len())
     }
 
     #[test]
     fn test_create_default_world() {
         let world = World::create_default();
 
-        assert_eq!(world.clone().light().unwrap().position, Point::create(-10.0, 10.0, -10.0));
-        assert!(world.clone().light().unwrap().intensity.equals(WHITE));
+        let light = world.lights()[0];
+
+        assert_eq!(light.position(), Point::create(-10.0, 10.0, -10.0));
+        assert!(light.intensity().equals(WHITE));
         assert_eq!(2, world.clone().objects().len());
     }
 
@@ -262,7 +278,7 @@ mod tests {
     #[test]
     fn test_shading_an_intersection_from_the_inside() {
         let mut world = World::create_default();
-        world.light = Some(PointLight::create(WHITE, Point::create(0.0, 0.25, 0.0)));
+        world.lights = vec![Light::create_point_light(PointLight::create(WHITE, Point::create(0.0, 0.25, 0.0)))];
         let ray = Ray::create(Point::zero(), Vector::create(0.0, 0.0, 1.0));
         let intersection = Intersection::create(0.5, &world.clone().objects()[1], 0.0, 0.0);
 
@@ -306,9 +322,9 @@ mod tests {
         let s2 = Shape::Sphere.create()
             .with_material(s2_material)
             .with_transform(Matrix::scale(0.5, 0.5, 0.5));
-        let light = PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0));
+        let light = Light::create_point_light(PointLight::create(WHITE, Point::create(-10.0, 10.0, -10.0)));
         let mut world = World::create();
-        world.light = Some(light);
+        world.lights = vec![light];
         world.objects = vec![s1, s2];
         let ray = Ray::create(Point::create(0.0, 0.0, 0.75), Vector::create(0.0, 0.0, -1.0));
 
@@ -394,8 +410,12 @@ mod tests {
 
     #[test]
     fn test_color_at_with_mutually_reflective_surfaces() {
-        let mut world = World::create();
-        world.set_light(PointLight::create(WHITE, Point::zero()));
+        let mut world = World::create()
+            .with_lights(
+                vec![
+                    Light::create_point_light(PointLight::create(WHITE, Point::zero()))
+                ]
+            );
 
         let material = Material::create().with_reflective(1.0);
 
@@ -594,7 +614,7 @@ mod tests {
     #[test]
     fn test_point_lights_evaluate_the_light_intensity_at_a_given_point() {
         let world = World::create_default();
-        let light = world.light().unwrap();
+        let light = world.lights()[0];
 
         let tests = vec![
             (Point::create(0.0, 1.0001, 0.0), 1.0),
