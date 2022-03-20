@@ -19,6 +19,10 @@ impl Light {
         Light::PointLight(point_light)
     }
 
+    pub fn create_area_light(area_light: AreaLight) -> Light {
+        Light::AreaLight(area_light)
+    }
+
     pub fn position(&self) -> Point {
         match self {
             Light::PointLight(point_light) => { point_light.position }

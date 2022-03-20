@@ -195,7 +195,7 @@ impl World {
         1.0
     }
 
-    fn is_shadowed(&self, light_point: Point, point: Point) -> bool {
+    pub(crate) fn is_shadowed(&self, light_point: Point, point: Point) -> bool {
         let v = light_point - point;
         let distance = v.magnitude();
         let direction = v.normalize();

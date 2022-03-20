@@ -2,6 +2,7 @@ use crate::features::color::Color;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
+use crate::features::world::World;
 
 #[derive(Clone, Copy)]
 pub struct AreaLight {
@@ -17,7 +18,7 @@ pub struct AreaLight {
 
 impl AreaLight {
     pub fn create(corner: Point, v1: Vector, u_steps: usize, v2: Vector, v_steps: usize, color: Color) -> AreaLight {
-        let position = Point::create(1.0, 00.0, 0.5);
+        let position = Point::create(1.0, 0.0, 0.5);
         AreaLight {
             corner,
             u_vec: v1 / u_steps as f64,
@@ -54,12 +55,28 @@ impl AreaLight {
         self.samples
     }
 
-    fn position(&self) -> Point {
+    pub(crate) fn position(&self) -> Point {
         self.position
     }
 
     fn point_on_light(&self, u: usize, v: usize) -> Point {
-        todo!()
+        self.corner() +
+            self.u_vec() * (u as f64 + 0.5) +
+            self.v_vec() * (v as f64 + 0.5)
+    }
+
+    fn intensity_at(&self, point: &Point, world: &World) -> f64 {
+        let mut total = 0.0;
+
+        for v in 0..self.v_steps() {
+            for u in 0..self.u_steps() {
+                let light_position = self.point_on_light(u, v);
+                if !world.is_shadowed(light_position, *point) {
+                    total = total + 1.0;
+                }
+            }
+        }
+        total / self.samples() as f64
     }
 }
 
@@ -67,9 +84,11 @@ impl AreaLight {
 mod tests {
     use crate::features::color::consts::WHITE;
     use crate::features::lights::area_light::AreaLight;
+    use crate::features::lights::Light;
     use crate::features::primitives::point::Point;
     use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::primitives::vector::Vector;
+    use crate::features::world::World;
 
     #[test]
     fn test_creating_an_area_light() {
@@ -108,6 +127,30 @@ mod tests {
             let point = light.point_on_light(test.0, test.1);
 
             assert_eq!(point, test.2);
+        }
+    }
+
+    #[test]
+    fn test_area_light_intensity_function() {
+        let mut world = World::create_default();
+        let corner = Point::create(-0.5, -0.5, -5.0);
+        let v1 = Vector::create(1.0, 0.0, 0.0);
+        let v2 = Vector::create(0.0, 1.0, 0.0);
+        let light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
+        world.set_light(0, Light::create_area_light(light));
+
+        let tests = vec![
+            (Point::create(0.0, 0.0, 2.0), 0.0),
+            (Point::create(1.0, -1.0, 2.0), 0.25),
+            (Point::create(1.5, 0.0, 2.0), 0.5),
+            (Point::create(1.25, 1.25, 3.0), 0.75),
+            (Point::create(0.0, 0.0, -2.0), 1.0)
+        ];
+
+        for test in tests {
+            let intensity = light.intensity_at(&test.0, &world);
+
+            assert_eq!(intensity, test.1);
         }
     }
 }
