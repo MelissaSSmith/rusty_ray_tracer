@@ -1,11 +1,11 @@
+use std::borrow::BorrowMut;
 use crate::features::color::Color;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::sequence::Sequence;
 use crate::features::world::World;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct AreaLight {
     corner: Point,
     u_vec: Vector,
@@ -13,24 +13,40 @@ pub struct AreaLight {
     v_vec: Vector,
     v_steps: usize,
     samples: usize,
-    position: Point,
+    positions: Vec<Point>,
     color: Color,
     jitter: Sequence
 }
 
 impl AreaLight {
     pub fn create(corner: Point, v1: Vector, u_steps: usize, v2: Vector, v_steps: usize, color: Color) -> AreaLight {
-        let position = Point::create(1.0, 0.0, 0.5);
+        let u_vec = v1 / u_steps as f64;
+        let v_vec = v2 / v_steps as f64;
+        let samples = u_steps * v_steps;
+        let mut jitter = Sequence::one(0.5);
+
+        let positions = { //todo: move this to intensity
+            let mut result = Vec::<Point>::with_capacity(samples);
+
+            for v in 0..v_steps {
+                for u in 0..u_steps {
+                    result.push(AreaLight::point_on_light_impl(corner, u_vec, v_vec, u, v, jitter.borrow_mut()));
+                }
+            }
+
+            result
+        };
+
         AreaLight {
             corner,
-            u_vec: v1 / u_steps as f64,
+            u_vec,
             u_steps,
-            v_vec: v2 / v_steps as f64,
+            v_vec,
             v_steps,
-            samples: u_steps * v_steps,
-            position,
+            samples,
+            positions,
             color,
-            jitter: Sequence::one(0.5)
+            jitter
         }
     }
 
@@ -54,12 +70,16 @@ impl AreaLight {
         self.v_steps
     }
 
-    fn samples(&self) -> usize {
+    pub(crate) fn samples(&self) -> usize {
         self.samples
     }
 
-    pub(crate) fn position(&self) -> Point {
-        self.position
+    pub(crate) fn positions(&self) -> &[Point] {
+        &self.positions
+    }
+
+    pub(crate) fn intensity(&self) -> Color {
+        self.color
     }
 
     fn jitter(&self) -> Sequence {
@@ -73,13 +93,16 @@ impl AreaLight {
         }
     }
 
-    fn point_on_light(&mut self, u: usize, v: usize) -> Point {
-        self.corner() +
-            self.u_vec() * (u as f64 + self.jitter.next()) +
-            self.v_vec() * (v as f64 + self.jitter.next())
+    fn point_on_light(&self, u: usize, v: usize) -> Point {
+        AreaLight::point_on_light_impl(self.corner(), self.u_vec(), self.v_vec(), u, v, self.jitter().borrow_mut())
+
     }
 
-    fn intensity_at(&mut self, point: &Point, world: &World) -> f64 {
+    fn point_on_light_impl(corner: Point, u_vec: Vector, v_vec: Vector, u: usize, v: usize, sequence: &mut Sequence) -> Point {
+        corner + u_vec * (u as f64 + sequence.next()) + v_vec * (v as f64 + sequence.next())
+    }
+
+    pub(crate) fn intensity_at(&self, point: &Point, world: &World) -> f64 {
         let mut total = 0.0;
 
         for v in 0..self.v_steps() {
@@ -119,7 +142,6 @@ mod tests {
         assert_eq!(light.v_vec(), Vector::create(0.0, 0.0, 0.5));
         assert_eq!(light.v_steps(), 2);
         assert_eq!(light.samples(), 8);
-        assert_eq!(light.position(), Point::create(1.0, 0.0, 0.5));
     }
 
     #[test]
@@ -128,7 +150,7 @@ mod tests {
         let v1 = Vector::create(2.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 0.0, 1.0);
 
-        let mut light = AreaLight::create(corner, v1, 4, v2, 2, WHITE);
+        let light = AreaLight::create(corner, v1, 4, v2, 2, WHITE);
 
         let tests = vec![
             (0, 0, Point::create(0.25, 0.0, 0.25)),
@@ -151,8 +173,8 @@ mod tests {
         let corner = Point::create(-0.5, -0.5, -5.0);
         let v1 = Vector::create(1.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 1.0, 0.0);
-        let mut light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
-        world.set_light(0, Light::create_area_light(light));
+        let light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
+        world.set_light(0, Light::create_area_light(light.clone()));
 
         let tests = vec![
             (Point::create(0.0, 0.0, 2.0), 0.0),
@@ -174,7 +196,7 @@ mod tests {
         let corner = Point::zero();
         let v1 = Vector::create(2.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 0.0, 1.0);
-        let mut light = AreaLight::create(corner, v1, 4, v2, 2, WHITE)
+        let light = AreaLight::create(corner, v1, 4, v2, 2, WHITE)
             .with_jitter(Sequence::two(0.3, 0.7));
 
         let tests = vec![
@@ -198,7 +220,7 @@ mod tests {
         let corner = Point::create(-0.5, -0.5, -5.0);
         let v1 = Vector::create(1.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 1.0, 0.0);
-        let mut light = AreaLight::create(corner, v1, 2, v2, 2, WHITE)
+        let light = AreaLight::create(corner, v1, 2, v2, 2, WHITE)
             .with_jitter(Sequence::five(0.7, 0.3, 0.9, 0.1, 0.5));
 
         let tests = vec![

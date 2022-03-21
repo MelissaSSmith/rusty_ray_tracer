@@ -25,6 +25,10 @@ impl Sequence {
         Sequence::create([one, two, three, one, two, three, one, two, three, f64::NAN])
     }
 
+    pub fn four(one: f64, two: f64, three: f64, four: f64) -> Sequence {
+        Sequence::create([one, two, three, four, one, two, three, four, f64::NAN, f64::NAN])
+    }
+
     pub fn five(one: f64, two: f64, three: f64, four: f64, five: f64) -> Sequence {
         Sequence::create([one, two, three, four, five, one, two, three, four, five])
     }

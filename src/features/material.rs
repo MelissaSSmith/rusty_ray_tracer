@@ -168,23 +168,28 @@ impl Material {
             return ambient;
         }
 
-        let mut diffuse = BLACK;
-        let mut specular = BLACK;
+        let mut sum = BLACK;
+        let light_samples = light.positions().len() as f64;
 
-        let light_vector = (light.position() - *position).normalize();
-        let light_dot_normal = light_vector ^ *normal_vector;
-        if light_dot_normal > 0.0 {
-            diffuse = effective_color * self.diffuse * light_dot_normal;
+        for light_position in light.positions().iter() {
+            let light_vector = (*light_position - *position).normalize();
+            let light_dot_normal = light_vector ^ *normal_vector;
+            if light_dot_normal > 0.0 {
+                let diffuse = effective_color * self.diffuse * light_dot_normal;
+                sum = sum + diffuse;
 
-            let reflection_vector = (-light_vector).reflect(*normal_vector);
-            let reflection_dot_eye = reflection_vector ^ *eye_vector;
-            if reflection_dot_eye > 0.0 {
-                let factor = reflection_dot_eye.powf(self.shininess);
-                specular = light.intensity() * self.specular * factor
+                let reflection_vector = (-light_vector).reflect(*normal_vector);
+                let reflection_dot_eye = reflection_vector ^ *eye_vector;
+                if reflection_dot_eye > 0.0 {
+                    let factor = f64::powf(reflection_dot_eye, self.shininess);
+                    let specular = light.intensity() * self.specular * factor;
+
+                    sum = sum + specular;
+                }
             }
         }
 
-        ambient + (diffuse * intensity) + (specular * intensity)
+        ambient + (sum / light_samples) * intensity
     }
 }
 
@@ -192,6 +197,7 @@ impl Material {
 mod tests {
     use crate::features::color::Color;
     use crate::features::color::consts::{BLACK, WHITE};
+    use crate::features::lights::area_light::AreaLight;
     use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
@@ -343,6 +349,41 @@ mod tests {
             let result = first_object.material().lighting(&world.lights()[0], &first_object, &point, &eye_vector, &normal_vector, test.0);
 
             assert_eq!(test.1, result);
+        }
+    }
+
+    #[test]
+    fn test_lighting_samples_the_area_light() {
+        let corner = Point::create(-0.5, -0.5, -5.0);
+        let v1 = Vector::create(1.0, 0.0, 0.0);
+        let v2 = Vector::create(0.0, 1.0, 0.0);
+        let area_light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
+        let light = Light::create_area_light(area_light);
+
+        let shape = Shape::Sphere.create()
+            .with_material(
+                Material::create()
+                    .with_ambient(0.1)
+                    .with_diffuse(0.9)
+                    .with_specular(0.0)
+                    .with_color(WHITE)
+            );
+
+        let eye = Point::create(0.0, 0.0, -5.0);
+
+        let tests = vec![
+            (Point::create(0.0, 0.0, -1.0), Color::create(0.9965, 0.9965, 0.9965)),
+            (Point::create(0.0, 0.7071, -0.7071), Color::create(0.6232, 0.6232, 0.6232))
+        ];
+
+        for test in tests {
+            let point = test.0;
+            let eye_vector = (eye - point).normalize();
+            let normal_vector = Vector::create(point.x(), point.y(), point.z());
+
+            let result = shape.material().lighting(&light, &shape, &point, &eye_vector, &normal_vector, 1.0);
+
+            assert_eq!(result, test.1)
         }
     }
 }

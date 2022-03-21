@@ -3,7 +3,7 @@ use core::ops::{Add, Mul, Sub};
 use std::fmt::Formatter;
 use crate::features::primitives::operations::Operations;
 
-#[derive(Clone, Copy, PartialEq,  Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Color {
     pub(crate) red: f64,
     pub(crate) green: f64,
@@ -101,9 +101,29 @@ impl core::ops::Mul for Color {
     }
 }
 
+impl std::ops::Div<f64> for Color {
+    type Output = Color;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Color {
+            red: self.red / rhs,
+            green: self.green / rhs,
+            blue: self.blue / rhs,
+        }
+    }
+}
+
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "red: {}, green: {}, blue:{}", self.red, self.green, self.blue)
+    }
+}
+
+impl PartialEq for Color {
+    fn eq(&self, other: &Self) -> bool {
+        self.red.equals_low_epsilon(other.red) &&
+            self.green.equals_low_epsilon(other.green) &&
+            self.blue.equals_low_epsilon(other.blue)
     }
 }
 

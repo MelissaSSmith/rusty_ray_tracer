@@ -117,27 +117,32 @@ impl World {
     }
 
     fn shade_hit(&self, computation: &Computation, remaining: u8) -> Color {
-        let shadowed = self.intensity_at(self.lights()[0], computation.over_point());
+        let mut full_color = BLACK;
+        for light in self.lights() {
+            let shadowed = light.intensity_at(&computation.over_point(), self);
 
-        let surface_color = computation.clone().object().material().lighting(
-            &self.lights()[0],
-            &computation.clone().object(),
-            &computation.over_point(),
-            &computation.eye_vector(),
-            &computation.normal_vector(),
-            shadowed
-        );
-        let reflected = self.reflected_color(&computation, remaining);
-        let refracted = self.refracted_color(&computation, remaining);
+            let surface_color = computation.clone().object().material().lighting(
+                &light,
+                &computation.clone().object(),
+                &computation.over_point(),
+                &computation.eye_vector(),
+                &computation.normal_vector(),
+                shadowed
+            );
+            let reflected = self.reflected_color(&computation, remaining);
+            let refracted = self.refracted_color(&computation, remaining);
 
-        let material = &computation.clone().object().material();
-        if material.reflective() > 0.0 && material.transparency() > 0.0 {
-            let reflectance = Intersection::schlick(computation);
+            let material = &computation.clone().object().material();
+            if material.reflective() > 0.0 && material.transparency() > 0.0 {
+                let reflectance = Intersection::schlick(computation);
 
-            return  surface_color + reflected * reflectance + refracted * (1.0 - reflectance);
+                full_color = full_color + (surface_color + reflected * reflectance + refracted * (1.0 - reflectance));
+            } else {
+                full_color = full_color + (surface_color + reflected + refracted);
+            }
         }
 
-        surface_color + reflected + refracted
+        full_color
     }
 
     fn reflected_color(&self, _computations: &Computation, remaining: u8) -> Color {
@@ -183,16 +188,6 @@ impl World {
                 self.shade_hit(&computations, remaining)
             }
         }
-    }
-
-    fn intensity_at(&self, light: Light, point: Point) -> f64{
-        let is_shadowed = self.is_shadowed(light.position(), point);
-
-        if is_shadowed {
-            return 0.0;
-        }
-
-        1.0
     }
 
     pub(crate) fn is_shadowed(&self, light_point: Point, point: Point) -> bool {
@@ -242,9 +237,9 @@ mod tests {
     fn test_create_default_world() {
         let world = World::create_default();
 
-        let light = world.lights()[0];
+        let light = world.lights()[0].clone();
 
-        assert_eq!(light.position(), Point::create(-10.0, 10.0, -10.0));
+        assert_eq!(light.positions()[0], Point::create(-10.0, 10.0, -10.0));
         assert!(light.intensity().equals(WHITE));
         assert_eq!(2, world.clone().objects().len());
     }
@@ -608,29 +603,6 @@ mod tests {
             let is_shadowed = world.is_shadowed(light_position, point);
 
             assert_eq!(is_shadowed, test.1);
-        }
-    }
-
-    #[test]
-    fn test_point_lights_evaluate_the_light_intensity_at_a_given_point() {
-        let world = World::create_default();
-        let light = world.lights()[0];
-
-        let tests = vec![
-            (Point::create(0.0, 1.0001, 0.0), 1.0),
-            (Point::create(-1.0001, 0.0, 0.0), 1.0),
-            (Point::create(0.0, 0.0, -1.0001), 1.0),
-            (Point::create(0.0, 0.0, 1.0001), 0.0),
-            (Point::create(1.0001, 0.0, 0.0), 0.0),
-            (Point::create(0.0, -1.0001, 0.0), 0.0),
-            (Point::create(0.0, 0.0, 0.0), 0.0)
-        ];
-
-        for test in tests {
-            let point = test.0;
-            let intensity = world.intensity_at(light, point);
-
-            assert_eq!(intensity, test.1);
         }
     }
 }
