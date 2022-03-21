@@ -357,7 +357,7 @@ mod tests {
         let corner = Point::create(-0.5, -0.5, -5.0);
         let v1 = Vector::create(1.0, 0.0, 0.0);
         let v2 = Vector::create(0.0, 1.0, 0.0);
-        let area_light = AreaLight::create(corner, v1, 2, v2, 2, WHITE);
+        let area_light = AreaLight::create(corner, v1, 2, v2, 2, WHITE, false);
         let light = Light::create_area_light(area_light);
 
         let shape = Shape::Sphere.create()

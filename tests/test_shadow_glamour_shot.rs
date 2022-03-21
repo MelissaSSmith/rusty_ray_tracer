@@ -64,8 +64,10 @@ fn test_glamour_shot() {
         .with_transform(Matrix::translate(-0.25, 0.33, 0.0) * Matrix::scale(0.33, 0.33, 0.33));
 
     let light_source = Light::AreaLight(
-        AreaLight::create(Point::create(-1.0, 2.0, 4.0), Vector::create(2.0, 0.0, 0.0), 10, Vector::create(0.0, 2.0, 0.0), 10, Color::create(1.5, 1.5, 1.5))
-            .with_jitter(Sequence::five(0.7, 0.3, 0.9, 0.1, 0.5))
+        AreaLight::create(Point::create(-1.0, 2.0, 4.0),
+                          Vector::create(2.0, 0.0, 0.0), 10,
+                          Vector::create(0.0, 2.0, 0.0), 10,
+                          Color::create(1.5, 1.5, 1.5), true)
     );
     let objects = vec![cube, plane, sphere_1, sphere_2];
     let world = World::create_world(light_source, objects);

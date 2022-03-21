@@ -1,36 +1,46 @@
+use rand::Rng;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Sequence {
-    base: [f64; 10],
+    base: [f64; 5],
     next_index: usize
 }
 
 impl Sequence {
-    fn create(base: [f64; 10]) -> Sequence {
+    fn create(base: [f64; 5]) -> Sequence {
         Sequence {
             base,
             next_index: 0
         }
     }
 
+    pub fn new() -> Sequence {
+        let mut rng = rand::thread_rng();
+        let mut base = [0.0; 5];
+        for n in &mut base {
+            *n = rng.gen_range(0.0, 1.0);
+        }
+        Sequence::create(base)
+    }
+
     pub fn one(one: f64) -> Sequence {
-        Sequence::create([one, one, one, one, one, one, one, one, one, one])
+        Sequence::create([one, one, one, one, one])
     }
 
     pub fn two(one: f64, two: f64) -> Sequence {
-        Sequence::create([one, two, one, two, one, two, one, two, one, two])
+        Sequence::create([one, two, one, two, f64::NAN])
     }
 
     pub fn three(one: f64, two: f64, three: f64) -> Sequence {
-        Sequence::create([one, two, three, one, two, three, one, two, three, f64::NAN])
+        Sequence::create([one, two, three, f64::NAN, f64::NAN])
     }
 
     pub fn four(one: f64, two: f64, three: f64, four: f64) -> Sequence {
-        Sequence::create([one, two, three, four, one, two, three, four, f64::NAN, f64::NAN])
+        Sequence::create([one, two, three, four, f64::NAN])
     }
 
     pub fn five(one: f64, two: f64, three: f64, four: f64, five: f64) -> Sequence {
-        Sequence::create([one, two, three, four, five, one, two, three, four, five])
+        Sequence::create([one, two, three, four, five])
     }
 
     pub fn next(&mut self) -> f64 {
@@ -66,5 +76,14 @@ mod tests {
         assert_eq!(gen.next(), 0.5);
         assert_eq!(gen.next(), 1.0);
         assert_eq!(gen.next(), 0.1);
+    }
+
+    #[test]
+    fn test_new_generates_random_numbers() {
+        let gen = Sequence::new();
+
+        for num in gen.base {
+            assert!(num > 0.0 && num < 1.0);
+        }
     }
 }
