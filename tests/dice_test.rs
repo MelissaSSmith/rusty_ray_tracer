@@ -4,6 +4,7 @@ use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::{BLACK, WHITE};
+use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
@@ -188,7 +189,7 @@ fn dice_test() {
 
     let light_source = PointLight::create(WHITE, Point::create(0.0, 8.0, -7.0));
     let objects = vec![floor, dice_group, lens];
-    let world = World::create_world(light_source, objects);
+    let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let canvas = camera.render(world);
 

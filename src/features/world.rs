@@ -28,10 +28,10 @@ impl World {
         }
     }
     
-    pub fn create_world(light: PointLight, objects: Vec<Object>) -> Self {
+    pub fn create_world(light: Light, objects: Vec<Object>) -> Self {
         Self {
             objects,
-            lights: vec![Light::create_point_light(light)],
+            lights: vec![light],
             recursion_limit: 5
         }
     }
@@ -335,7 +335,7 @@ mod tests {
         let s2 = Shape::Sphere.create()
             .with_transform(Matrix::translate(0.0, 0.0, 10.0));
         let objects = vec![s1, s2.clone()];
-        let world = World::create_world(light, objects);
+        let world = World::create_world(Light::create_point_light(light), objects);
         let ray = Ray::create(Point::create(0.0, 0.0, 5.0), Vector::create(0.0, 0.0, 1.0));
         let intersection = Intersection::create(4.0, &s2, 0.0, 0.0);
         let computations = intersection.prepare_computations(ray, &vec![]);

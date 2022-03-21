@@ -3,6 +3,7 @@ use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::{BLUE, GREEN, RED, WHITE};
+use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
@@ -115,7 +116,7 @@ fn cone_test() {
 
     let light_source = PointLight::create(WHITE, Point::create(-5.0, 10.0, -10.0));
     let objects = vec![floor, right_wall, left_wall, cone_x, cone_y, cone_z];
-    let world = World::create_world(light_source, objects);
+    let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let canvas = camera.render(world);
 

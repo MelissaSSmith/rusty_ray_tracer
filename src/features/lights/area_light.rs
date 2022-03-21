@@ -23,7 +23,7 @@ impl AreaLight {
         let u_vec = v1 / u_steps as f64;
         let v_vec = v2 / v_steps as f64;
         let samples = u_steps * v_steps;
-        let mut jitter = Sequence::one(0.5);
+        let mut jitter = Sequence::one(0.5); //todo: pass in boolean for jitter to implement a non-deterministic jitter
 
         let positions = { //todo: move this to intensity
             let mut result = Vec::<Point>::with_capacity(samples);
@@ -86,7 +86,7 @@ impl AreaLight {
         self.jitter
     }
 
-    fn with_jitter(self, jitter: Sequence) -> AreaLight {
+    pub fn with_jitter(self, jitter: Sequence) -> AreaLight {
         AreaLight {
             jitter,
             ..self

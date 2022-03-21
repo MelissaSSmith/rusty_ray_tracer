@@ -2,6 +2,7 @@ use core::f64::consts::PI;
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::consts::{RED, WHITE};
+use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
@@ -55,7 +56,7 @@ fn hexagon() -> Object {
 fn test_hexagon() {
     let light_source = PointLight::create(WHITE, Point::create(-5.0, 10.0, -10.0));
     let objects = vec![hexagon()];
-    let world = World::create_world(light_source, objects);
+    let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let mut camera = Camera::create(1080, 1080, PI/3.0);
     camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));

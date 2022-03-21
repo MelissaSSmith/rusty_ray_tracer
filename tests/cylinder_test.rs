@@ -3,6 +3,7 @@ use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::{BLUE, GREEN, RED, WHITE};
+use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
@@ -153,7 +154,7 @@ fn cylinder_test() {
 
     let light_source = PointLight::create(WHITE, Point::create(-5.0, 10.0, -10.0));
     let objects = vec![right_wall, left_wall, cylinder_x, cylinder_y, cylinder_z, shallow_cylinder, cylinder, refractive_cylinder];
-    let world = World::create_world(light_source, objects);
+    let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let canvas = camera.render(world);
 

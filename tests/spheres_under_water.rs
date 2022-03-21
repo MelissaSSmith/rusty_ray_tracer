@@ -3,6 +3,7 @@ use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
 use rusty_ray_tracer::features::color::consts::WHITE;
+use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::{OneColorCreate, OnePatternWithScale, TwoColorCreate};
@@ -56,7 +57,7 @@ fn spheres_under_water_test() {
 
     let light_source = PointLight::create(WHITE, Point::create(2.0, 5.0, -5.0));
     let objects: Vec<Object> = vec![ground, water, sphere];
-    let world = World::create_world(light_source, objects);
+    let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let canvas = camera.render(world);
 
