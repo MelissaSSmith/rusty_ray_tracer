@@ -10,6 +10,7 @@ use crate::features::patterns::stripe::StripePattern;
 use crate::features::patterns::test::TestPattern;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
+use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
 
 pub mod stripe;
@@ -129,6 +130,10 @@ pub trait OneColorCreate {
 
 pub trait TwoColorCreate {
     fn create(color_a: Color, color_b: Color) -> Pattern;
+}
+
+pub trait MultiColorCreate {
+    fn create(colors: Vec<Color>) -> Pattern;
 }
 
 pub trait OnePatternCreate {
