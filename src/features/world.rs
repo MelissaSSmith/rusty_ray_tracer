@@ -466,8 +466,8 @@ mod tests {
     #[test]
     fn test_find_the_refracted_color_at_the_maximum_recursion_depth() {
         let world = World::create_default();
-        let mut shape = world.clone().objects()[0].clone();
-        shape.set_material(Material::create()
+        let shape = world.clone().objects()[0].clone()
+            .with_material(Material::create()
                 .with_refractive_index(1.5)
                 .with_transparency(1.0)
         );
@@ -484,11 +484,11 @@ mod tests {
     fn test_refracted_color_when_under_total_internal_reflection() {
         let sqrt2 = f64::sqrt(2.0);
         let mut world = World::create_default();
-        let mut shape = world.clone().objects()[0].clone();
-        shape.set_material(Material::create()
-            .with_refractive_index(1.5)
-            .with_transparency(1.0)
-        );
+        let shape = world.clone().objects()[0].clone()
+            .with_material(Material::create()
+                .with_refractive_index(1.5)
+                .with_transparency(1.0)
+            );
         world.set_object(0, shape.clone());
         let ray = Ray::create(Point::create(0.0, 0.0, sqrt2/2.0), Vector::create(0.0, 1.0, 0.0));
         let intersections = vec![Intersection::create(-sqrt2/2.0, &shape, 0.0, 0.0), Intersection::create(sqrt2/2.0, &shape, 0.0, 0.0)];
@@ -502,16 +502,16 @@ mod tests {
     #[test]
     fn test_refracted_color_with_a_refracted_ray() {
         let world = World::create_default();
-        let mut a = world.clone().objects()[0].clone();
-        a.set_material(Material::create()
-            .with_ambient(1.0)
-            .with_pattern(TestPattern::create())
-        );
-        let mut b = world.clone().objects()[1].clone();
-        b.set_material(Material::create()
-            .with_transparency(1.0)
-            .with_refractive_index(1.5)
-        );
+        let a = world.clone().objects()[0].clone()
+            .with_material(Material::create()
+                .with_ambient(1.0)
+                .with_pattern(TestPattern::create())
+            );
+        let b = world.clone().objects()[1].clone()
+            .with_material(Material::create()
+                .with_transparency(1.0)
+                .with_refractive_index(1.5)
+            );
         let world = world.with_objects(vec![a.clone(), b.clone()]);
 
         let ray = Ray::create(Point::create(0.0, 0.0, 0.1), Vector::create(0.0, 1.0, 0.0));

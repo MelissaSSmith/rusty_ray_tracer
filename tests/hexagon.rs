@@ -49,6 +49,9 @@ fn hexagon() -> Object {
     Shape::Group(Group::create()).create()
         .with_transform(Matrix::translate(0.0, 0.5, 0.0) * Matrix::rotate_x(PI / 3.0))
         .with_children(children)
+        .with_material(
+            Material::create().with_color(RED)
+        )
 }
 
 #[test]

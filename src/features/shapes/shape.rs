@@ -238,10 +238,6 @@ impl Object {
         }
     }
 
-    pub fn set_material(&mut self, _material: Material) {
-        self.material = _material;
-    }
-
     pub fn with_transform(self, _transform: Matrix) -> Object {
         match self.shape {
             Shape::CSG(ref c) => {
@@ -264,9 +260,9 @@ impl Object {
                 }
             }
             Shape::Group(ref g) => {
-                let group = Group::create_with_children(g.shapes(), _transform);
+                let group = Group::create_with_children(g.children(), _transform);
                 let mut group_bounds = BoundingBox::create();
-                for child in group.shapes() {
+                for child in group.children() {
                     let child_box = child.parent_space_bounds();
                     group_bounds = group_bounds + child_box;
                 }
@@ -294,10 +290,25 @@ impl Object {
 
     }
 
-    pub fn with_material(self, _material: Material) -> Object {
-        Object {
-            material: _material,
-            ..self
+    pub fn with_material(self, material: Material) -> Object {
+        match self.shape {
+            Shape::Group(g) => {
+                let children = g.children().iter()
+                    .map(|child| child.clone().with_material(material.clone()))
+                    .collect();
+
+                Object {
+                    material,
+                    shape: Shape::Group(g.with_children(children)),
+                    ..self
+                }
+            }
+            _ => {
+                Object {
+                    material,
+                    ..self
+                }
+            }
         }
     }
 
@@ -326,7 +337,7 @@ impl Object {
             Shape::Group(_) => {
                 let group = Group::create_with_children(children, self.cumulative_transform());
                 let mut group_bounds = BoundingBox::create();
-                for child in group.shapes() {
+                for child in group.children() {
                     let child_box = child.parent_space_bounds();
                     group_bounds = group_bounds + child_box;
                 }
@@ -374,7 +385,7 @@ impl Object {
 
     pub fn children(&self) -> Vec<Object> {
         match self.shape() {
-            Shape::Group(g) => { g.shapes() }
+            Shape::Group(g) => { g.children() }
             _ => vec![]
         }
     }

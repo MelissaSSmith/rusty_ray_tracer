@@ -21,8 +21,14 @@ impl Group {
         }
     }
 
-    pub fn shapes(&self) -> Vec<Object> {
+    pub fn children(&self) -> Vec<Object> {
         self.children.clone()
+    }
+
+    pub fn with_children(self, children: Vec<Object>) -> Group {
+        Group {
+            children
+        }
     }
 
     fn transform_children(children: Vec<Object>, transform: Matrix) -> Vec<Object> {

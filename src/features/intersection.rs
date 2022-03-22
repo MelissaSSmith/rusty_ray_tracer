@@ -290,15 +290,15 @@ mod tests {
 
     #[test]
     fn test_n1_and_n2_at_various_intersections() {
-        let mut a = Shape::Sphere.glass();
-        a.set_transform(Matrix::scale(2.0, 2.0, 2.0));
-        a.set_material(Material::create().with_refractive_index(1.5));
-        let mut b = Shape::Sphere.glass();
-        b.set_transform(Matrix::translate(0.0, 0.0, -0.25));
-        b.set_material(Material::create().with_refractive_index(2.0));
-        let mut c = Shape::Sphere.glass();
-        c.set_transform(Matrix::translate(0.0, 0.0, 0.25));
-        c.set_material(Material::create().with_refractive_index(2.5));
+        let a = Shape::Sphere.glass()
+            .with_transform(Matrix::scale(2.0, 2.0, 2.0))
+            .with_material(Material::create().with_refractive_index(1.5));
+        let b = Shape::Sphere.glass()
+            .with_transform(Matrix::translate(0.0, 0.0, -0.25))
+            .with_material(Material::create().with_refractive_index(2.0));
+        let c = Shape::Sphere.glass()
+            .with_transform(Matrix::translate(0.0, 0.0, 0.25))
+            .with_material(Material::create().with_refractive_index(2.5));
 
         let ray = Ray::create(Point::create(0.0, 0.0, -4.0), Vector::create(0.0, 0.0, 1.0));
         let intersections = vec![

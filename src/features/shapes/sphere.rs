@@ -257,11 +257,9 @@ mod tests {
 
     #[test]
     fn test_sphere_may_be_assigned_a_material() {
-        let mut sphere = Shape::Sphere.create();
-        let mut material = Material::create();
-        material.set_ambient(1.0);
-
-        sphere.set_material(material.clone());
+        let material = Material::create().with_ambient(1.0);
+        let sphere = Shape::Sphere.create()
+            .with_material(material.clone());
 
         assert!(material.equals(sphere.material()));
     }
