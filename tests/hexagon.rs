@@ -1,10 +1,12 @@
 use core::f64::consts::PI;
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::consts::{RED, WHITE};
+use rusty_ray_tracer::features::color::consts::{BLUE, GREEN, RED, WHITE};
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
+use rusty_ray_tracer::features::patterns::MultiColorCreate;
+use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -16,7 +18,11 @@ use rusty_ray_tracer::features::world::World;
 
 fn hexagon_corner() -> Object {
     Shape::Sphere.create()
-        .with_transform(Matrix::translate(0.0, 0.0, -1.0) * Matrix::scale(0.25, 0.25, 0.25))
+        .with_transform(
+            Matrix::translate(0.0, 0.0, -1.0) *
+                Matrix::rotate_z(PI/2.0) *
+                Matrix::rotate_y(0.1111) *
+                Matrix::scale(0.25, 0.25, 0.25))
 }
 
 fn hexagon_edge() -> Object {
@@ -41,6 +47,8 @@ fn hexagon_side(n:i32) -> Object {
 }
 
 fn hexagon() -> Object {
+    let stripe_pattern = StripePattern::create(vec![RED, GREEN, BLUE])
+        .with_transform(Matrix::scale(0.25, 0.25, 0.25));
     let mut children = vec![];
     for n in 0..=5 {
         children.push(hexagon_side(n));
@@ -50,7 +58,7 @@ fn hexagon() -> Object {
         .with_transform(Matrix::translate(0.0, 0.5, 0.0) * Matrix::rotate_x(PI / 3.0))
         .with_children(children)
         .with_material(
-            Material::create().with_color(RED)
+            Material::create().with_pattern(stripe_pattern)
         )
 }
 
@@ -62,7 +70,7 @@ fn test_hexagon() {
     let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let mut camera = Camera::create(1080, 1080, PI/3.0);
-    camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
+    camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -3.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
     let canvas = camera.render(world);
 

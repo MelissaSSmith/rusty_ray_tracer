@@ -10,7 +10,6 @@ use crate::features::patterns::stripe::StripePattern;
 use crate::features::patterns::test::TestPattern;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
-use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
 
 pub mod stripe;
@@ -23,7 +22,7 @@ pub mod solid;
 pub mod perturb;
 pub mod test;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Patterns {
     Blended(BlendedPattern),
     Checkers(CheckerPattern),
@@ -36,7 +35,7 @@ pub enum Patterns {
     Test(TestPattern)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Pattern {
     pattern: Box<Patterns>,
     transformation: Matrix,
@@ -66,11 +65,6 @@ impl Pattern {
             Patterns::Stripe(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
             Patterns::Test(p) => { p.pattern_at(&pattern_point) }
         }
-    }
-
-    pub fn equals(&self, other_pattern: &Pattern) -> bool {
-        self.transformation.eq(&other_pattern.transformation) &&
-            self.inverse_transformation.eq(&other_pattern.inverse_transformation) //todo: add patterns
     }
 
     pub fn transformation(&self) -> Matrix {
@@ -109,6 +103,13 @@ impl Pattern {
 impl PatternAt for Pattern {
     fn pattern_at(&self, point: &Point) -> Color {
         Pattern::call_pattern_at(self, point)
+    }
+}
+
+impl PartialEq for Pattern {
+    fn eq(&self, other: &Self) -> bool {
+        self.transformation.eq(&other.transformation) &&
+            self.inverse_transformation.eq(&other.inverse_transformation) //todo: add patterns
     }
 }
 

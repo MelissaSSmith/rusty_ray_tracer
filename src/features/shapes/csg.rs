@@ -22,7 +22,7 @@ impl CSGOperation {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CSG {
     operation: CSGOperation,
     left: Box<Object>,

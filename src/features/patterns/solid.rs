@@ -2,7 +2,7 @@ use crate::features::color::Color;
 use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SolidPattern {
     color: Color
 }

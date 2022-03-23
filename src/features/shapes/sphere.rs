@@ -252,7 +252,7 @@ mod tests {
 
         let material = Material::create();
 
-        assert!(material.equals(sphere.material()));
+        assert_eq!(material, sphere.material());
     }
 
     #[test]
@@ -261,7 +261,7 @@ mod tests {
         let sphere = Shape::Sphere.create()
             .with_material(material.clone());
 
-        assert!(material.equals(sphere.material()));
+        assert_eq!(material, sphere.material());
     }
 
     #[test]

@@ -3,7 +3,7 @@ use crate::features::patterns::{EmptyCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TestPattern {}
 
 impl EmptyCreate for TestPattern {

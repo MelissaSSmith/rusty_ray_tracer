@@ -8,7 +8,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Cylinder {
     maximum: f64,
     minimum: f64,

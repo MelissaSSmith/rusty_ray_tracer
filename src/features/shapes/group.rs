@@ -5,7 +5,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Group {
     children: Vec<Object>
 }

@@ -3,7 +3,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::{Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoPatternCreate};
 use crate::features::primitives::point::Point;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BlendedPattern {
     pattern_a: Box<Pattern>,
     pattern_b: Box<Pattern>

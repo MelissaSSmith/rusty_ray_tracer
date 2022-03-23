@@ -18,7 +18,7 @@ use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::triangle::Triangle;
 use crate::features::transformations::Transform;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Shape {
     Object,
     Sphere,
@@ -140,7 +140,7 @@ impl Shape {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Object {
     transformation: Matrix,
     inverse_transformation: Matrix,
@@ -171,7 +171,7 @@ impl Object {
 
     pub fn equals(&self, other: &Object) -> bool {
         self.shape_type() == other.shape_type() &&
-            self.material().equals(other.material()) &&
+            self.material().eq(&other.material()) &&
             self.transformation().eq(&other.transformation()) &&
             self.cumulative_transform().eq(&other.cumulative_transform())
     }

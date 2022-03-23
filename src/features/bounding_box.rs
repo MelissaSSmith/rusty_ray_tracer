@@ -6,7 +6,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
 use crate::features::transformations::Transform;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct BoundingBox {
     minimum: Point,
     maximum: Point

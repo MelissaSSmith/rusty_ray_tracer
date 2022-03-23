@@ -5,7 +5,7 @@ use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RadialGradientPattern {
     pattern_a: Box<Pattern>,
     pattern_b: Box<Pattern>

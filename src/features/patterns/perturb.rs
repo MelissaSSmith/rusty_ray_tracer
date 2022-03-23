@@ -4,7 +4,7 @@ use crate::features::patterns::{OnePatternWithScale, Pattern, PatternAt, Pattern
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PerturbedPattern {
     pattern: Box<Pattern>,
     scale: f64

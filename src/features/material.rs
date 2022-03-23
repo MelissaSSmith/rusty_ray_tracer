@@ -7,7 +7,7 @@ use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Material {
     pattern: Pattern,
     ambient: f64,
@@ -31,17 +31,6 @@ impl Material {
             transparency: 0.0,
             refractive_index: 1.0
         }
-    }
-
-    pub fn equals(&self, other_material: Material) -> bool {
-        self.ambient == other_material.ambient &&
-            self.diffuse == other_material.diffuse &&
-            self.specular == other_material.specular &&
-            self.shininess == other_material.shininess &&
-            self.reflective == other_material.reflective &&
-            self.transparency == other_material.transparency &&
-            self.refractive_index == other_material.refractive_index &&
-            self.pattern.equals(&other_material.pattern)
     }
 
     //setters
@@ -190,6 +179,19 @@ impl Material {
         }
 
         ambient + (sum / light_samples) * intensity
+    }
+}
+
+impl PartialEq for Material {
+    fn eq(&self, other: &Self) -> bool {
+        self.ambient == other.ambient &&
+            self.diffuse == other.diffuse &&
+            self.specular == other.specular &&
+            self.shininess == other.shininess &&
+            self.reflective == other.reflective &&
+            self.transparency == other.transparency &&
+            self.refractive_index == other.refractive_index &&
+            self.pattern.eq(&other.pattern)
     }
 }
 

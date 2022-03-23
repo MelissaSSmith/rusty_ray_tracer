@@ -7,7 +7,7 @@ use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::{Object, Shape};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Triangle {
     point1: Point,
     point2: Point,
