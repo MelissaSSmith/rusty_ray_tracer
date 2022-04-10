@@ -18,7 +18,7 @@ pub struct AreaLight {
 }
 
 impl AreaLight {
-    pub fn create(corner: Point, v1: Vector, u_steps: usize, v2: Vector, v_steps: usize, color: Color, jitter: bool) -> AreaLight {
+    pub fn create(corner: Point, v1: Vector, u_steps: usize, v2: Vector, v_steps: usize, intensity: Color, jitter: bool) -> AreaLight {
         let u_vec = v1 / u_steps as f64;
         let v_vec = v2 / v_steps as f64;
         let samples = u_steps * v_steps;
@@ -46,7 +46,7 @@ impl AreaLight {
             v_vec,
             v_steps,
             positions,
-            color,
+            color: intensity,
             jitter: sequence
         }
     }

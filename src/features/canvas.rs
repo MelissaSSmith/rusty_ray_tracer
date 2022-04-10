@@ -38,10 +38,10 @@ impl Canvas {
         }
     }
 
-    pub fn get_pixel(&self, _x: i32, _y: i32) -> &Color {
+    pub fn get_pixel(&self, _x: i32, _y: i32) -> Color {
         let key = Canvas::create_key(_x, _y);
         let pixel = self.pixels.get(&key).unwrap();
-        pixel.value()
+        *pixel.value()
     }
 
     pub fn pixels(&self) -> DashMap<String, Color> {
