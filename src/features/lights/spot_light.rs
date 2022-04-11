@@ -9,8 +9,8 @@ use crate::features::world::World;
 pub struct SpotLight {
     center: [Point; 1],
     color: Color,
-    r1: f64,
-    r2: f64
+    radius_start: f64,
+    radius_end: f64
 }
 
 impl SpotLight {
@@ -18,8 +18,8 @@ impl SpotLight {
         SpotLight {
             center: [center],
             color: intensity,
-            r1,
-            r2
+            radius_start: r1,
+            radius_end: r2
         }
     }
 
@@ -63,12 +63,20 @@ impl SpotLight {
         let t1 = (-b + disc.sqrt()) / (2.0 * a);
 
         let y0 = origin.y() + t0 * direction.y();
-        if self.r1 < y0 && y0 < self.r2 {
+        if self.radius_start < y0 && y0 < self.radius_end {
             return true;
         }
 
         let y1 = origin.y() + t1 * direction.y();
-        if self.r1 < y1 && y1 < self.r2 {
+        if self.radius_start < y1 && y1 < self.radius_end {
+            return true;
+        }
+
+        let t = (self.radius_end - origin.y()) / direction.y();
+        let x = origin.x() + t * direction.x();
+        let z = origin.z() + t * direction.z();
+
+        if (x.powi(2) + z.powi(2)) <= self.radius_end.powi(2) {
             return true;
         }
 

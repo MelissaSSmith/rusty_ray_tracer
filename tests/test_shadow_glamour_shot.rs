@@ -16,7 +16,7 @@ use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-//#[ignore]
+#[ignore]
 fn test_glamour_shot() {
     let cube = Shape::Cube.create()
         .with_material(
@@ -65,10 +65,10 @@ fn test_glamour_shot() {
         .with_transform(Matrix::translate(-0.25, 0.33, 0.0) * Matrix::scale(0.33, 0.33, 0.33));
 
     let light_source = Light::SpotLight(
-        SpotLight::create(Point::create(-1.0, 1.0, 2.0),
+        SpotLight::create(Point::create(0.0, 2.0, 0.0),
                           Color::create(1.5, 1.5, 1.5),
-                          -10.0,
-                          20.0)
+                          10.0,
+                          10.0)
     );
     let objects = vec![cube, plane, sphere_1, sphere_2];
     let world = World::create_world(light_source, objects);
