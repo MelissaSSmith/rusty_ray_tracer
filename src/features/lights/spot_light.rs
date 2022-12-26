@@ -1,5 +1,4 @@
 use crate::features::color::Color;
-use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
@@ -10,7 +9,9 @@ pub struct SpotLight {
     center: [Point; 1],
     color: Color,
     radius_start: f64,
-    radius_end: f64
+    radius_end: f64,
+    fade: f64,
+    direction: Vector
 }
 
 impl SpotLight {
@@ -19,7 +20,9 @@ impl SpotLight {
             center: [center],
             color: intensity,
             radius_start: r1,
-            radius_end: r2
+            radius_end: r2,
+            fade: 45.0,
+            direction: Vector::create(0.0, 0.0, 1.0)
         }
     }
 
@@ -33,6 +36,7 @@ impl SpotLight {
 
     pub(crate) fn intensity_at(&self, point: &Point, world: &World) -> f64 {
         let direction = (self.center[0] - *point).normalize();
+        //let dot_product = self.direction ^ direction;
         let intersects_disk = self.intersects_disk(self.center[0], direction);
         if !intersects_disk {
             return 0.0;
