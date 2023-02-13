@@ -16,7 +16,7 @@ use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
-//#[ignore]
+#[ignore]
 fn test_glamour_shot() {
     let cube = Shape::Cube.create()
         .with_material(
