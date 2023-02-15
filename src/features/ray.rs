@@ -4,8 +4,8 @@ use crate::features::primitives::vector::Vector;
 
 #[derive(Clone, Copy)]
 pub struct Ray {
-    pub(crate) origin: Point,
-    pub(crate) direction: Vector
+    origin: Point,
+    direction: Vector
 }
 
 impl Ray {

@@ -53,9 +53,9 @@ impl BoundingBox {
     }
 
     pub fn intersects(_bounds: &BoundingBox, _ray: &Ray) -> bool {
-        let (xtmin, xtmax) = Object::check_axis(&_ray.origin.x(), &_ray.direction.x(), _bounds.minimum().x(), _bounds.maximum().x());
-        let (ytmin, ytmax) = Object::check_axis(&_ray.origin.y(), &_ray.direction.y(), _bounds.minimum().y(), _bounds.maximum().y());
-        let (ztmin, ztmax) = Object::check_axis(&_ray.origin.z(), &_ray.direction.z(), _bounds.minimum().z(), _bounds.maximum().z());
+        let (xtmin, xtmax) = Object::check_axis(&_ray.origin().x(), &_ray.direction().x(), _bounds.minimum().x(), _bounds.maximum().x());
+        let (ytmin, ytmax) = Object::check_axis(&_ray.origin().y(), &_ray.direction().y(), _bounds.minimum().y(), _bounds.maximum().y());
+        let (ztmin, ztmax) = Object::check_axis(&_ray.origin().z(), &_ray.direction().z(), _bounds.minimum().z(), _bounds.maximum().z());
 
         let tmin = vec![xtmin, ytmin, ztmin].iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
         let tmax = vec![xtmax, ytmax, ztmax].iter().fold(f64::INFINITY, |a, &b| a.min(b));

@@ -59,7 +59,7 @@ impl Intersection {
         computation.set_eye_vector(eye_vector);
         computation.set_normal_vector(normal);
         computation.set_inside(inside);
-        computation.set_reflect_vector(_ray.direction.reflect(normal));
+        computation.set_reflect_vector(_ray.direction().reflect(normal));
         computation.set_over_point(point + normal * EPSILON);
         computation.set_under_point(point - normal * EPSILON);
 

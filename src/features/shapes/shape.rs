@@ -100,7 +100,7 @@ impl Shape {
                 Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
             Shape::Torus(torus) => {
-                Object::create(Shape::Torus(*torus), has_shadow, material, bounds)
+                Object::create(Shape::Torus(*torus), has_shadow, material, BoundingBox::create())
             }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }

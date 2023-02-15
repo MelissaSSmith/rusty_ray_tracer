@@ -12,10 +12,10 @@ pub struct Plane {}
 
 impl Intersect for Plane {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        if _ray.direction.y().abs() < EPSILON {
+        if _ray.direction().y().abs() < EPSILON {
             return vec![]
         }
-        let t = -_ray.origin.y() / _ray.direction.y();
+        let t = -_ray.origin().y() / _ray.direction().y();
         vec![Intersection::create(t, _object, 0.0, 0.0)]
     }
 }

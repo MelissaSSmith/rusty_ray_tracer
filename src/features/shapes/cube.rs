@@ -11,9 +11,9 @@ pub struct Cube {}
 
 impl Intersect for Cube {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        let (xtmin, xtmax) = Object::check_axis(&_ray.origin.x(), &_ray.direction.x(), -1.0, 1.0);
-        let (ytmin, ytmax) = Object::check_axis(&_ray.origin.y(), &_ray.direction.y(), -1.0, 1.0);
-        let (ztmin, ztmax) = Object::check_axis(&_ray.origin.z(), &_ray.direction.z(), -1.0, 1.0);
+        let (xtmin, xtmax) = Object::check_axis(&_ray.origin().x(), &_ray.direction().x(), -1.0, 1.0);
+        let (ytmin, ytmax) = Object::check_axis(&_ray.origin().y(), &_ray.direction().y(), -1.0, 1.0);
+        let (ztmin, ztmax) = Object::check_axis(&_ray.origin().z(), &_ray.direction().z(), -1.0, 1.0);
 
         let tmin = vec![xtmin, ytmin, ztmin].iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
         let tmax = vec![xtmax, ytmax, ztmax].iter().fold(f64::INFINITY, |a, &b| a.min(b));

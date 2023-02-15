@@ -11,9 +11,9 @@ pub struct Sphere {}
 
 impl Intersect for Sphere {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        let sphere_to_ray = _ray.origin - Point::create(0.0,0.0,0.0);
-        let a = _ray.direction ^ _ray.direction;
-        let b = 2.0 * (_ray.direction ^ sphere_to_ray);
+        let sphere_to_ray = _ray.origin() - Point::create(0.0,0.0,0.0);
+        let a = _ray.direction() ^ _ray.direction();
+        let b = 2.0 * (_ray.direction() ^ sphere_to_ray);
         let c = (sphere_to_ray ^ sphere_to_ray) - 1.0;
 
         let discriminant = b.powf(2.0) - (4.0 * a * c);

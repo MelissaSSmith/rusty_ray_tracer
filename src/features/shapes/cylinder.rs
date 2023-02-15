@@ -58,8 +58,8 @@ impl Cylinder {
     }
 
     fn check_cap(ray: &Ray, t: f64) -> bool {
-        let x = ray.origin.x() + t * ray.direction.x();
-        let z = ray.origin.z() + t * ray.direction.z();
+        let x = ray.origin().x() + t * ray.direction().x();
+        let z = ray.origin().z() + t * ray.direction().z();
 
         (x.powi(2) + z.powi(2)) <= 1.0
     }
@@ -67,16 +67,16 @@ impl Cylinder {
     fn intersect_caps(object: &Object, ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
 
-        if !object.closed() || ray.direction.y().equals(0.0) {
+        if !object.closed() || ray.direction().y().equals(0.0) {
             return  intersections;
         }
 
-        let t = (object.minimum_bound() - ray.origin.y()) / ray.direction.y();
+        let t = (object.minimum_bound() - ray.origin().y()) / ray.direction().y();
         if Cylinder::check_cap(ray, t) {
             intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
-        let t = (object.maximum_bound() - ray.origin.y()) / ray.direction.y();
+        let t = (object.maximum_bound() - ray.origin().y()) / ray.direction().y();
         if Cylinder::check_cap(ray, t) {
             intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
@@ -88,11 +88,11 @@ impl Cylinder {
 impl Intersect for Cylinder {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
-        let a = _ray.direction.x().powi(2) + _ray.direction.z().powi(2);
+        let a = _ray.direction().x().powi(2) + _ray.direction().z().powi(2);
 
         if !a.equals(0.0) {
-            let b = 2.0 * _ray.origin.x() * _ray.direction.x() + 2.0 * _ray.origin.z() * _ray.direction.z();
-            let c = _ray.origin.x().powi(2) + _ray.origin.z().powi(2) - 1.0;
+            let b = 2.0 * _ray.origin().x() * _ray.direction().x() + 2.0 * _ray.origin().z() * _ray.direction().z();
+            let c = _ray.origin().x().powi(2) + _ray.origin().z().powi(2) - 1.0;
 
             let disc = b.powi(2) - 4.0 * a * c;
             if disc < 0.0 {
@@ -102,12 +102,12 @@ impl Intersect for Cylinder {
             let t0 = (-b - disc.sqrt()) / (2.0 * a);
             let t1 = (-b + disc.sqrt()) / (2.0 * a);
 
-            let y0 = _ray.origin.y() + t0 * _ray.direction.y();
+            let y0 = _ray.origin().y() + t0 * _ray.direction().y();
             if _object.minimum_bound() < y0 && y0 < _object.maximum_bound() {
                 intersections.push(Intersection::create(t0, &_object, 0.0, 0.0));
             }
 
-            let y1 = _ray.origin.y() + t1 * _ray.direction.y();
+            let y1 = _ray.origin().y() + t1 * _ray.direction().y();
             if _object.minimum_bound() < y1 && y1 < _object.maximum_bound() {
                 intersections.push(Intersection::create(t1, &_object, 0.0, 0.0));
             }

@@ -13,10 +13,10 @@ pub struct Torus {
 }
 
 impl Torus {
-    fn create(swept_radius: f64, tube_radius: f64) -> Self {
+    fn create() -> Self {
         Self {
-            swept_radius,
-            tube_radius
+            swept_radius: 1.0,
+            tube_radius: 1.0
         }
     }
 
@@ -79,7 +79,7 @@ impl Normal for Torus {
             _point.y() * _point.y() + _point.z() * _point.z();
         let vector = Vector::create(
             4.0 * _point.x() * (point_squared - object_squared),
-            4.0 * _point.y() * (point_squared - object_squraed +
+            4.0 * _point.y() * (point_squared - object_squared +
                 2.0 * _object.swept_radius() * _object.tube_radius()),
             4.0 * _point.z() * (point_squared - object_squared));
 
