@@ -15,6 +15,7 @@ use crate::features::shapes::group::Group;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
 use crate::features::shapes::smooth_triangle::SmoothTriangle;
+use crate::features::shapes::torus::Torus;
 use crate::features::shapes::triangle::Triangle;
 use crate::features::transformations::Transform;
 
@@ -29,7 +30,8 @@ pub enum Shape {
     Group(Group),
     Triangle(Triangle),
     SmoothTriangle(SmoothTriangle),
-    CSG(CSG)
+    CSG(CSG),
+    Torus(Torus)
 }
 
 impl Shape {
@@ -44,6 +46,7 @@ impl Shape {
             Shape::Triangle(_) => "Triangle",
             Shape::SmoothTriangle(_) => "SmoothTriangle",
             Shape::CSG(_) => "CSG",
+            Shape::Torus(_) => "Torus",
             _ => "Object"
         }
     }
@@ -96,6 +99,9 @@ impl Shape {
                 let bounds = BoundingBox::create() + csg.left().bounds() + csg.right().bounds().transform(csg.left().transformation()).transform(csg.right().transformation());
                 Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
+            Shape::Torus(torus) => {
+                Object::create(Shape::Torus(*torus), has_shadow, material, bounds)
+            }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }
     }
@@ -380,6 +386,20 @@ impl Object {
             Shape::Cylinder(c) => { c.closed() },
             Shape::Cone(c) => { c.closed() },
             _ => false
+        }
+    }
+
+    pub fn swept_radius(&self) -> f64 {
+        match self.shape() {
+            Shape::Torus(t) => { t.swept_radius() }
+            _ => 0.0
+        }
+    }
+
+    pub fn tube_radius(&self) -> f64 {
+        match self.shape() {
+            Shape::Torus(t) => { t.tube_radius() }
+            _ => 0.0
         }
     }
 

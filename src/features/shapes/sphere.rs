@@ -6,7 +6,7 @@ use crate::features::primitives::vector::Vector;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Sphere {}
 
 impl Intersect for Sphere {
