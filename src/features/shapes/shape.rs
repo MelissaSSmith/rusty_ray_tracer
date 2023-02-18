@@ -503,6 +503,7 @@ impl Intersect for Object {
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
             Shape::CSG(csg) => { csg.intersect(_ray, _object) }
+            Shape::Torus(_) => { Torus::intersect(_object, _ray) }
             _ => { vec![] }
         }
     }
@@ -520,6 +521,7 @@ impl NormalAt for Object {
             Shape::Cone(_) => { Cone::normal(_object, &object_point) }
             Shape::Triangle(t) => { t.normal_vector() }
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
+            Shape::Torus(_) => { Torus::normal(_object, &object_point) }
             _ => { panic!("{} has no normal", _object.shape_type()); }
         };
 

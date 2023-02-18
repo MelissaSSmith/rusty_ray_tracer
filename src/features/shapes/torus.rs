@@ -15,21 +15,21 @@ pub struct Torus {
 }
 
 impl Torus {
-    fn create() -> Self {
+    pub fn create() -> Self {
         Self {
             swept_radius: 1.0,
             tube_radius: 1.0
         }
     }
 
-    fn with_swept_radius(self, swept_radius: f64) -> Self {
+    pub fn with_swept_radius(self, swept_radius: f64) -> Self {
         Self {
             swept_radius,
             ..self
         }
     }
 
-    fn with_tube_radius(self, tube_radius: f64) -> Self {
+    pub fn with_tube_radius(self, tube_radius: f64) -> Self {
         Self {
             tube_radius,
             ..self
