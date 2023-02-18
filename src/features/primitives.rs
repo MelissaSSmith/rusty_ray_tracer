@@ -4,3 +4,4 @@ pub mod point;
 pub mod matrix;
 pub mod operations;
 pub mod tuple;
+pub mod calculus;

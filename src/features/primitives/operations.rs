@@ -3,6 +3,7 @@ use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
 pub trait Operations<Rhs = Self> {
     fn equals(self, _: Rhs) -> bool;
     fn equals_low_epsilon(self, _: Rhs) -> bool;
+    fn zero(self) -> bool;
 }
 
 impl Operations for f64 {
@@ -17,6 +18,10 @@ impl Operations for f64 {
     fn equals_low_epsilon(self, b: f64) -> bool {
         let diff = self - b;
         diff.abs() < LOW_EPSILON
+    }
+
+    fn zero(self) -> bool {
+        (self > -EPSILON && self < EPSILON)
     }
 }
 

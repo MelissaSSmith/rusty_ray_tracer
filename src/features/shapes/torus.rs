@@ -1,4 +1,6 @@
 use crate::features::intersection::Intersection;
+use crate::features::primitives::calculus::quartic;
+use crate::features::primitives::operations::consts::EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
@@ -60,14 +62,30 @@ impl Intersect for Torus {
         let f = ox * dx + oy * dy + oz * dz;
         let four_a_squared = 4.0 * _object.swept_radius() * _object.swept_radius();
 
-        let coeffcients = [
+        let coefficients = [
             e * e - four_a_squared * (_object.tube_radius() * _object.tube_radius() - oy * oy),
             4.0 * f * e + 2.0 * four_a_squared * oy * dy,
             2.0 * sum_direction_squared * e + 4.0 * f * f + four_a_squared * dy * dy,
             4.0 * sum_direction_squared * f,
             sum_direction_squared * sum_direction_squared];
 
-        todo!()
+        let solution = quartic(coefficients);
+
+        if solution.is_empty() {
+            return vec![]
+        }
+
+        let mut mint = f64::INFINITY;
+        solution.iter()
+            .for_each(|t| if (t > &EPSILON) && (t < &mint) {
+                mint = *t
+            });
+
+        if mint.is_finite() {
+            return vec![Intersection::create(mint, _object, 0.0, 0.0)];
+        }
+
+        vec![]
     }
 }
 
