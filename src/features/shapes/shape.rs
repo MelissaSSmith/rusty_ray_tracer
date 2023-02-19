@@ -389,9 +389,9 @@ impl Object {
         }
     }
 
-    pub fn swept_radius(&self) -> f64 {
+    pub fn radius(&self) -> f64 {
         match self.shape() {
-            Shape::Torus(t) => { t.swept_radius() }
+            Shape::Torus(t) => { t.radius() }
             _ => 0.0
         }
     }
