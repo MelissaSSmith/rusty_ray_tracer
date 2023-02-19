@@ -1,5 +1,5 @@
 use crate::features::computation::Computation;
-use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
 use crate::features::ray::Ray;
 use smallvec::SmallVec;
 use crate::features::shapes::{NormalAt};
@@ -26,7 +26,7 @@ impl Intersection {
         let mut hit: Option<Intersection> = None;
         for intersection in intersections {
             let h = &hit;
-            if intersection.t > 0.0001 {
+            if intersection.t > LOW_EPSILON {
                 if h.is_none() {
                     hit = Some(intersection);
                 } else if h.is_some() && intersection.t < h.as_ref().unwrap().t {

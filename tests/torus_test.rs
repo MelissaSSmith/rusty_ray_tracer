@@ -21,7 +21,7 @@ use rusty_ray_tracer::features::world::World;
 fn torus_test() {
     let camera = Camera::create(1080, 1080, PI/1.5)
         .with_transform(Matrix::view_transform(
-            Point::create(3.0, 2.5, -2.5),
+            Point::create(3.0, 2.5, -3.5),
             Point::create(1.5, 3.0, 0.0),
             Vector::create(0.0, 1.0, 0.0)
         ));
@@ -46,7 +46,7 @@ fn torus_test() {
         );
 
     let light_source = PointLight::create(WHITE, Point::create(-5.0, 10.0, -10.0));
-    let objects = vec![floor, torus];
+    let objects = vec![torus];
     let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let canvas = camera.render(world);

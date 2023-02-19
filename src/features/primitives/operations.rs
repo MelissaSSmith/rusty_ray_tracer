@@ -1,4 +1,4 @@
-use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
+use crate::features::primitives::operations::consts::{EPSILON, HIGH_EPSILON, LOW_EPSILON};
 
 pub trait Operations<Rhs = Self> {
     fn equals(self, _: Rhs) -> bool;
@@ -21,11 +21,12 @@ impl Operations for f64 {
     }
 
     fn zero(self) -> bool {
-        (self > -EPSILON && self < EPSILON)
+        self > -HIGH_EPSILON && self < HIGH_EPSILON
     }
 }
 
 pub mod consts {
     pub const EPSILON: f64 = 0.00001;
     pub const LOW_EPSILON: f64 = 0.0001;
+    pub const HIGH_EPSILON: f64 = 0.000000001;
 }

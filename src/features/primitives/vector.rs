@@ -96,7 +96,7 @@ impl Mul<f64> for Vector {
     }
 }
 
-impl core::ops::Mul<Vector> for f64 {
+impl Mul<Vector> for f64 {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Self::Output {
@@ -105,7 +105,7 @@ impl core::ops::Mul<Vector> for f64 {
 }
 
 // "Cross" product
-impl core::ops::Mul for Vector {
+impl Mul for Vector {
     type Output = Vector;
 
     fn mul(self, rhs: Vector) -> Self::Output {

@@ -5,7 +5,7 @@ pub fn quadratic(inputs: [f64; 3]) -> Vec<f64> {
     let p = inputs[1] / (2.0 * inputs[2]);
     let q = inputs[0] / inputs[2];
 
-    let d = p * p - q;
+    let d = p.powi(2) - q;
 
     return if d.zero() {
         vec![-p]
@@ -23,12 +23,12 @@ pub fn cubic(inputs: [f64; 4]) -> Vec<f64> {
     let b = inputs[1] / inputs[3];
     let c = inputs[0] / inputs[3];
 
-    let sqrt_a = a.sqrt();
-    let p = 1.0 / 3.0 * (-1.0 / 3.0 * sqrt_a + b);
-    let q = 1.0 / 2.0 * (2.0 / 27.0 * a * sqrt_a - 1.0 / 3.0 * a * b + c);
+    let squared_a = a.powi(2);
+    let p = 1.0 / 3.0 * (-1.0 / 3.0 * squared_a + b);
+    let q = 1.0 / 2.0 * (2.0 / 27.0 * a * squared_a - 1.0 / 3.0 * a * b + c);
 
-    let cubic_p = p * p * p;
-    let d = q * q * cubic_p;
+    let cubic_p = p.powi(3);
+    let d = q.powi(2) * cubic_p;
 
     let solutions = determine_solutions(d, p, q, cubic_p);
 
@@ -45,10 +45,10 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
     let c = inputs[1] / inputs[4];
     let d = inputs[0] / inputs[4];
 
-    let sqrt_a = a.sqrt();
-    let p = -3.0 / 8.0 * sqrt_a + b;
-    let q = 1.0 / 8.0 * sqrt_a * a - 1.0 / 2.0 * a * b + c;
-    let r = -3.0 / 256.0 * sqrt_a * sqrt_a + 1.0 / 16.0 * sqrt_a * b - 1.0 / 4.0 * a * b * c;
+    let squared_a = a.powi(2);
+    let p = -3.0 / 8.0 * squared_a + b;
+    let q = 1.0 / 8.0 * squared_a * a - 1.0 / 2.0 * a * b + c;
+    let r = -3.0 / 256.0 * squared_a.powi(2) + 1.0 / 16.0 * squared_a * b - 1.0 / 4.0 * a * c + d;
 
     let mut solutions = vec![];
 
@@ -58,7 +58,7 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
         solutions.push(0.0);
     } else {
         let coefficients = [
-            1.0 / 2.0 * r * p - 1.0 / 8.0 * q * q,
+            1.0 / 2.0 * r * p - 1.0 / 8.0 * q.powi(2),
             -r,
             -1.0 / 2.0 * p,
             1.0
@@ -68,11 +68,11 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
 
         let z = solutions[0];
 
-        let u = match handle_result(z * z - r) {
+        let u = match handle_result(z.powi(2) - r) {
             None => { return vec![0.0] }
             Some(x) => { x }
         };
-        let v = match handle_result(z * z - r) {
+        let v = match handle_result(2.0 * z - p) {
             None => { return vec![0.0] }
             Some(x) => { x }
         };
@@ -90,6 +90,7 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
 
         solutions = quadratic(coefficients);
 
+        real_v = v;
         if q < 0.0 {
             real_v = v;
         }
@@ -129,7 +130,7 @@ fn determine_solutions(d: f64, p: f64, q: f64, cubic_p: f64) -> Vec<f64> {
     }
     let sqrt_d = d.sqrt();
     let u = (sqrt_d - q).cbrt();
-    let v = -(sqrt_d + u).cbrt();
+    let v = -(sqrt_d + q).cbrt();
 
     return vec![u + v];
 }
@@ -140,5 +141,5 @@ fn handle_result(x: f64) -> Option<f64> {
     } else if x > 0.0 {
         return Some(x.sqrt());
     }
-    None
+    Some(0.0)
 }
