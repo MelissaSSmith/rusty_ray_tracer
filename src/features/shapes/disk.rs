@@ -13,7 +13,7 @@ pub struct Disk {
     center: Point
 }
 
-impl Disk() {
+impl Disk {
     pub fn create() -> Self {
         Self {
             radius: 0.0,

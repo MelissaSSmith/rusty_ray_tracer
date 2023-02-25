@@ -9,8 +9,8 @@ pub struct PointLight {
 }
 
 impl PointLight {
-    pub fn create(intensity: Color, position: Point) -> PointLight {
-        PointLight{intensity, position: [position]}
+    pub fn create(intensity: Color, position: Point) -> Self {
+        Self{intensity, position: [position]}
     }
 
     pub fn positions(&self) -> &[Point] {

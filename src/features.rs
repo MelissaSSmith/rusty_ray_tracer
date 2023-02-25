@@ -13,4 +13,5 @@ pub mod primitives;
 pub mod bounding_box;
 pub mod lights;
 pub mod sequence;
+pub mod math;
 

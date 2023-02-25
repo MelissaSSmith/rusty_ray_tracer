@@ -30,35 +30,35 @@ pub struct CSG {
 }
 
 impl CSG {
-    pub fn create(operation: CSGOperation, left: Object, right: Object) -> CSG {
-        CSG {
+    pub fn create(operation: CSGOperation, left: Object, right: Object) -> Self {
+        Self {
             operation,
             left: Box::new(left),
             right: Box::new(right)
         }
     }
 
-    pub(crate) fn operation(&self) -> CSGOperation {
+    pub fn operation(&self) -> CSGOperation {
         self.operation
     }
 
-    pub(crate) fn left(&self) -> Object {
+    pub fn left(&self) -> Object {
         self.left.deref().clone()
     }
 
-    pub(crate) fn right(&self) -> Object {
+    pub fn right(&self) -> Object {
         self.right.deref().clone()
     }
 
-    pub(crate) fn with_left(self, left: Object) -> CSG {
-        CSG {
+    pub fn with_left(self, left: Object) -> Self {
+        Self {
             left: Box::new(left),
             ..self
         }
     }
 
-    pub(crate) fn with_right(self, right: Object) -> CSG {
-        CSG {
+    pub fn with_right(self, right: Object) -> Self {
+        Self {
             right: Box::new(right),
             ..self
         }

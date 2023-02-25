@@ -18,10 +18,10 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub fn create(point1: Point, point2: Point, point3: Point) -> Triangle {
+    pub fn create(point1: Point, point2: Point, point3: Point) -> Self {
         let e1 = point2 - point1;
         let e2 = point3 - point1;
-        Triangle {
+        Self {
             point1,
             point2,
             point3,

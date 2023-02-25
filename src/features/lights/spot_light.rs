@@ -15,8 +15,8 @@ pub struct SpotLight {
 }
 
 impl SpotLight {
-    pub fn create(center: Point, intensity: Color, r1: f64, r2: f64) -> SpotLight {
-        SpotLight {
+    pub fn create(center: Point, intensity: Color, r1: f64, r2: f64) -> Self {
+        Self {
             center: [center],
             color: intensity,
             radius_start: r1,

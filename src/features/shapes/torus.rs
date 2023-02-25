@@ -1,5 +1,5 @@
 use crate::features::intersection::Intersection;
-use crate::features::primitives::calculus::quartic;
+use crate::features::math::quartic_algebra::quartic;
 use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;

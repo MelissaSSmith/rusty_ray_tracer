@@ -16,8 +16,8 @@ pub struct Cone {
 }
 
 impl Cone {
-    pub fn create() -> Cone {
-        Cone {
+    pub fn create() -> Self {
+        Self {
             maximum: f64::INFINITY,
             minimum: f64::NEG_INFINITY,
             closed: false
@@ -36,22 +36,22 @@ impl Cone {
         self.closed
     }
 
-    pub fn with_maximum_bound(self, bound: f64) -> Cone {
-        Cone {
+    pub fn with_maximum_bound(self, bound: f64) -> Self {
+        Self {
             maximum: bound,
             ..self
         }
     }
 
-    pub fn with_minimum_bound(self, bound: f64) -> Cone {
-        Cone {
+    pub fn with_minimum_bound(self, bound: f64) -> Self {
+        Self {
             minimum: bound,
             ..self
         }
     }
 
-    pub fn with_closed(self, closed: bool) -> Cone {
-        Cone {
+    pub fn with_closed(self, closed: bool) -> Self {
+        Self {
             closed,
             ..self
         }

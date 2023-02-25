@@ -11,12 +11,12 @@ pub struct Group {
 }
 
 impl Group {
-    pub fn create() -> Group {
-        Group { children: vec![] }
+    pub fn create() -> Self {
+        Self { children: vec![] }
     }
 
-    pub fn create_with_children(children: Vec<Object>, transform: Matrix) -> Group {
-        Group {
+    pub fn create_with_children(children: Vec<Object>, transform: Matrix) -> Self {
+        Self {
             children: Group::transform_children(children, transform)
         }
     }
@@ -25,8 +25,8 @@ impl Group {
         self.children.clone()
     }
 
-    pub fn with_children(self, children: Vec<Object>) -> Group {
-        Group {
+    pub fn with_children(self, children: Vec<Object>) -> Self {
+        Self {
             children
         }
     }

@@ -20,10 +20,10 @@ pub struct SmoothTriangle {
 }
 
 impl SmoothTriangle {
-    pub fn create(p1: Point, p2: Point, p3: Point, n1: Vector, n2: Vector, n3: Vector) -> SmoothTriangle {
+    pub fn create(p1: Point, p2: Point, p3: Point, n1: Vector, n2: Vector, n3: Vector) -> Self {
         let e1 = p2 - p1;
         let e2 = p3 - p1;
-        SmoothTriangle {
+        Self {
             point1: p1,
             point2: p2,
             point3: p3,
@@ -35,27 +35,27 @@ impl SmoothTriangle {
         }
     }
 
-    pub(crate) fn point1(&self) -> Point {
+    pub fn point1(&self) -> Point {
         self.point1
     }
 
-    pub(crate) fn point2(&self) -> Point {
+    pub fn point2(&self) -> Point {
         self.point2
     }
 
-    pub(crate) fn point3(&self) -> Point {
+    pub fn point3(&self) -> Point {
         self.point3
     }
 
-    pub(crate) fn normal1(&self) -> Vector {
+    pub fn normal1(&self) -> Vector {
         self.normal1
     }
 
-    pub(crate) fn normal2(&self) -> Vector {
+    pub fn normal2(&self) -> Vector {
         self.normal2
     }
 
-    pub(crate) fn normal3(&self) -> Vector {
+    pub fn normal3(&self) -> Vector {
         self.normal3
     }
 

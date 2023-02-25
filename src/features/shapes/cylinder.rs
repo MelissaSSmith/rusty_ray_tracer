@@ -16,7 +16,7 @@ pub struct Cylinder {
 }
 
 impl Cylinder {
-    pub fn create() -> Cylinder {
+    pub fn create() -> Self {
         Cylinder {
             maximum: f64::INFINITY,
             minimum: f64::NEG_INFINITY,
@@ -36,22 +36,22 @@ impl Cylinder {
         self.closed
     }
 
-    pub fn with_maximum_bound(self, bound: f64) -> Cylinder {
-        Cylinder {
+    pub fn with_maximum_bound(self, bound: f64) -> Self {
+        Self {
             maximum: bound,
             ..self
         }
     }
 
-    pub fn with_minimum_bound(self, bound: f64) -> Cylinder {
-        Cylinder {
+    pub fn with_minimum_bound(self, bound: f64) -> Self {
+        Self {
             minimum: bound,
             ..self
         }
     }
 
-    pub fn with_closed(self, closed: bool) -> Cylinder {
-        Cylinder {
+    pub fn with_closed(self, closed: bool) -> Self {
+        Self {
             closed,
             ..self
         }
