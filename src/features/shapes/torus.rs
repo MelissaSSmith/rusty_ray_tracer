@@ -11,14 +11,16 @@ use crate::features::shapes::shape::Object;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Torus {
     radius: f64,
-    tube_radius: f64
+    tube_radius: f64,
+    center: Point
 }
 
 impl Torus {
     pub fn create() -> Self {
         Self {
             radius: 1.0,
-            tube_radius: 0.5
+            tube_radius: 0.5,
+            center: Point::zero()
         }
     }
 
@@ -36,12 +38,23 @@ impl Torus {
         }
     }
 
-    pub(crate) fn radius(&self) -> f64 {
+    pub fn with_center(self, center: Point) -> Self {
+        Self {
+            center,
+            ..self
+        }
+    }
+
+    pub fn radius(&self) -> f64 {
         self.radius
     }
 
-    pub(crate) fn tube_radius(&self) -> f64 {
+    pub fn tube_radius(&self) -> f64 {
         self.tube_radius
+    }
+
+    pub fn center(&self) -> Point {
+        self.center
     }
 }
 
@@ -95,13 +108,12 @@ impl Normal for Torus {
     fn normal(_object: &Object, _point: &Point) -> Vector {
         let object_squared = _object.radius().powi(2) + _object.tube_radius().powi(2);
         let point_squared = _point.x().powi(2) + _point.y().powi(2) + _point.z().powi(2);
-        let vector = Vector::create(
+        Vector::create(
             4.0 * _point.x() * (point_squared - object_squared),
             4.0 * _point.y() * (point_squared - object_squared +
                 2.0 * _object.radius() * _object.radius()),
-            4.0 * _point.z() * (point_squared - object_squared));
-
-        vector.normalize()
+            4.0 * _point.z() * (point_squared - object_squared)
+        )
     }
 }
 
@@ -124,9 +136,9 @@ mod tests {
         let torus = Shape::Torus(Torus::create()).create();
 
         let tests = vec![
-            //(Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 0.0)),
-            (Point::create(1.0, 1.0, 1.0), Vector::create(0.3895, 0.8346, 0.3895)),
-            (Point::create(-1.0, -1.0, 0.0), Vector::create(-0.263117, -0.96476, 0.0))
+            (Point::create(0.0, 0.0, 0.0), Vector::create(0.0, 0.0, 0.0)),
+            (Point::create(1.0, 1.0, 1.0), Vector::create(7.0, 15.0, 7.0)),
+            (Point::create(-1.0, -1.0, 0.0), Vector::create(-3.0, -11.0, 0.0))
         ];
 
         for test in tests {

@@ -75,14 +75,14 @@ impl Camera {
     pub fn set_transform(&mut self, transform: Matrix) {
         self.transform = transform;
         self.inverse_transform = self.transform.inverse();
-        self.origin = self.inverse_transform * Point::zero();
+        self.origin = self.inverse_transform * self.origin;
     }
 
     pub fn with_transform(self, transform: Matrix) -> Camera {
         Camera {
             transform,
             inverse_transform: transform.inverse(),
-            origin: transform.inverse() * Point::zero(),
+            origin: transform.inverse() * self.origin,
             ..self
         }
     }

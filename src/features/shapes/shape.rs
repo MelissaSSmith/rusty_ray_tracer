@@ -11,6 +11,7 @@ use crate::features::shapes::cone::Cone;
 use crate::features::shapes::csg::CSG;
 use crate::features::shapes::cube::Cube;
 use crate::features::shapes::cylinder::Cylinder;
+use crate::features::shapes::disk::Disk;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::sphere::Sphere;
 use crate::features::shapes::plane::Plane;
@@ -31,7 +32,8 @@ pub enum Shape {
     Triangle(Triangle),
     SmoothTriangle(SmoothTriangle),
     CSG(CSG),
-    Torus(Torus)
+    Torus(Torus),
+    Disk(Disk)
 }
 
 impl Shape {
@@ -100,7 +102,12 @@ impl Shape {
                 Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
             Shape::Torus(torus) => {
-                Object::create(Shape::Torus(*torus), has_shadow, material, BoundingBox::create())
+                let bounds = Object::create_radial_bounds(torus.center(), torus.radius(), 0.0);
+                Object::create(Shape::Torus(*torus), has_shadow, material, bounds)
+            },
+            Shape::Disk(disk) => {
+                let bounds = Object::create_radial_bounds(disk.center(), disk.radius(), disk.height());
+                Object::create(Shape::Disk(*disk), has_shadow, material, bounds)
             }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }
@@ -391,7 +398,8 @@ impl Object {
 
     pub fn radius(&self) -> f64 {
         match self.shape() {
-            Shape::Torus(t) => { t.radius() }
+            Shape::Torus(t) => { t.radius() },
+            Shape::Disk(d) => { d.radius() }
             _ => 0.0
         }
     }
@@ -400,6 +408,14 @@ impl Object {
         match self.shape() {
             Shape::Torus(t) => { t.tube_radius() }
             _ => 0.0
+        }
+    }
+
+    pub fn center(&self) -> Point {
+        match self.shape() {
+            Shape::Torus(t) => { t.center() }
+            Shape::Disk(d) => { d.center() }
+            _ => Point::zero()
         }
     }
 
@@ -479,6 +495,22 @@ impl Object {
         }
     }
 
+    fn create_radial_bounds(center: Point, radius: f64, height: f64) -> BoundingBox {
+        let min = Point::create(
+            center.x() - radius,
+            center.y() - radius,
+            height
+        );
+        let max = Point::create(
+            center.x() + radius,
+            center.y() + radius,
+            height
+        );
+        BoundingBox::create()
+            .with_minimum(min)
+            .with_maximum(max)
+    }
+
     fn world_to_object(_object: &Object, point: &Point) -> Point {
         _object.inverse_cumulative_transform() * *point
     }
@@ -504,6 +536,7 @@ impl Intersect for Object {
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
             Shape::CSG(csg) => { csg.intersect(_ray, _object) }
             Shape::Torus(_) => { Torus::intersect(_object, _ray) }
+            Shape::Disk(_) => { Disk::intersect(_object, _ray) }
             _ => { vec![] }
         }
     }
@@ -522,6 +555,7 @@ impl NormalAt for Object {
             Shape::Triangle(t) => { t.normal_vector() }
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
             Shape::Torus(_) => { Torus::normal(_object, &object_point) }
+            Shape::Disk(_) => { Disk::normal(_object, &object_point) }
             _ => { panic!("{} has no normal", _object.shape_type()); }
         };
 
