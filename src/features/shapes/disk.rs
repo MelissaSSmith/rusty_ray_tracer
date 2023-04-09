@@ -19,10 +19,10 @@ pub struct Disk {
 impl Disk {
     pub fn create() -> Self {
         Self {
-            radius: 0.0,
+            radius: 1.0,
             inner_radius: 0.0,
             height: 0.0,
-            phi_max: 360.0,
+            phi_max: 1.0,
             center: Point::zero(),
             normal: Vector::create(0.0, 0.0, -1.0)
         }
@@ -46,6 +46,10 @@ impl Disk {
 
     pub fn phi_max(&self) -> f64 {
         self.phi_max
+    }
+
+    pub fn normal(&self) -> Vector {
+        self.normal
     }
 
     pub fn with_radius(self, radius: f64) -> Self {
@@ -88,15 +92,17 @@ impl Disk {
 
 impl Intersect for Disk {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
+        if _ray.direction().z() == 0.0 {
+            return vec![];
+        }
+
         let h = _ray.origin().z() + _ray.direction().z();
-        let t = (h - _ray.origin().z()) / _ray.direction().z();
+        let t_shape_hit = (h - _ray.origin().z()) / _ray.direction().z();
         let hit = (_object.height() - _ray.origin().z()) / _ray.direction().z();
         if hit <= 0.0 {
             return vec![];
         }
-        if _ray.direction().z() == 0.0 {
-            return vec![];
-        }
+
         todo!()
     }
 }

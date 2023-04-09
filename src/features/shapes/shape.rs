@@ -419,6 +419,8 @@ impl Object {
         }
     }
 
+    pub fn height(&self)
+
     pub fn children(&self) -> Vec<Object> {
         match self.shape() {
             Shape::Group(g) => { g.children() }
@@ -555,7 +557,7 @@ impl NormalAt for Object {
             Shape::Triangle(t) => { t.normal_vector() }
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
             Shape::Torus(_) => { Torus::normal(_object, &object_point) }
-            Shape::Disk(_) => { Disk::normal(_object, &object_point) }
+            Shape::Disk(d) => { d.normal() }
             _ => { panic!("{} has no normal", _object.shape_type()); }
         };
 
