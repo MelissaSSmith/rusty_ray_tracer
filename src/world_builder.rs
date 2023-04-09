@@ -11,3 +11,8 @@ pub fn create_default_world_with_group(group: Object) -> World {
     let objects = vec![group];
     World::create_world(Light::create_point_light(light_source), objects)
 }
+
+pub fn create_empty_world() -> World {
+    let light_source = PointLight::create(WHITE, Point::create(-5.0, 25.0, -15.0));
+    World::create_world(Light::create_point_light(light_source), vec![])
+}
