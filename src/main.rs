@@ -9,7 +9,7 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
-use crate::world_builder::create_default_world_with_group;
+use crate::world_builder::{create_default_world_with_group, create_empty_world};
 
 mod features;
 mod draw;
@@ -17,6 +17,7 @@ mod world_builder;
 
 
 // Command 1: generate image from obj file using a default world `create_object <filename>`
+// Command 2: Fractal Generation `generate_fractal_image <filename>`
 
 fn main() {
     let start = Instant::now();
@@ -41,6 +42,24 @@ fn main() {
                     Point::create(0.0, 1.0, 0.0),
                     Vector::create(2.0, 3.0, 0.0)
                 ) * Matrix::rotate_x(-PI/2.0) * Matrix::rotate_y(PI/8.0));
+            let canvas = camera.render(world);
+            println!("Rendered World. Time {}", start.elapsed().as_secs());
+
+            let mut path = PathBuf::from(filename);
+            path.set_extension("ppm");
+            canvas.convert_to_ppm_and_save(format!("{}", path.file_name().unwrap().to_str().unwrap()));
+            println!("Finished {} {}. Final Time {}", command, filename, start.elapsed().as_secs());
+        }
+        "generate_fractal_image" => {
+            let world = create_empty_world();
+            println!("Created World. Time {}", start.elapsed().as_secs());
+
+            let camera = Camera::create(1080, 1080, 0.45)
+                .with_transform(Matrix::view_transform(
+                    Point::create(0.0, 0.0, -5.0),
+                    Point::zero(),
+                    Vector::create(0.0, 1.0, 0.0)
+                ));
             let canvas = camera.render(world);
             println!("Rendered World. Time {}", start.elapsed().as_secs());
 
