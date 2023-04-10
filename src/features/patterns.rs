@@ -1,9 +1,12 @@
 use crate::features::color::Color;
+use crate::features::color::consts::BLACK;
 use crate::features::patterns::blended::BlendedPattern;
 use crate::features::patterns::checkers::CheckerPattern;
 use crate::features::patterns::gradient::GradientPattern;
 use crate::features::patterns::perturb::PerturbedPattern;
 use crate::features::patterns::radial_gradient::RadialGradientPattern;
+use crate::features::patterns::random_pixels::RandomPixelsPattern;
+use crate::features::patterns::random_rectangles::RandomRectanglesPattern;
 use crate::features::patterns::ring::RingPattern;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::patterns::stripe::StripePattern;
@@ -21,6 +24,8 @@ pub mod blended;
 pub mod solid;
 pub mod perturb;
 pub mod test;
+pub mod random_rectangles;
+pub mod random_pixels;
 
 #[derive(Clone, Debug)]
 pub enum Patterns {
@@ -32,7 +37,9 @@ pub enum Patterns {
     Ring(RingPattern),
     Solid(SolidPattern),
     Stripe(StripePattern),
-    Test(TestPattern)
+    Test(TestPattern),
+    RandomRectangles(RandomRectanglesPattern),
+    RandomPixels(RandomPixelsPattern)
 }
 
 #[derive(Clone, Debug)]
@@ -64,6 +71,8 @@ impl Pattern {
             Patterns::Solid(p) => { p.pattern_at(&pattern_point) }
             Patterns::Stripe(p) => { p.pattern_at(&pattern_point, &self.inverse_transformation) }
             Patterns::Test(p) => { p.pattern_at(&pattern_point) }
+            Patterns::RandomRectangles(p) => { p.pattern_at(&pattern_point) }
+            Patterns::RandomPixels(p) => { p.pattern_at(&pattern_point) }
         }
     }
 
@@ -123,6 +132,10 @@ pub trait PatternAtWithInverse {
 
 pub trait EmptyCreate {
     fn create() -> Pattern;
+}
+
+pub trait WidthHeightCreate {
+    fn create(width: f64, height: f64) -> Pattern;
 }
 
 pub trait OneColorCreate {

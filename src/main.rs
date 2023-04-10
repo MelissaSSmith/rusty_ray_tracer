@@ -1,15 +1,25 @@
 use std::env;
 use core::f64::consts::PI;
+use std::f64::consts::FRAC_PI_2;
 use std::path::PathBuf;
 use std::time::Instant;
 use crate::draw::obj_format::OBJParser;
 use crate::draw::ppm_format::PPMFile;
 use crate::features::camera::Camera;
+use crate::features::color::consts::WHITE;
+use crate::features::material::Material;
+use crate::features::patterns::{EmptyCreate, OneColorCreate};
+use crate::features::patterns::random_pixels::RandomPixelsPattern;
+use crate::features::patterns::random_rectangles::RandomRectanglesPattern;
+use crate::features::patterns::solid::SolidPattern;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
-use crate::world_builder::{create_default_world_with_group, create_empty_world};
+use crate::features::shapes::shape::Shape;
+use crate::features::shapes::shape::Shape::Object;
+use crate::Shape::Plane;
+use crate::world_builder::{create_default_world_with_object, create_objects_from_input};
 
 mod features;
 mod draw;
@@ -17,7 +27,7 @@ mod world_builder;
 
 
 // Command 1: generate image from obj file using a default world `create_object <filename>`
-// Command 2: Fractal Generation `generate_fractal_image <filename>`
+// Command 2: Fractal Generation `generate_fractal_image <pattern>`
 
 fn main() {
     let start = Instant::now();
@@ -33,7 +43,7 @@ fn main() {
             let group = OBJParser::parse(filename);
             println!("Parsed into group. Time {}", start.elapsed().as_secs());
 
-            let world = create_default_world_with_group(group);
+            let world = create_default_world_with_object(group);
             println!("Created World. Time {}", start.elapsed().as_secs());
 
             let camera = Camera::create(300, 300, PI/2.0) //high def: 1080 1080
@@ -51,7 +61,9 @@ fn main() {
             println!("Finished {} {}. Final Time {}", command, filename, start.elapsed().as_secs());
         }
         "generate_fractal_image" => {
-            let world = create_empty_world();
+            let object = create_objects_from_input(filename);
+
+            let world = create_default_world_with_object(object);
             println!("Created World. Time {}", start.elapsed().as_secs());
 
             let camera = Camera::create(1080, 1080, 0.45)

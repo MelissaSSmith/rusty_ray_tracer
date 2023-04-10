@@ -1,6 +1,7 @@
 use core::fmt;
 use core::ops::{Add, Mul, Sub};
 use std::fmt::Formatter;
+use rand::Rng;
 use crate::features::primitives::operations::Operations;
 
 #[derive(Clone, Copy, Debug)]
@@ -32,6 +33,14 @@ impl Color {
             return 0.0;
         }
         new_number.round()
+    }
+
+    pub fn random_color() -> Color {
+        let mut rng = rand::thread_rng();
+        let r = (rng.gen::<f64>() * 256.0).floor();
+        let g = (rng.gen::<f64>() * 256.0).floor();
+        let b = (rng.gen::<f64>() * 256.0).floor();
+        Color::create(r, g, b)
     }
 
     pub fn format_color_string(&self) -> String {

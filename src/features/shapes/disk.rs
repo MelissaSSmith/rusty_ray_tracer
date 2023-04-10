@@ -82,7 +82,7 @@ impl Disk {
 
     fn hash_three(n: f64) -> Vector {
         let vector = Vector::create(n.sin(), (n + 1.0).sin(), (n + 2.0).sin());
-        (vector * Vector::create(43758.5453123,12578.1459123,19642.3490423))
+        vector * Vector::create(43758.5453123,12578.1459123,19642.3490423)
     }
 
     fn area(&self) -> f64 {
@@ -98,10 +98,10 @@ impl Intersect for Disk {
 
         let h = _ray.origin().z() + _ray.direction().z();
         let t_shape_hit = (h - _ray.origin().z()) / _ray.direction().z();
-        let hit = (_object.height() - _ray.origin().z()) / _ray.direction().z();
-        if hit <= 0.0 {
-            return vec![];
-        }
+        // let hit = (_object.height() - _ray.origin().z()) / _ray.direction().z();
+        // if hit <= 0.0 {
+        //     return vec![];
+        // }
 
         todo!()
     }
