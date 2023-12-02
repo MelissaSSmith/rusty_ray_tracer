@@ -19,7 +19,7 @@ use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Shape;
 use crate::features::shapes::shape::Shape::Object;
 use crate::Shape::Plane;
-use crate::world_builder::{create_default_world_with_object, create_objects_from_input};
+use crate::world_builder::{create_default_world_with_object, create_default_world_with_objects, create_objects_from_input};
 
 mod features;
 mod draw;
@@ -52,7 +52,7 @@ fn main() {
                     Point::create(0.0, 1.0, 0.0),
                     Vector::create(2.0, 3.0, 0.0)
                 ) * Matrix::rotate_x(-PI/2.0) * Matrix::rotate_y(PI/8.0));
-            let canvas = camera.render(world);
+            let canvas = camera.render_scene(world);
             println!("Rendered World. Time {}", start.elapsed().as_secs());
 
             let mut path = PathBuf::from(filename);
@@ -61,9 +61,9 @@ fn main() {
             println!("Finished {} {}. Final Time {}", command, filename, start.elapsed().as_secs());
         }
         "generate_fractal_image" => {
-            let object = create_objects_from_input(filename);
+            let objects = create_objects_from_input(filename);
 
-            let world = create_default_world_with_object(object);
+            let world = create_default_world_with_objects(objects);
             println!("Created World. Time {}", start.elapsed().as_secs());
 
             let camera = Camera::create(1080, 1080, 0.45)
@@ -72,7 +72,7 @@ fn main() {
                     Point::zero(),
                     Vector::create(0.0, 1.0, 0.0)
                 ));
-            let canvas = camera.render(world);
+            let canvas = camera.render_art(world);
             println!("Rendered World. Time {}", start.elapsed().as_secs());
 
             let mut path = PathBuf::from(filename);

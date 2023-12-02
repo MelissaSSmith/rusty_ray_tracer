@@ -25,6 +25,21 @@ impl Canvas {
         }
     }
 
+    pub fn create_with_default(_width: i32, _height: i32, default_color: Color) -> Canvas {
+        let default_pixels = DashMap::<String, Color>::new();
+        for x in 0.._width {
+            for y in 0.._height {
+                let key = Canvas::create_key(x, y);
+                default_pixels.insert(key, default_color);
+            }
+        }
+        Canvas {
+            width: _width,
+            height: _height,
+            pixels: default_pixels
+        }
+    }
+
     fn create_key(x: i32, y: i32) -> String {
         format!("{}.{}", x, y)
     }

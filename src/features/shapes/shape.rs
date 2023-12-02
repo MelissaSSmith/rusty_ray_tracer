@@ -33,7 +33,8 @@ pub enum Shape {
     SmoothTriangle(SmoothTriangle),
     CSG(CSG),
     Torus(Torus),
-    Disk(Disk)
+    Disk(Disk),
+    Rectangle(Plane)
 }
 
 impl Shape {
@@ -49,6 +50,7 @@ impl Shape {
             Shape::SmoothTriangle(_) => "SmoothTriangle",
             Shape::CSG(_) => "CSG",
             Shape::Torus(_) => "Torus",
+            Shape::Rectangle(_) => "Rectangle",
             _ => "Object"
         }
     }
@@ -108,6 +110,14 @@ impl Shape {
             Shape::Disk(disk) => {
                 let bounds = Object::create_radial_bounds(disk.center(), disk.radius(), disk.height());
                 Object::create(Shape::Disk(*disk), has_shadow, material, bounds)
+            }
+            Shape::Rectangle(plane) => {
+                let off_center_w = plane.width() / 2.0;
+                let off_center_h = plane.height() / 2.0;
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-off_center_w, 0.0, -off_center_h))
+                    .with_maximum(Point::create(off_center_w, 0.0, off_center_h));
+                Object::create(Shape::Plane, has_shadow, material, bounds)
             }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
         }

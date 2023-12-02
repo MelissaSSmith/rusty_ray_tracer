@@ -76,7 +76,7 @@ fn test_glamour_shot() {
     let mut camera = Camera::create(1000, 400, 0.7854);
     camera.set_transform(Matrix::view_transform(Point::create(-3.0, 1.0, 2.5), Point::create(0.0, 0.5, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
-    let canvas = camera.render(world);
+    let canvas = camera.render_scene(world);
 
     canvas.convert_to_ppm_and_save(String::from("shadow_glamour_shot.ppm"));
 }

@@ -119,7 +119,7 @@ fn cubes_test() {
     let objects = vec![floor, left_wall, right_wall, blue_cube, red_cube, green_cube];
     let world = World::create_world(Light::create_point_light(light_source), objects);
 
-    let canvas = camera.render(world);
+    let canvas = camera.render_scene(world);
 
     canvas.convert_to_ppm_and_save(String::from("cubes_test.ppm"));
 }

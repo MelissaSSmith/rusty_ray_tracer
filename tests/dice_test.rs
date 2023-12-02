@@ -191,7 +191,7 @@ fn dice_test() {
     let objects = vec![floor, dice_group, lens];
     let world = World::create_world(Light::create_point_light(light_source), objects);
 
-    let canvas = camera.render(world);
+    let canvas = camera.render_scene(world);
 
     canvas.convert_to_ppm_and_save(String::from("dice_test.ppm"));
 }

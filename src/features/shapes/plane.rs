@@ -8,7 +8,41 @@ use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Plane {}
+pub struct Plane {
+    width: f64,
+    height: f64
+}
+
+impl Plane {
+    pub fn create() -> Plane {
+        Self {
+            width: f64::INFINITY,
+            height: f64::INFINITY
+        }
+    }
+
+    pub fn with_width(self, width: f64) -> Plane {
+        Self {
+            width,
+            ..self
+        }
+    }
+
+    pub fn with_height(self, height: f64) -> Plane {
+        Self {
+            height,
+            ..self
+        }
+    }
+
+    pub fn width(&self) -> f64 {
+        self.width
+    }
+
+    pub fn height(&self) -> f64 {
+        self.height
+    }
+}
 
 impl Intersect for Plane {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {

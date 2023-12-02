@@ -17,7 +17,6 @@ pub mod smooth_triangle;
 pub mod csg;
 pub mod torus;
 pub mod disk;
-mod rectangle;
 
 pub trait Intersect {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection>;

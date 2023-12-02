@@ -6,6 +6,7 @@ use crate::features::ray::Ray;
 use crate::features::world::World;
 
 use rayon::prelude::*;
+use crate::features::color::consts::WHITE;
 
 pub struct Camera {
     h_size: i32,
@@ -55,9 +56,19 @@ impl Camera {
         Ray::create(self.origin, direction)
     }
 
-    pub fn render(&self, world: World) -> Canvas {
+    pub fn render_scene(&self, world: World) -> Canvas {
         let canvas = Canvas::create(self.h_size, self.v_size);
 
+        self.render_canvas(world, canvas)
+    }
+
+    pub fn render_art(&self, world: World) -> Canvas {
+        let canvas = Canvas::create_with_default(self.h_size, self.v_size, WHITE);
+
+        self.render_canvas(world, canvas)
+    }
+
+    fn render_canvas(&self, world: World, canvas: Canvas) -> Canvas {
         canvas.pixels
             .par_iter_mut()
             .for_each(|mut map_value| {
@@ -189,7 +200,7 @@ mod tests {
         let up = Vector::create(0.0, 1.0, 0.0);
         camera.set_transform(Matrix::view_transform(from, to, up));
 
-        let image = camera.render(world);
+        let image = camera.render_scene(world);
 
         let color = image.get_pixel(5, 5);
         assert!(color.equals(Color::create(0.38066, 0.47583, 0.2855)));

@@ -156,7 +156,7 @@ fn cylinder_test() {
     let objects = vec![right_wall, left_wall, cylinder_x, cylinder_y, cylinder_z, shallow_cylinder, cylinder, refractive_cylinder];
     let world = World::create_world(Light::create_point_light(light_source), objects);
 
-    let canvas = camera.render(world);
+    let canvas = camera.render_scene(world);
 
     canvas.convert_to_ppm_and_save(String::from("cylinder_test.ppm"));
 }

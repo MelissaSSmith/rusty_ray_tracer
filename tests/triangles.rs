@@ -98,7 +98,7 @@ fn test_triangles() {
     let mut camera = Camera::create(1080, 1080, PI/4.5);
     camera.set_transform(Matrix::view_transform(Point::create(3.0, 3.0, -6.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
-    let canvas = camera.render(world);
+    let canvas = camera.render_scene(world);
 
     canvas.convert_to_ppm_and_save(String::from("triangle_test.ppm"));
 }

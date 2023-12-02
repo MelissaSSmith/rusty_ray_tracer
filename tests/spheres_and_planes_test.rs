@@ -83,7 +83,7 @@ fn sphere_scene_test() {
     let mut camera = Camera::create(400, 350, PI/3.0);
     camera.set_transform(Matrix::view_transform(Point::create(0.0, 1.5, -5.0), Point::create(0.0, 1.0, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
-    let canvas = camera.render(world);
+    let canvas = camera.render_scene(world);
 
     canvas.convert_to_ppm_and_save(String::from("sphere_and_planes_test.ppm"));
 }
