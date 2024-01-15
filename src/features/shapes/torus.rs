@@ -1,6 +1,6 @@
 use crate::features::intersection::Intersection;
 use crate::features::math::quartic_algebra::quartic;
-use crate::features::primitives::operations::consts::{EPSILON, LOW_EPSILON};
+use crate::features::primitives::operations::consts::{LOW_EPSILON};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;

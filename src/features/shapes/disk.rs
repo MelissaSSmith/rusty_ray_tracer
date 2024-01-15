@@ -82,7 +82,7 @@ impl Disk {
 
     fn hash_three(n: f64) -> Vector {
         let vector = Vector::create(n.sin(), (n + 1.0).sin(), (n + 2.0).sin());
-        (vector * Vector::create(43758.5453123,12578.1459123,19642.3490423))
+        vector * Vector::create(43758.5453123,12578.1459123,19642.3490423)
     }
 
     fn area(&self) -> f64 {

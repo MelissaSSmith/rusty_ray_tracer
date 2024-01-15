@@ -419,7 +419,9 @@ impl Object {
         }
     }
 
-    pub fn height(&self)
+    pub fn height(&self) -> f64 {
+        0.0
+    }
 
     pub fn children(&self) -> Vec<Object> {
         match self.shape() {
