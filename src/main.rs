@@ -54,7 +54,7 @@ fn main() {
         }
         "generate_fractal_image" => {
             let mut canvas = initialize_blank_canvas();
-            draw_random_rectangles(&mut canvas, 15);
+            draw_random_rectangles(&mut canvas, 70);
             println!("Rendered Canvas. Time {}", start.elapsed().as_secs());
 
             let mut path = PathBuf::from(filename);
