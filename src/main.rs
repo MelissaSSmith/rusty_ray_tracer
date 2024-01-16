@@ -2,6 +2,7 @@ use std::env;
 use core::f64::consts::PI;
 use std::path::PathBuf;
 use std::time::Instant;
+use crate::chaos::{draw_random_rectangles, initialize_blank_canvas};
 use crate::draw::obj_format::OBJParser;
 use crate::draw::ppm_format::PPMFile;
 use crate::features::camera::Camera;
@@ -9,11 +10,12 @@ use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
-use crate::world_builder::{create_default_world_with_group, create_empty_world};
+use crate::world_builder::{create_default_world_with_group};
 
 mod features;
 mod draw;
 mod world_builder;
+mod chaos;
 
 
 // Command 1: generate image from obj file using a default world `create_object <filename>`
@@ -51,17 +53,9 @@ fn main() {
             println!("Finished {} {}. Final Time {}", command, filename, start.elapsed().as_secs());
         }
         "generate_fractal_image" => {
-            let world = create_empty_world();
-            println!("Created World. Time {}", start.elapsed().as_secs());
-
-            let camera = Camera::create(1080, 1080, 0.45)
-                .with_transform(Matrix::view_transform(
-                    Point::create(0.0, 0.0, -5.0),
-                    Point::zero(),
-                    Vector::create(0.0, 1.0, 0.0)
-                ));
-            let canvas = camera.render(world);
-            println!("Rendered World. Time {}", start.elapsed().as_secs());
+            let mut canvas = initialize_blank_canvas();
+            draw_random_rectangles(&mut canvas, 15);
+            println!("Rendered Canvas. Time {}", start.elapsed().as_secs());
 
             let mut path = PathBuf::from(filename);
             path.set_extension("ppm");

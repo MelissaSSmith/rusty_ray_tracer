@@ -1,21 +1,26 @@
 use core::ops::Div;
+use std::cmp::{max, min};
 use dashmap::DashMap;
 use crate::features::color::Color;
 use crate::features::color::consts::BLACK;
 
 pub struct Canvas {
-    pub width: i32,
-    pub height: i32,
+    width: i32,
+    height: i32,
     pub(crate) pixels: DashMap<String, Color>
 }
 
 impl Canvas {
     pub fn create(_width: i32, _height: i32) -> Canvas {
+        Canvas::create_with_default(_width, _height, BLACK)
+    }
+
+    pub fn create_with_default(_width: i32, _height: i32, _default_color: Color) -> Canvas {
         let default_pixels = DashMap::<String, Color>::new();
         for x in 0.._width {
             for y in 0.._height {
                 let key = Canvas::create_key(x, y);
-                default_pixels.insert(key, BLACK);
+                default_pixels.insert(key, _default_color);
             }
         }
         Canvas {
@@ -25,8 +30,28 @@ impl Canvas {
         }
     }
 
+    pub fn width(&self) -> i32 {
+        self.width
+    }
+
+    pub fn height(&self) -> i32 {
+        self.height
+    }
+
     fn create_key(x: i32, y: i32) -> String {
         format!("{}.{}", x, y)
+    }
+
+    pub fn write_rectangle(&mut self, x: i32, y: i32, w: i32, h: i32, color: Color) {
+        let max_i = max(x, w);
+        let min_i = min(x, w);
+        let max_j = max(y, h);
+        let min_j = min(y, h);
+        for i in min_i..max_i {
+            for j in min_j..max_j {
+                self.write_pixel(i, j, color)
+            }
+        }
     }
 
     pub fn write_pixel(&mut self, _x: i32, _y: i32, _color: Color) {
@@ -41,7 +66,11 @@ impl Canvas {
     pub fn get_pixel(&self, _x: i32, _y: i32) -> Color {
         let key = Canvas::create_key(_x, _y);
         let pixel = self.pixels.get(&key).unwrap();
-        *pixel.value()
+        let color = *pixel.value();
+        if color.blue <= 1.0 && color.blue <= 1.0 && color.blue <= 1.0 {
+            return color.scale_color();
+        }
+        color
     }
 
     pub fn pixels(&self) -> DashMap<String, Color> {
@@ -92,8 +121,8 @@ mod tests {
 
         let canvas = Canvas::create(width, height);
 
-        assert_eq!(width, canvas.width);
-        assert_eq!(height, canvas.height);
+        assert_eq!(width, canvas.width());
+        assert_eq!(height, canvas.height());
         assert_eq!(200, canvas.pixels.len());
 
         for key_value in canvas.pixels {

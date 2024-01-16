@@ -14,7 +14,7 @@ pub trait PPMFile {
 
 impl PPMFormat for Canvas {
     fn create_header(&self) -> String {
-        format!("P3\n{} {}\n255", self.width, self.height)
+        format!("P3\n{} {}\n255", self.width(), self.height())
     }
 
     fn create_termination() -> String {
@@ -22,12 +22,11 @@ impl PPMFormat for Canvas {
     }
 
     fn write_to_ppm(&self, file: &File) {
-        for h in 0..self.height {
+        for h in 0..self.height() {
             let mut line_array = Vec::<String>::new();
-            for w in 0..self.width {
+            for w in 0..self.width() {
                 let pixel = self.get_pixel(w, h);
-                let scaled_color = pixel.scale_color();
-                line_array.push(scaled_color.format_color_string());
+                line_array.push(pixel.format_color_string());
             }
 
             write_line_to_file(file, Canvas::format_pixel_line(line_array));
