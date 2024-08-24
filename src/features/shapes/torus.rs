@@ -1,6 +1,6 @@
 use crate::features::intersection::Intersection;
 use crate::features::math::quartic_algebra::quartic;
-use crate::features::primitives::operations::consts::{LOW_EPSILON};
+use crate::features::primitives::operations::consts::{EPSILON, HIGH_EPSILON, LOW_EPSILON};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
@@ -72,7 +72,7 @@ impl Intersect for Torus {
         let b = _object.tube_radius();
 
         let sum_direction_squared = dx * dx + dy * dy + dz * dz;
-        let e = ox * ox + oy * oy  + oz * oz - a * a - b * b;
+        let e = ox * ox + oy * oy + oz * oz - a * a - b * b;
         let f = ox * dx + oy * dy + oz * dz;
         let four_a_squared = 4.0 * a * a;
 
@@ -84,23 +84,19 @@ impl Intersect for Torus {
             sum_direction_squared * sum_direction_squared
         ];
 
-        let solution = quartic(coefficients);
-
-        if solution.is_empty() {
-            return vec![]
-        }
+        let solutions = quartic(coefficients);
 
         let mut mint = f64::INFINITY;
-        solution.iter()
+        let mut intersections = vec![];
+        solutions.iter()
             .for_each(|t| if (t > &LOW_EPSILON) && (t < &mint) {
-                mint = *t
+                mint = *t;
+                intersections.append(
+                    &mut vec![Intersection::create(mint, _object, 0.0, 0.0)]
+                );
             });
 
-        if mint.is_finite() {
-            return vec![Intersection::create(mint, _object, 0.0, 0.0)];
-        }
-
-        vec![]
+        intersections
     }
 }
 
