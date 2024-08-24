@@ -7,7 +7,7 @@ pub fn quadratic(inputs: [f64; 3]) -> Vec<f64> {
 
     let d = p * p - q;
 
-    return if d.zero() {
+    if d.zero() {
         vec![-p]
     } else if d < 0.0 {
         vec![]
@@ -134,7 +134,7 @@ fn determine_solutions(d: f64, p: f64, q: f64, cubic_p: f64) -> Vec<f64> {
     let u = (sqrt_d - q).cbrt();
     let v = -(sqrt_d + q).cbrt();
 
-    return vec![u + v];
+    vec![u + v]
 }
 
 fn handle_result(x: f64) -> Option<f64> {
