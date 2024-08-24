@@ -163,18 +163,18 @@ fn dice_test() {
     for i in -2..=2 {
         for j in -4..=4 {
             let mut rnd = thread_rng();
-            let hue = rnd.gen_range(0.0, 1.0);
+            let hue = rnd.gen_range((0.0..1.0));
             let material1 = Material::create()
                 .with_color(Color::create(hue, 0.8, 1.0))
                 .with_diffuse(1.0);
             let material2 = Material::create()
                 .with_color(Color::create(hue, 0.8, 1.0))
                 .with_diffuse(1.0);
-            let size = rnd.gen_range(0.05, 0.1);
-            let pos_x = i as f64 * 0.4 + rnd.gen_range(-0.1, 0.1);
-            let pos_y = j as f64 * 0.4 + rnd.gen_range(-0.1, 0.1);
+            let size = rnd.gen_range((0.05..0.1));
+            let pos_x = i as f64 * 0.4 + rnd.gen_range((-0.1..0.1));
+            let pos_y = j as f64 * 0.4 + rnd.gen_range((-0.1..0.1));
 
-            let radians = rnd.gen_range(0.0, 2.0 * PI);
+            let radians = rnd.gen_range((0.0..2.0 * PI));
             //let rotax: [f64; 3] = rnd.gen();
             //let rotax: Vector = rotax.into();
 

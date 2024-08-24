@@ -12,7 +12,7 @@ pub struct PerturbedPattern {
 
 impl PerturbedPattern {
     fn noise(&self, x: f64, y: f64, z: f64) -> f64 {
-        let noise = Perlin::new();
+        let noise = Perlin::new(0);
 
         noise.get([x, y, z])
     }
