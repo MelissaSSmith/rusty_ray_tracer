@@ -18,7 +18,7 @@ impl Sequence {
         let mut rng = thread_rng();
         let mut base = [0.0; 5];
         for n in &mut base {
-            *n = rng.gen_range((0.0..1.0));
+            *n = rng.gen_range(0.0..1.0);
         }
         Sequence::create(base)
     }
