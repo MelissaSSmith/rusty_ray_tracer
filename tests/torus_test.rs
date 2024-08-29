@@ -21,14 +21,14 @@ use rusty_ray_tracer::features::world::World;
 fn torus_test() {
     let camera = Camera::create(1080, 1080, 0.45)
         .with_transform(Matrix::view_transform(
-            Point::create(0.0, 0.0, -5.0),
+            Point::create(0.0, 6.0, -5.0),
             Point::zero(),
             Vector::create(0.0, 2.0, 2.0)
         ));
 
     let wall = Shape::Plane.create()
         .with_transform(
-            Matrix::translate(0.0, 0.0, 10.0) * Matrix::rotate_x(FRAC_PI_2)
+            Matrix::translate(-3.0, -3.0, 10.0)
         )
         .with_material(
             Material::create()
@@ -44,7 +44,7 @@ fn torus_test() {
     let torus = Shape::Torus(
         Torus::create()
             .with_radius(1.0)
-            .with_tube_radius(0.4)
+            .with_tube_radius(0.5)
     ).create()
         .with_material(
             Material::create()
