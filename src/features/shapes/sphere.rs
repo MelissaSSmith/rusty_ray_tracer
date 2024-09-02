@@ -138,10 +138,8 @@ mod tests {
 
     #[test]
     fn test_change_transformation_in_a_sphere() {
-        let mut sphere = Shape::Sphere.create();
-        let transform = Matrix::translate(2.0, 3.0, 4.0);
-
-        sphere.set_transform(transform);
+        let sphere = Shape::Sphere.create()
+            .with_transform(Matrix::translate(2.0, 3.0, 4.0));
 
         assert_eq!(sphere.transformation(), Matrix::translate(2.0, 3.0, 4.0));
     }

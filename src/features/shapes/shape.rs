@@ -229,30 +229,6 @@ impl Object {
         self.has_shadow
     }
 
-    pub fn set_transform(&mut self, _transformation: Matrix) {
-        self.cumulative_transform = _transformation;
-        self.cumulative_inverse_transform = self.cumulative_transform().inverse();
-        self.parent_space_bounds = self.bounds.transform(_transformation);
-        match self.shape() {
-            Shape::Group(_) => {
-                let group = Group::create_with_children(self.children(), _transformation);
-                self.shape = Shape::Group(group);
-            }
-            Shape::CSG(csg) => {
-                let left = csg.left().with_transform(_transformation);
-                let right = csg.right().with_transform(_transformation);
-                self.shape = Shape::CSG(CSG::create(csg.operation(), left, right));
-            }
-            // Shape::Torus(torus) => {
-            //
-            // }
-            _ => {
-                self.transformation = _transformation;
-                self.inverse_transformation = _transformation.inverse();
-            }
-        }
-    }
-
     pub fn with_transform(self, _transform: Matrix) -> Object {
         match self.shape {
             Shape::CSG(ref c) => {
@@ -297,6 +273,7 @@ impl Object {
                     .with_radius(t.radius())
                     .with_tube_radius(t.tube_radius())
                     .with_center(center);
+                let bounds = Self::create_radial_bounds(center, torus.radius(), torus.radius()*3.0);
 
                 Object {
                     shape: Shape::Torus(torus),
@@ -304,7 +281,7 @@ impl Object {
                     inverse_transformation: _transform.inverse(),
                     cumulative_transform: _transform * self.cumulative_transform(),
                     cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
-                    parent_space_bounds: self.bounds.transform(_transform),
+                    parent_space_bounds: bounds.transform(_transform),
                     ..self
                 }
             }
@@ -608,9 +585,9 @@ mod tests {
         let mut group_1 = Shape::Group(Group::create()).create()
             .with_transform(Matrix::rotate_y(PI/2.0))
             .with_children(vec![group_2]);
-        group_1.set_transform(Matrix::identity());
+        let g = group_1.with_transform(Matrix::identity());
 
-        let sphere = group_1.children()[0].clone().children()[0].clone();
+        let sphere = g.children()[0].clone().children()[0].clone();
 
         let point = Object::world_to_object(&sphere, &Point::create(-2.0, 0.0, -10.0));
 
