@@ -181,7 +181,7 @@ impl World {
     fn color_at_impl(&self, _ray: &Ray, remaining: u8) -> Color {
         let intersections = self.intersect(*_ray);
         let intersection = Intersection::hit(intersections.clone());
-        return match intersection {
+        match intersection {
             None => { BLACK }
             Some(i) => {
                 let computations = i.prepare_computations(*_ray, &intersections);

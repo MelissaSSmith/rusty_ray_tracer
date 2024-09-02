@@ -46,9 +46,9 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
     let d = inputs[0] / inputs[4];
 
     let squared_a =  a * a;
-    let p = -3.0 / 8.0 * squared_a + b;
-    let q = 1.0 / 8.0 * squared_a * a - 1.0 / 2.0 * a * b + c;
-    let r = -3.0 / 256.0 * squared_a * squared_a + 1.0 / 16.0 * squared_a * b - 1.0 / 4.0 * a * c + d;
+    let p = (-3.0 / 8.0) * squared_a + b;
+    let q = (1.0 / 8.0) * squared_a * a - (1.0 / 2.0) * a * b + c;
+    let r = (-3.0 / 256.0) * squared_a * squared_a + (1.0 / 16.0) * squared_a * b - (1.0 / 4.0) * a * c + d;
 
     let mut solutions = vec![];
 
@@ -58,9 +58,9 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
         solutions.push(0.0);
     } else { /* solve the resolvent cubic ... */
         let coefficients = [
-            1.0 / 2.0 * r * p - 1.0 / 8.0 * q * q,
+            (1.0 / 2.0) * r * p - (1.0 / 8.0) * q * q,
             -r,
-            -1.0 / 2.0 * p,
+            (-1.0 / 2.0) * p,
             1.0
         ];
 
@@ -104,7 +104,7 @@ pub fn quartic(inputs: [f64; 5]) -> Vec<f64> {
         solutions.append(&mut quadratic(coefficients));
     }
 
-    let substitute = 1.0 / 4.0 * a;
+    let substitute = (1.0 / 4.0) * a;
 
     solutions.iter()
         .map(|s| s - substitute)

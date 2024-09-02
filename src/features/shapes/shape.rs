@@ -102,7 +102,7 @@ impl Shape {
                 Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
             Shape::Torus(torus) => {
-                let bounds = Object::create_radial_bounds(torus.center(), torus.radius(), 0.0);
+                let bounds = Object::create_radial_bounds(torus.center(), torus.radius(), torus.radius()*3.0);
                 Object::create(Shape::Torus(*torus), has_shadow, material, bounds)
             },
             Shape::Disk(disk) => {
@@ -237,13 +237,15 @@ impl Object {
             Shape::Group(_) => {
                 let group = Group::create_with_children(self.children(), _transformation);
                 self.shape = Shape::Group(group);
-
             }
             Shape::CSG(csg) => {
                 let left = csg.left().with_transform(_transformation);
                 let right = csg.right().with_transform(_transformation);
                 self.shape = Shape::CSG(CSG::create(csg.operation(), left, right));
             }
+            // Shape::Torus(torus) => {
+            //
+            // }
             _ => {
                 self.transformation = _transformation;
                 self.inverse_transformation = _transformation.inverse();
@@ -286,6 +288,23 @@ impl Object {
                     cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
                     bounds: group_bounds,
+                    ..self
+                }
+            }
+            Shape::Torus(ref t) => {
+                let center = _transform * t.center();
+                let torus = Torus::create()
+                    .with_radius(t.radius())
+                    .with_tube_radius(t.tube_radius())
+                    .with_center(center);
+
+                Object {
+                    shape: Shape::Torus(torus),
+                    transformation: _transform,
+                    inverse_transformation: _transform.inverse(),
+                    cumulative_transform: _transform * self.cumulative_transform(),
+                    cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
+                    parent_space_bounds: self.bounds.transform(_transform),
                     ..self
                 }
             }

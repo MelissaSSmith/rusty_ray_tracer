@@ -1,6 +1,6 @@
 use crate::features::intersection::Intersection;
 use crate::features::math::quartic_algebra::quartic;
-use crate::features::primitives::operations::consts::{EPSILON, HIGH_EPSILON, LOW_EPSILON};
+use crate::features::primitives::operations::consts::LOW_EPSILON;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
@@ -64,9 +64,9 @@ impl Intersect for Torus {
         let dy = _ray.direction().y();
         let dz = _ray.direction().z();
 
-        let ox = _ray.origin().x();
-        let oy = _ray.origin().y();
-        let oz = _ray.origin().z();
+        let ox = _ray.origin().x() - _object.center().x();
+        let oy = _ray.origin().y() - _object.center().y();
+        let oz = _ray.origin().z() - _object.center().z();
 
         let a = _object.radius();
         let b = _object.tube_radius();
@@ -86,13 +86,11 @@ impl Intersect for Torus {
 
         let solutions = quartic(coefficients);
 
-        let mut mint = f64::INFINITY;
         let mut intersections = vec![];
         solutions.iter()
-            .for_each(|t| if (t > &LOW_EPSILON) && (t < &mint) {
-                mint = *t;
+            .for_each(|t| if t >= & LOW_EPSILON {
                 intersections.append(
-                    &mut vec![Intersection::create(mint, _object, 0.0, 0.0)]
+                    &mut vec![Intersection::create(*t, _object, 1.0, 1.0)]
                 );
             });
 

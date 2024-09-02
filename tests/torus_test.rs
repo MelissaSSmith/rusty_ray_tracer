@@ -2,13 +2,14 @@ use std::f64::consts::{FRAC_PI_2};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{RED};
+use rusty_ray_tracer::features::color::consts::{BLUE, RED};
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::{OneColorCreate, TwoPatternCreate};
 use rusty_ray_tracer::features::patterns::solid::SolidPattern;
+use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -51,7 +52,7 @@ fn torus_test() {
                 .with_color(RED)
         )
         .with_transform(
-            Matrix::translate(0.0, 0.0, 0.0) * Matrix::rotate_y(FRAC_PI_2)
+            Matrix::translate(0.25, 0.5, 0.0) * Matrix::rotate_y(FRAC_PI_2)
         );
 
     let light_source = PointLight::create(Color::create(0.9, 0.9, 0.9), Point::create(2.0, 10.0, -5.0));
