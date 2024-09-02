@@ -264,8 +264,8 @@ mod tests {
     #[test]
     fn test_hit_should_offset_the_point() {
         let ray = Ray::create(Point::create(0.0, 0.0, -5.0), Vector::create(0.0, 0.0, 1.0));
-        let sphere = Shape::Sphere.create()
-            .with_transform(Matrix::translate(0.0, 0.0, 1.0));
+        let mut sphere = Shape::Sphere.create();
+        sphere.set_transform(Matrix::translate(0.0, 0.0, 1.0));
 
         let intersection = Intersection::create(5.0, &sphere, 0.0, 0.0);
 

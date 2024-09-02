@@ -34,8 +34,7 @@ impl Group {
     fn transform_children(children: Vec<Object>, transform: Matrix) -> Vec<Object> {
         let mut transformed_children = vec![];
         for mut child in children {
-            let new_transform = transform * child.transformation();
-            child = child.with_transform(new_transform);
+            child.set_transform(transform * child.transformation());
             transformed_children.push(child);
         }
 
