@@ -86,15 +86,17 @@ impl Intersect for Torus {
 
         let solutions = quartic(coefficients);
 
-        let mut intersections = vec![];
+        let mut mint = f64::INFINITY;
         solutions.iter()
-            .for_each(|t| if t >= & LOW_EPSILON {
-                intersections.append(
-                    &mut vec![Intersection::create(*t, _object, 1.0, 1.0)]
-                );
+            .for_each(|t| if t >= & LOW_EPSILON && t < &mint {
+                mint = *t;
             });
 
-        intersections
+        if mint.is_finite() {
+            return vec![Intersection::create(mint, _object, 0.0, 0.0)];
+        }
+
+        vec![]
     }
 }
 
