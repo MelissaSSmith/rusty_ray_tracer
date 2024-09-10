@@ -9,7 +9,6 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::{OneColorCreate, TwoPatternCreate};
 use rusty_ray_tracer::features::patterns::solid::SolidPattern;
-use rusty_ray_tracer::features::patterns::stripe::StripePattern;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -53,7 +52,7 @@ fn torus_test() {
         )
         .with_transform(
             Matrix::translate(-0.25, -0.5, 0.0) * Matrix::rotate_y(FRAC_PI_2)
-            //* Matrix::rotate_x(FRAC_2_PI)
+            * Matrix::rotate_x(FRAC_2_PI)
         );
 
     let light_source = PointLight::create(Color::create(0.9, 0.9, 0.9), Point::create(2.0, 10.0, -5.0));

@@ -548,6 +548,7 @@ impl Object {
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = _ray.transform(_object.inverse_transformation());
+        let cul_ray = _ray.transform(_object.inverse_cumulative_transform());
         match _object.shape() {
             Shape::Sphere => { Sphere::intersect(_object, &transformed_ray) }
             Shape::Plane => { Plane::intersect(_object, &transformed_ray) }
@@ -558,7 +559,7 @@ impl Intersect for Object {
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
             Shape::CSG(csg) => { csg.intersect(_ray, _object) }
-            Shape::Torus(_) => { Torus::intersect(_object, _ray) }
+            Shape::Torus(_) => { Torus::intersect(_object, &cul_ray) }
             Shape::Disk(_) => { Disk::intersect(_object, _ray) }
             _ => { vec![] }
         }

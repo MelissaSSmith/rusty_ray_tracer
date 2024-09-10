@@ -64,9 +64,9 @@ impl Intersect for Torus {
         let dy = _ray.direction().y();
         let dz = _ray.direction().z();
 
-        let ox = _ray.origin().x() - _object.center().x();
-        let oy = _ray.origin().y() - _object.center().y();
-        let oz = _ray.origin().z() - _object.center().z();
+        let ox = _ray.origin().x();
+        let oy = _ray.origin().y();
+        let oz = _ray.origin().z();
 
         let a = _object.radius();
         let b = _object.tube_radius();
