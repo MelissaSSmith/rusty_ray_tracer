@@ -106,7 +106,9 @@ impl Shape {
                 Object::create(Shape::Torus(*torus), has_shadow, material, bounds)
             },
             Shape::Disk(disk) => {
-                let bounds = Object::create_radial_bounds(disk.center(), disk.radius(), disk.height());
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-disk.radius(), -disk.radius(), disk.height()))
+                    .with_maximum(Point::create(disk.radius(), disk.radius(), disk.height()));
                 Object::create(Shape::Disk(*disk), has_shadow, material, bounds)
             }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
@@ -423,6 +425,13 @@ impl Object {
         }
     }
 
+    pub fn inner_radius(&self) -> f64 {
+        match self.shape() {
+            Shape::Disk(d) => { d.inner_radius() }
+            _ => 0.0
+        }
+    }
+
     pub fn tube_radius(&self) -> f64 {
         match self.shape() {
             Shape::Torus(t) => { t.tube_radius() }
@@ -439,7 +448,17 @@ impl Object {
     }
 
     pub fn height(&self) -> f64 {
-        0.0
+        match self.shape() {
+            Shape::Disk(d) => { d.height() }
+            _ => 0.0
+        }
+    }
+
+    pub fn phi_max(&self) -> f64 {
+        match self.shape() {
+            Shape::Disk(d) => { d.phi_max() }
+            _ => 0.0
+        }
     }
 
     pub fn children(&self) -> Vec<Object> {
@@ -560,7 +579,7 @@ impl Intersect for Object {
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
             Shape::CSG(csg) => { csg.intersect(_ray, _object) }
             Shape::Torus(_) => { Torus::intersect(_object, &cul_ray) }
-            Shape::Disk(_) => { Disk::intersect(_object, _ray) }
+            Shape::Disk(_) => { Disk::intersect(_object, &cul_ray) }
             _ => { vec![] }
         }
     }
