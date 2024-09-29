@@ -1,4 +1,4 @@
-use std::f64::consts::{FRAC_2_PI, FRAC_PI_2};
+use std::f64::consts::{FRAC_2_PI, FRAC_PI_2, FRAC_PI_4};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
@@ -21,7 +21,7 @@ use rusty_ray_tracer::features::world::World;
 fn disk_test() {
     let camera = Camera::create(1080, 1080, 0.45)
         .with_transform(Matrix::view_transform(
-            Point::create(0.0, 6.0, -5.0),
+            Point::create(0.0, 10.0, 0.0),
             Point::zero(),
             Vector::create(0.0, 2.0, 2.0)
         ));
@@ -43,17 +43,17 @@ fn disk_test() {
 
     let disk = Shape::Disk(
         Disk::create()
-            .with_radius(1.0)
-            .with_inner_radius(0.4)
-            .with_height(2.0)
+            .with_radius(2.0)
+            .with_inner_radius(1.0)
+            .with_height(4.0)
     ).create()
         .with_material(
             Material::create()
                 .with_color(GREEN)
         )
         .with_transform(
-            Matrix::translate(-0.25, -0.25, 0.0) * Matrix::rotate_y(FRAC_PI_2)
-               // * Matrix::rotate_x(FRAC_2_PI)
+            Matrix::translate(-0.25, -0.5, 0.0) * Matrix::rotate_y(FRAC_PI_4)
+                * Matrix::rotate_x(FRAC_2_PI)
         );
 
     let light_source = PointLight::create(Color::create(0.9, 0.9, 0.9), Point::create(2.0, 10.0, -5.0));

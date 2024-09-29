@@ -1,11 +1,12 @@
 use std::f64::consts::PI;
 use crate::features::intersection::Intersection;
+use crate::features::primitives::operations::Operations;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
-use crate::features::shapes::shape::{Object, Shape};
+use crate::features::shapes::shape::Object;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Disk {
@@ -81,70 +82,68 @@ impl Disk {
         }
     }
 
-    fn hash_three(n: f64) -> Vector {
-        let vector = Vector::create(n.sin(), (n + 1.0).sin(), (n + 2.0).sin());
-        vector * Vector::create(43758.5453123,12578.1459123,19642.3490423)
-    }
-
     fn area(&self) -> f64 {
         self.phi_max() * 0.5 * (self.radius().powi(2) - self.inner_radius().powi(2))
     }
 
-    fn intersect_ray(&self, ray: &Ray) -> (bool, f64) {
-        if ray.direction().z() == 0.0 {
-            return (false, 0.0);
+    fn intersect_disk_2d(object: &Object, ray: &Ray) -> Vec<Intersection> {
+        let mut intersections: Vec<Intersection> = vec![];
+
+        if ray.direction().y().equals(0.0) {
+            return  intersections;
         }
 
-        let t_shape_hit = (self.height - ray.direction().z()) / ray.direction().z();
-        if t_shape_hit <= 0.0 {
-            return (false, 0.0);
+        //minimum_bound=0.0, maximum_bound=0.0 for now
+        let t = -ray.origin().y() / ray.direction().y();
+        if Object::check_disk(ray, t) {
+            intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
-        let p_hit = ray.position(t_shape_hit);
+        intersections
+    }
+
+    fn intersect_disk(t_hit: f64, object: &Object, ray: &Ray) -> Vec<Intersection> {
+        let mut intersections: Vec<Intersection> = vec![];
+        let p_hit = ray.position(t_hit);
         let dist_2 = p_hit.x() * p_hit.x() + p_hit.y() * p_hit.y();
-        if dist_2 > self.radius * self.radius || dist_2 < self.inner_radius * self.inner_radius {
-            return (false, 0.0)
+        if dist_2 <= object.radius().powi(2) && dist_2 >= object.inner_radius().powi(2) {
+            let mut phi = p_hit.y().atan2(p_hit.x());
+            if phi < 0.0 {
+                phi += 2.0 * PI;
+            }
+            if phi > object.phi_max() {
+                return intersections
+            }
+
+            let u = phi / object.phi_max();
+            let r_hit = dist_2.sqrt();
+            let one_minus_v = (object.radius() / r_hit) / (object.radius() / object.inner_radius());
+            let v = 1.0 - one_minus_v;
+            intersections.push(Intersection::create(t_hit, object, u, v));
         }
 
-        let mut phi = p_hit.y().atan2(p_hit.x());
-        if phi < 0.0 {
-            phi += 2.0 * PI;
-        }
-        if phi > self.phi_max {
-            return (false, 0.0)
-        }
-
-        let u = phi / self.phi_max;
-        let r_hit = dist_2.sqrt();
-        let v = (self.radius / r_hit) / (self.radius / self.inner_radius);
-        let dpdu = Vector::create(
-            -self.phi_max * p_hit.y(),
-            self.phi_max * p_hit.x(),
-            0.0
-        );
-        let dpdv = Vector::create(p_hit.x(), p_hit.y(), 0.0) *
-            (self.inner_radius - self.radius) / r_hit;
-        // todo! calculate Normal3f dndu(0,0,0), dndv(0,0,0)
-        let new_p_hit = Point::create(p_hit.x(), p_hit.y(), self.height);
-
-
-
-        (true, t_shape_hit)
+        intersections
     }
 }
 
 impl Intersect for Disk {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        
-        let (hit, t_shape_hit) = match _object.shape() {
-            Shape::Disk(d) => { d.intersect_ray(_ray) }
-            _ => (false, 0.0)
-        };
-        if !hit {
-            return vec![]
+        let mut intersections: Vec<Intersection> = vec![];
+        if _ray.direction().z() == 0.0 {
+            return intersections;
+        }
+        let t_shape_hit = (_object.height() - _ray.direction().z()) / _ray.direction().z();
+        if t_shape_hit > 0.0 {
+            intersections.append(&mut Disk::intersect_disk(t_shape_hit, _object, _ray));
+        }
+        let t_shape_hit = (-_object.height() - _ray.direction().z()) / _ray.direction().z();
+        if t_shape_hit <= 0.0 {
+            intersections.append(&mut Disk::intersect_disk(t_shape_hit, _object, _ray));
         }
 
-        vec![Intersection::create(t_shape_hit, _object, 0.0, 0.0)]
+        intersections.append(&mut Disk::intersect_disk_2d(_object, _ray));
+
+        intersections
     }
 }
 
