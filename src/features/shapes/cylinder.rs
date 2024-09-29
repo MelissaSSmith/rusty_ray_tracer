@@ -57,13 +57,6 @@ impl Cylinder {
         }
     }
 
-    fn check_cap(ray: &Ray, t: f64) -> bool {
-        let x = ray.origin().x() + t * ray.direction().x();
-        let z = ray.origin().z() + t * ray.direction().z();
-
-        (x.powi(2) + z.powi(2)) <= 1.0
-    }
-
     fn intersect_caps(object: &Object, ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
 
@@ -72,12 +65,12 @@ impl Cylinder {
         }
 
         let t = (object.minimum_bound() - ray.origin().y()) / ray.direction().y();
-        if Cylinder::check_cap(ray, t) {
+        if Object::check_disk(ray, t) {
             intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 
         let t = (object.maximum_bound() - ray.origin().y()) / ray.direction().y();
-        if Cylinder::check_cap(ray, t) {
+        if Object::check_disk(ray, t) {
             intersections.push(Intersection::create(t, object, 0.0, 0.0));
         }
 

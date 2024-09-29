@@ -1,3 +1,5 @@
+use crate::features::primitives::tuple_trait::Tuple;
+use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
 
 impl Object {
@@ -12,5 +14,12 @@ impl Object {
             return (tmax, tmin);
         }
         (tmin, tmax)
+    }
+
+    pub(crate) fn check_disk(ray: &Ray, t: f64) -> bool {
+        let x = ray.origin().x() + t * ray.direction().x();
+        let z = ray.origin().z() + t * ray.direction().z();
+
+        (x.powi(2) + z.powi(2)) <= 1.0
     }
 }
