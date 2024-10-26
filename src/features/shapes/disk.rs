@@ -1,6 +1,5 @@
 use std::f64::consts::PI;
 use crate::features::intersection::Intersection;
-use crate::features::primitives::operations::Operations;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::primitives::vector::Vector;
@@ -24,7 +23,7 @@ impl Disk {
             radius: 1.0,
             inner_radius: 0.0,
             height: 0.0,
-            phi_max: 3.0,
+            phi_max: PI * 2.0,
             center: Point::zero(),
             normal: Vector::create(0.0, 0.0, -1.0)
         }
@@ -86,22 +85,6 @@ impl Disk {
         self.phi_max() * 0.5 * (self.radius().powi(2) - self.inner_radius().powi(2))
     }
 
-    fn intersect_disk_2d(object: &Object, ray: &Ray) -> Vec<Intersection> {
-        let mut intersections: Vec<Intersection> = vec![];
-
-        if ray.direction().y().equals(0.0) {
-            return  intersections;
-        }
-
-        //minimum_bound=0.0, maximum_bound=0.0 for now
-        let t = -ray.origin().y() / ray.direction().y();
-        if Object::check_disk(ray, t) {
-            intersections.push(Intersection::create(t, object, 0.0, 0.0));
-        }
-
-        intersections
-    }
-
     fn intersect_disk(t_hit: f64, object: &Object, ray: &Ray) -> Vec<Intersection> {
         let mut intersections: Vec<Intersection> = vec![];
         let p_hit = ray.position(t_hit);
@@ -132,16 +115,14 @@ impl Intersect for Disk {
         if _ray.direction().z() == 0.0 {
             return intersections;
         }
-        let t_shape_hit = (_object.height() - _ray.direction().z()) / _ray.direction().z();
+        let t_shape_hit = (_object.height() - _ray.origin().z()) / _ray.direction().z();
         if t_shape_hit > 0.0 {
             intersections.append(&mut Disk::intersect_disk(t_shape_hit, _object, _ray));
         }
-        let t_shape_hit = (-_object.height() - _ray.direction().z()) / _ray.direction().z();
+        let t_shape_hit = (-_object.height() - _ray.origin().z()) / _ray.direction().z();
         if t_shape_hit <= 0.0 {
             intersections.append(&mut Disk::intersect_disk(t_shape_hit, _object, _ray));
         }
-
-        intersections.append(&mut Disk::intersect_disk_2d(_object, _ray));
 
         intersections
     }
