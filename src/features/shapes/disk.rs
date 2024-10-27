@@ -81,6 +81,13 @@ impl Disk {
         }
     }
 
+    pub fn with_phi_max(self, phi_max: f64) -> Self {
+        Self {
+            phi_max,
+            ..self
+        }
+    }
+
     fn area(&self) -> f64 {
         self.phi_max() * 0.5 * (self.radius().powi(2) - self.inner_radius().powi(2))
     }

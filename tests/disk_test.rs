@@ -1,8 +1,8 @@
-use std::f64::consts::{FRAC_PI_2};
+use std::f64::consts::{FRAC_1_PI, FRAC_2_PI, FRAC_PI_2, PI};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{GREEN};
+use rusty_ray_tracer::features::color::consts::{BLUE, GREEN};
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
@@ -44,19 +44,58 @@ fn disk_test() {
     let disk = Shape::Disk(
         Disk::create()
             .with_radius(2.0)
-            .with_inner_radius(1.0)
+            .with_inner_radius(0.5)
             .with_height(1.0)
     ).create()
         .with_material(
             Material::create()
-                .with_color(GREEN)
+                .with_color(BLUE)
         )
         .with_transform(
             Matrix::translate(0.0, 0.0, 0.0) * Matrix::rotate_x(FRAC_PI_2)
         );
 
-    let light_source = PointLight::create(Color::create(0.9, 0.9, 0.9), Point::create(2.0, 10.0, -5.0));
-    let objects = vec![wall, disk];
+    let disk_2 = Shape::Disk(
+        Disk::create()
+            .with_radius(2.0)
+            .with_inner_radius(1.0)
+            .with_height(1.0)
+    ).create()
+        .with_material(
+            Material::create()
+                .with_color(Color::create(0.3, 0.3, 0.3))
+                .with_diffuse(0.5)
+                .with_specular(0.2)
+                .with_reflective(0.25)
+                .with_transparency(1.0)
+                .with_refractive_index(3.2)
+        )
+        .with_transform(
+            Matrix::translate(0.0, 2.0, 0.0) * Matrix::rotate_x(FRAC_PI_2)
+        );
+
+    let disk_3 = Shape::Disk(
+        Disk::create()
+            .with_radius(0.8)
+            .with_inner_radius(0.6)
+            .with_height(1.0)
+            .with_phi_max(PI)
+    ).create()
+        .with_material(
+            Material::create()
+                .with_color(Color::create(0.3, 0.3, 0.3))
+                .with_diffuse(0.5)
+                .with_specular(0.2)
+                .with_reflective(0.25)
+                .with_transparency(1.0)
+                .with_refractive_index(3.2)
+        )
+        .with_transform(
+            Matrix::translate(0.0, 2.0, 0.0) * Matrix::rotate_x(FRAC_PI_2) * Matrix::rotate_y(PI)
+        );
+
+    let light_source = PointLight::create(Color::create(0.9, 0.9, 0.9), Point::create(0.0, 10.0, 0.0));
+    let objects = vec![wall, disk, disk_2, disk_3];
     let world = World::create_world(Light::create_point_light(light_source), objects);
 
     let canvas = camera.render(world);
