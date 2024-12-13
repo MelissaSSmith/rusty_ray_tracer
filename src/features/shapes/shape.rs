@@ -417,10 +417,32 @@ impl Object {
         }
     }
 
+    pub fn capsule(&self) -> bool {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.capsule() },
+            _ => false
+        }
+    }
+
+    pub fn cap_a(&self) -> Vector {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.cap_a() }
+            _ => Vector::zero()
+        }
+    }
+
+    pub fn cap_b(&self) -> Vector {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.cap_b() }
+            _ => Vector::zero()
+        }
+    }
+
     pub fn radius(&self) -> f64 {
         match self.shape() {
             Shape::Torus(t) => { t.radius() },
-            Shape::Disk(d) => { d.radius() }
+            Shape::Disk(d) => { d.radius() },
+            Shape::Cylinder(c) => { c.cap_radius() }
             _ => 0.0
         }
     }

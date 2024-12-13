@@ -12,7 +12,11 @@ use crate::features::shapes::shape::Object;
 pub struct Cylinder {
     maximum: f64,
     minimum: f64,
-    closed: bool
+    closed: bool,
+    capsule: bool,
+    cap_a: Vector,
+    cap_b: Vector,
+    cap_radius: f64
 }
 
 impl Cylinder {
@@ -20,7 +24,11 @@ impl Cylinder {
         Cylinder {
             maximum: f64::INFINITY,
             minimum: f64::NEG_INFINITY,
-            closed: false
+            closed: false,
+            capsule: false,
+            cap_a: Vector::zero(),
+            cap_b: Vector::zero(),
+            cap_radius: 0.0
         }
     }
 
@@ -34,6 +42,22 @@ impl Cylinder {
 
     pub fn closed(&self) -> bool {
         self.closed
+    }
+
+    pub fn capsule(&self) -> bool {
+        self.capsule
+    }
+
+    pub fn cap_a(&self) -> Vector {
+        self.cap_a
+    }
+
+    pub fn cap_b(&self) -> Vector {
+        self.cap_b
+    }
+
+    pub fn cap_radius(&self) -> f64 {
+        self.cap_radius
     }
 
     pub fn with_maximum_bound(self, bound: f64) -> Self {
@@ -57,11 +81,60 @@ impl Cylinder {
         }
     }
 
+    pub fn with_capsule(self, capsule: bool) -> Self {
+        Self {
+            capsule,
+            closed: capsule,
+            cap_a : Vector::create(-0.3, -0.1, -0.1),
+            cap_b : Vector::create(0.3, 0.1, 0.4),
+            cap_radius: 0.4,
+            ..self
+        }
+    }
+
+    fn intersect_capsule_caps(object: &Object, ray: &Ray) -> Vec<Intersection> {
+        let ba = object.cap_b() - object.cap_a();
+        let oa = (ray.origin() - Point::zero()) - object.cap_a();
+        let baba = ba ^ ba;
+        let bard = ba ^ ray.direction();
+        let baoa = ba ^ oa;
+        let rdoa = ray.direction() ^ oa;
+        let oaoa = oa ^ oa;
+        let a = baba - bard * bard;
+        let b = baba * rdoa - baoa * bard;
+        let c = baba * oaoa - baoa * baoa - object.radius() * object.radius() * baba;
+        let h = b * b - a * c;
+        if h < 0.0 {
+            return vec![];
+        }
+        let t = (-b - h.sqrt()) / a;
+        let y = baoa + t * bard;
+        if y > 0.0 && y < baba {
+            return vec![];
+        }
+        let mut oc = oa;
+        if y > 0.0 {
+            oc = (ray.origin() - object.cap_b()) - Point::zero();
+        }
+
+        let b = ray.direction() ^ oc;
+        let c = (oc ^ oc) - object.radius() * object.radius();
+        let h = b * b - a * c;
+        if h <= 0.0 {
+            return vec![]
+        }
+        vec![Intersection::create(-b - h.sqrt(), object, 0.0, 0.0)]
+    }
+
     fn intersect_caps(object: &Object, ray: &Ray) -> Vec<Intersection> {
+        if object.capsule() {
+            return Cylinder::intersect_capsule_caps(object, ray);
+        }
+
         let mut intersections: Vec<Intersection> = vec![];
 
         if !object.closed() || ray.direction().y().equals(0.0) {
-            return  intersections;
+            return intersections;
         }
 
         let t = (object.minimum_bound() - ray.origin().y()) / ray.direction().y();

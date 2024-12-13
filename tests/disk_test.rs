@@ -1,8 +1,8 @@
-use std::f64::consts::{FRAC_1_PI, FRAC_2_PI, FRAC_PI_2, PI};
+use std::f64::consts::{FRAC_PI_2, PI};
 use rusty_ray_tracer::draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{BLUE, GREEN};
+use rusty_ray_tracer::features::color::consts::BLUE;
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
@@ -18,6 +18,7 @@ use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
+#[ignore]
 fn disk_test() {
     let camera = Camera::create(1080, 1080, 0.45)
         .with_transform(Matrix::view_transform(

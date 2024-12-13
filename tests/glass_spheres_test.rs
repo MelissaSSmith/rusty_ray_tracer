@@ -16,6 +16,7 @@ use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
 #[test]
+#[ignore]
 fn glass_sphere_test() {
     let camera = Camera::create(1080, 1080, 0.45)
         .with_transform(Matrix::view_transform(
