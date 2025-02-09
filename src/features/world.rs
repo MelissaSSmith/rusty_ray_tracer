@@ -1,5 +1,5 @@
-use crate::features::color::Color;
-use crate::features::color::consts::{BLACK, WHITE};
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::{BLACK, WHITE};
 use crate::features::computation::Computation;
 use crate::features::intersection::Intersection;
 use crate::features::lights::Light;
@@ -209,8 +209,8 @@ impl World {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::color::Color;
-    use crate::features::color::consts::{BLACK, WHITE};
+    use canvas_draw::color::Color;
+    use canvas_draw::color::consts::{BLACK, WHITE};
     use crate::features::intersection::Intersection;
     use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;

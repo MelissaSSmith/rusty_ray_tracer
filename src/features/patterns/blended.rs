@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::{Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoPatternCreate};
 use crate::features::primitives::point::Point;
@@ -31,8 +31,8 @@ impl PatternAtWithInverse for BlendedPattern {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::color::Color;
-    use crate::features::color::consts::{BLACK, WHITE};
+    use canvas_draw::color::Color;
+    use canvas_draw::color::consts::{BLACK, WHITE};
     use crate::features::patterns::blended::BlendedPattern;
     use crate::features::patterns::{TwoPatternCreate, PatternAt, OneColorCreate};
     use crate::features::patterns::solid::SolidPattern;

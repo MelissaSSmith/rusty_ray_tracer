@@ -1,5 +1,5 @@
-use crate::features::color::Color;
-use crate::features::color::consts::{BLACK, WHITE};
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::{BLACK, WHITE};
 use crate::features::lights::Light;
 use crate::features::patterns::{OneColorCreate, Pattern};
 use crate::features::patterns::solid::SolidPattern;
@@ -197,8 +197,8 @@ impl PartialEq for Material {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::color::Color;
-    use crate::features::color::consts::{BLACK, WHITE};
+    use canvas_draw::color::Color;
+    use canvas_draw::color::consts::{BLACK, WHITE};
     use crate::features::lights::area_light::AreaLight;
     use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;
@@ -375,7 +375,7 @@ mod tests {
 
         let tests = vec![
             (Point::create(0.0, 0.0, -1.0), Color::create(0.9965, 0.9965, 0.9965)),
-            (Point::create(0.0, 0.7071, -0.7071), Color::create(0.6232, 0.6232, 0.6232))
+            (Point::create(0.0, std::f64::consts::FRAC_1_SQRT_2, -std::f64::consts::FRAC_1_SQRT_2), Color::create(0.6232, 0.6232, 0.6232))
         ];
 
         for test in tests {

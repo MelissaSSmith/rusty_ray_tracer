@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::{MultiColorCreate, OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
@@ -62,7 +62,7 @@ impl PatternAtWithInverse for StripePattern {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::color::consts::{BLACK, WHITE};
+    use canvas_draw::color::consts::{BLACK, WHITE};
     use crate::features::primitives::matrix::Matrix;
     use crate::features::patterns::{PatternAt, TwoColorCreate};
     use crate::features::patterns::stripe::StripePattern;

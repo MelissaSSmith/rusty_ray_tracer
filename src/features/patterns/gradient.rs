@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
@@ -49,8 +49,8 @@ impl PatternAtWithInverse for GradientPattern {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::color::Color;
-    use crate::features::color::consts::{BLACK, WHITE};
+    use canvas_draw::color::Color;
+    use canvas_draw::color::consts::{BLACK, WHITE};
     use crate::features::patterns::gradient::GradientPattern;
     use crate::features::patterns::{PatternAt, TwoColorCreate};
     use crate::features::primitives::point::Point;

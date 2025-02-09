@@ -1,10 +1,11 @@
-use crate::features::canvas::Canvas;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::world::World;
 
+use canvas_draw::canvas::Canvas;
+use canvas_draw::color::consts::BLACK;
 use rayon::prelude::*;
 
 pub struct Camera {
@@ -56,9 +57,9 @@ impl Camera {
     }
 
     pub fn render(&self, world: World) -> Canvas {
-        let canvas = Canvas::create(self.h_size, self.v_size);
+        let canvas = Canvas::create(self.h_size, self.v_size, BLACK);
 
-        canvas.pixels
+        canvas.pixels()
             .par_iter_mut()
             .for_each(|mut map_value| {
                 let x_y = canvas.get_x_y(map_value.key());
@@ -117,7 +118,7 @@ impl PixelSize {
 mod tests {
     use core::f64::consts::PI;
     use crate::features::camera::Camera;
-    use crate::features::color::Color;
+    use canvas_draw::color::Color;
     use crate::features::primitives::matrix::Matrix;
     use crate::features::primitives::operations::Operations;
     use crate::features::primitives::point::Point;

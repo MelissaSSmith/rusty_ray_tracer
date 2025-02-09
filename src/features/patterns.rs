@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::patterns::blended::BlendedPattern;
 use crate::features::patterns::checkers::CheckerPattern;
 use crate::features::patterns::gradient::GradientPattern;

@@ -1,9 +1,7 @@
-use core::f64::consts::PI;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::{RED, WHITE};
+use canvas_draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{RED, WHITE};
-use rusty_ray_tracer::features::lights::area_light::AreaLight;
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::spot_light::SpotLight;
 use rusty_ray_tracer::features::material::Material;
@@ -11,7 +9,6 @@ use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::primitives::vector::Vector;
-use rusty_ray_tracer::features::sequence::Sequence;
 use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 
@@ -73,7 +70,7 @@ fn test_glamour_shot() {
     let objects = vec![cube, plane, sphere_1, sphere_2];
     let world = World::create_world(light_source, objects);
 
-    let mut camera = Camera::create(1000, 400, 0.7854);
+    let mut camera = Camera::create(1000, 400, std::f64::consts::FRAC_PI_4);
     camera.set_transform(Matrix::view_transform(Point::create(-3.0, 1.0, 2.5), Point::create(0.0, 0.5, 0.0), Vector::create(0.0, 1.0, 0.0)));
 
     let canvas = camera.render(world);

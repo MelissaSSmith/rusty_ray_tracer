@@ -1,8 +1,7 @@
-use core::f64::consts::PI;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
-use rusty_ray_tracer::features::canvas::Canvas;
-use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::WHITE;
+use canvas_draw::canvas::Canvas;
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::{BLACK, WHITE};
+use canvas_draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::intersection::Intersection;
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
@@ -15,7 +14,6 @@ use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::ray::Ray;
 use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
 use rusty_ray_tracer::features::shapes::{Intersect, NormalAt};
-use rusty_ray_tracer::features::shapes::sphere::Sphere;
 
 #[test]
 #[ignore]
@@ -27,7 +25,7 @@ fn sphere_shadow_test() {
     let pixel_size = wall_size / canvas_pixels as f64;
     let half = wall_size / 2.0;
 
-    let mut canvas = Canvas::create(canvas_pixels, canvas_pixels);
+    let mut canvas = Canvas::create(canvas_pixels, canvas_pixels, BLACK);
     let pattern = CheckerPattern::create(Color::create(1.0, 0.0, 1.0), Color::create(1.0, 0.5, 0.0));
     let material = Material::create().with_pattern(pattern);
     let shape = Shape::Sphere.create()

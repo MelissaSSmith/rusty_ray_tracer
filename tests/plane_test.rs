@@ -1,13 +1,12 @@
 use core::f64::consts::{FRAC_PI_4, PI};
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::WHITE;
+use canvas_draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{BLACK, WHITE};
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
-use rusty_ray_tracer::features::patterns::blended::BlendedPattern;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::solid::SolidPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;

@@ -1,8 +1,8 @@
 use std::f64::consts::{FRAC_PI_2, PI};
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::BLUE;
+use canvas_draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::BLUE;
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;

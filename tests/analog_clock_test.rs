@@ -1,7 +1,7 @@
 use core::f64::consts::PI;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
-use rusty_ray_tracer::features::canvas::Canvas;
-use rusty_ray_tracer::features::color::Color;
+use canvas_draw::ppm_format::PPMFile;
+use canvas_draw::canvas::Canvas;
+use canvas_draw::color::Color;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;

@@ -1,9 +1,9 @@
+use canvas_draw::ppm_format::PPMFile;
 use std::env;
 use core::f64::consts::PI;
 use std::path::PathBuf;
 use std::time::Instant;
 use crate::draw::obj_format::OBJParser;
-use crate::draw::ppm_format::PPMFile;
 use crate::features::camera::Camera;
 use crate::features::primitives::matrix::Matrix;
 use crate::features::primitives::point::Point;

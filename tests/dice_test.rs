@@ -1,16 +1,15 @@
-use core::f64::consts::{FRAC_PI_2, PI};
+use core::f64::consts::PI;
 use rand::{Rng, thread_rng};
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::{BLACK, WHITE};
+use canvas_draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{BLACK, WHITE};
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
 use rusty_ray_tracer::features::patterns::solid::SolidPattern;
 use rusty_ray_tracer::features::patterns::{OneColorCreate, TwoPatternCreate};
-use rusty_ray_tracer::features::patterns::gradient::GradientPattern;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
@@ -18,7 +17,6 @@ use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::shapes::csg::{CSG, CSGOperation};
 use rusty_ray_tracer::features::shapes::group::Group;
 use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
-use rusty_ray_tracer::features::shapes::shape::Shape::Sphere;
 use rusty_ray_tracer::features::world::World;
 
 fn dice(material1: Material, material2: Material) -> Object {

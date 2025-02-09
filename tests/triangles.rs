@@ -1,19 +1,19 @@
 use core::f64::consts::PI;
-use rusty_ray_tracer::draw::ppm_format::PPMFile;
+use canvas_draw::color::Color;
+use canvas_draw::color::consts::{BLUE, GREEN, RED, WHITE};
+use canvas_draw::ppm_format::PPMFile;
 use rusty_ray_tracer::features::camera::Camera;
-use rusty_ray_tracer::features::color::Color;
-use rusty_ray_tracer::features::color::consts::{BLUE, GREEN, RED, WHITE};
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
 use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::checkers::CheckerPattern;
-use rusty_ray_tracer::features::patterns::{Pattern, TwoColorCreate};
+use rusty_ray_tracer::features::patterns::TwoColorCreate;
 use rusty_ray_tracer::features::primitives::matrix::Matrix;
 use rusty_ray_tracer::features::primitives::point::Point;
 use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
 use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::shapes::group::Group;
-use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
+use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::shapes::triangle::Triangle;
 use rusty_ray_tracer::features::world::World;
 

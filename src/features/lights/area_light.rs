@@ -1,5 +1,5 @@
 use std::borrow::BorrowMut;
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::primitives::point::Point;
 use crate::features::primitives::vector::Vector;
 use crate::features::sequence::Sequence;
@@ -117,7 +117,7 @@ impl AreaLight {
 #[cfg(test)]
 mod tests {
     use std::borrow::BorrowMut;
-    use crate::features::color::consts::WHITE;
+    use canvas_draw::color::consts::WHITE;
     use crate::features::lights::area_light::AreaLight;
     use crate::features::lights::Light;
     use crate::features::primitives::point::Point;

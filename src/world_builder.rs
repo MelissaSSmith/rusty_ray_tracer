@@ -1,4 +1,4 @@
-use crate::features::color::consts::WHITE;
+use canvas_draw::color::consts::WHITE;
 use crate::features::lights::Light;
 use crate::features::lights::point_light::PointLight;
 use crate::features::primitives::point::Point;

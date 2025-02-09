@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::lights::area_light::AreaLight;
 use crate::features::lights::point_light::PointLight;
 use crate::features::lights::spot_light::SpotLight;

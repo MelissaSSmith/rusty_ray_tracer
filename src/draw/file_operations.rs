@@ -31,9 +31,3 @@ pub fn open_file(file_name: String) -> File {
     let path = Path::new(file_name.as_str());
     File::open(path).expect("file not found!")
 }
-
-pub fn write_line_to_file(mut file: &File, line: String) {
-    if let Err(why) = writeln!(file, "{}", line) {
-        panic!("couldn't write to file: {}", why);
-    }
-}

@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 

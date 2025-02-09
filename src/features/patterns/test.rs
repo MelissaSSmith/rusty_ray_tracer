@@ -1,4 +1,4 @@
-use crate::features::color::Color;
+use canvas_draw::color::Color;
 use crate::features::patterns::{EmptyCreate, Pattern, PatternAt, Patterns};
 use crate::features::primitives::point::Point;
 use crate::features::primitives::tuple_trait::Tuple;
@@ -20,7 +20,7 @@ impl PatternAt for TestPattern {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::color::Color;
+    use canvas_draw::color::Color;
     use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;
     use crate::features::primitives::matrix::Matrix;
