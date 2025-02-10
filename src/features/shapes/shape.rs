@@ -1,5 +1,6 @@
 use linear_algebra::matrix::Matrix;
 use linear_algebra::point::Point;
+use linear_algebra::transformations::Transform;
 use linear_algebra::tuple_trait::Tuple;
 use linear_algebra::vector::Vector;
 use crate::features::bounding_box::BoundingBox;
@@ -18,7 +19,6 @@ use crate::features::shapes::plane::Plane;
 use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::torus::Torus;
 use crate::features::shapes::triangle::Triangle;
-use crate::features::transformations::Transform;
 
 #[derive(Clone, Debug)]
 pub enum Shape {

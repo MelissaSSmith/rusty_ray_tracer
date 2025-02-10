@@ -1,3 +1,4 @@
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
 

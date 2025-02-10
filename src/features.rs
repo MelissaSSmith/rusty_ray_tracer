@@ -1,4 +1,3 @@
-pub mod transformations;
 pub mod ray;
 pub mod shapes;
 pub mod intersection;

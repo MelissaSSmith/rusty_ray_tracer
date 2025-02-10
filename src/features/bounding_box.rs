@@ -1,10 +1,10 @@
 use core::ops::Add;
 use linear_algebra::matrix::Matrix;
 use linear_algebra::point::Point;
+use linear_algebra::transformations::Transform;
 use linear_algebra::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
-use crate::features::transformations::Transform;
 
 #[derive(Clone, Copy, Debug)]
 pub struct BoundingBox {
@@ -166,10 +166,10 @@ mod tests {
     use crate::features::bounding_box::BoundingBox;
     use linear_algebra::matrix::Matrix;
     use linear_algebra::point::Point;
+    use linear_algebra::transformations::Transform;
     use linear_algebra::tuple_trait::Tuple;
     use linear_algebra::vector::Vector;
     use crate::features::ray::Ray;
-    use crate::features::transformations::Transform;
 
     #[test]
     fn test_create_an_empty_bounding_box() {
