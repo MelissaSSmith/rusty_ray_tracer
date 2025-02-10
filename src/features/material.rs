@@ -1,10 +1,10 @@
 use canvas_draw::color::Color;
 use canvas_draw::color::consts::{BLACK, WHITE};
+use linear_algebra::point::Point;
+use linear_algebra::vector::Vector;
 use crate::features::lights::Light;
 use crate::features::patterns::{OneColorCreate, Pattern};
 use crate::features::patterns::solid::SolidPattern;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::vector::Vector;
 use crate::features::shapes::shape::Object;
 
 #[derive(Clone, Debug)]
@@ -199,15 +199,15 @@ impl PartialEq for Material {
 mod tests {
     use canvas_draw::color::Color;
     use canvas_draw::color::consts::{BLACK, WHITE};
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::lights::area_light::AreaLight;
     use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::stripe::StripePattern;
     use crate::features::patterns::TwoColorCreate;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
     use crate::features::world::World;
 

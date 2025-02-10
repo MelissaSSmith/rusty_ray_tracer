@@ -1,6 +1,6 @@
 use canvas_draw::color::Color;
+use linear_algebra::point::Point;
 use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, Patterns};
-use crate::features::primitives::point::Point;
 
 #[derive(Clone, Debug)]
 pub struct SolidPattern {

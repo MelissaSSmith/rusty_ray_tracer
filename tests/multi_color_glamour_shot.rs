@@ -1,6 +1,10 @@
 use canvas_draw::color::Color;
 use canvas_draw::color::consts::{BLUE, GREEN, RED, WHITE};
 use canvas_draw::ppm_format::PPMFile;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::lights::area_light::AreaLight;
 use rusty_ray_tracer::features::lights::Light;
@@ -8,10 +12,6 @@ use rusty_ray_tracer::features::material::Material;
 use rusty_ray_tracer::features::patterns::MultiColorCreate;
 use rusty_ray_tracer::features::patterns::ring::RingPattern;
 use rusty_ray_tracer::features::patterns::stripe::StripePattern;
-use rusty_ray_tracer::features::primitives::matrix::Matrix;
-use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
-use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::shapes::shape::Shape;
 use rusty_ray_tracer::features::world::World;
 

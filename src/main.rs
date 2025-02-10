@@ -1,14 +1,14 @@
 use canvas_draw::ppm_format::PPMFile;
-use std::env;
 use core::f64::consts::PI;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
+use std::env;
 use std::path::PathBuf;
 use std::time::Instant;
 use crate::draw::obj_format::OBJParser;
 use crate::features::camera::Camera;
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
 use crate::world_builder::create_default_world_with_group;
 
 mod features;

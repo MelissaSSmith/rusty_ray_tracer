@@ -1,4 +1,6 @@
 use canvas_draw::color::Color;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
 use crate::features::patterns::blended::BlendedPattern;
 use crate::features::patterns::checkers::CheckerPattern;
 use crate::features::patterns::gradient::GradientPattern;
@@ -8,8 +10,6 @@ use crate::features::patterns::ring::RingPattern;
 use crate::features::patterns::solid::SolidPattern;
 use crate::features::patterns::stripe::StripePattern;
 use crate::features::patterns::test::TestPattern;
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
 use crate::features::shapes::shape::Object;
 
 pub mod stripe;

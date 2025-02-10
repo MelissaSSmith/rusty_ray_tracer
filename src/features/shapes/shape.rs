@@ -1,10 +1,10 @@
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal, NormalAt};
 use crate::features::shapes::cone::Cone;
@@ -631,11 +631,11 @@ impl NormalAt for Object {
 #[cfg(test)]
 mod tests {
     use core::f64::consts::PI;
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::intersection::Intersection;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::group::Group;
     use crate::features::shapes::{NormalAt};
     use crate::features::shapes::shape::{Object, Shape};

@@ -1,6 +1,6 @@
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::vector::Vector;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::vector::Vector;
 
 #[derive(Clone, Copy)]
 pub struct Ray {
@@ -34,11 +34,11 @@ impl Ray {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::ray::Ray;
-    use crate::features::primitives::vector::Vector;
 
     #[test]
     fn test_create_and_query_a_ray() {

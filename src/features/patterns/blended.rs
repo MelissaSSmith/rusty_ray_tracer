@@ -1,7 +1,7 @@
 use canvas_draw::color::Color;
-use crate::features::primitives::matrix::Matrix;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
 use crate::features::patterns::{Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoPatternCreate};
-use crate::features::primitives::point::Point;
 
 #[derive(Clone, Debug)]
 pub struct BlendedPattern {
@@ -33,12 +33,12 @@ impl PatternAtWithInverse for BlendedPattern {
 mod tests {
     use canvas_draw::color::Color;
     use canvas_draw::color::consts::{BLACK, WHITE};
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
     use crate::features::patterns::blended::BlendedPattern;
     use crate::features::patterns::{TwoPatternCreate, PatternAt, OneColorCreate};
     use crate::features::patterns::solid::SolidPattern;
     use crate::features::patterns::stripe::StripePattern;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_blended_pattern() {

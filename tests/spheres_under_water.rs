@@ -2,6 +2,10 @@ use core::f64::consts::FRAC_PI_2;
 use canvas_draw::color::Color;
 use canvas_draw::color::consts::WHITE;
 use canvas_draw::ppm_format::PPMFile;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use rusty_ray_tracer::features::camera::Camera;
 use rusty_ray_tracer::features::lights::Light;
 use rusty_ray_tracer::features::lights::point_light::PointLight;
@@ -10,10 +14,6 @@ use rusty_ray_tracer::features::patterns::{OneColorCreate, OnePatternWithScale, 
 use rusty_ray_tracer::features::patterns::perturb::PerturbedPattern;
 use rusty_ray_tracer::features::patterns::radial_gradient::RadialGradientPattern;
 use rusty_ray_tracer::features::patterns::solid::SolidPattern;
-use rusty_ray_tracer::features::primitives::matrix::Matrix;
-use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
-use rusty_ray_tracer::features::primitives::vector::Vector;
 use rusty_ray_tracer::features::shapes::shape::{Object, Shape};
 use rusty_ray_tracer::features::world::World;
 

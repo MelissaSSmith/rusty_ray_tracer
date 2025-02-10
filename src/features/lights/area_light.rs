@@ -1,7 +1,7 @@
 use std::borrow::BorrowMut;
 use canvas_draw::color::Color;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::vector::Vector;
+use linear_algebra::point::Point;
+use linear_algebra::vector::Vector;
 use crate::features::sequence::Sequence;
 use crate::features::world::World;
 
@@ -118,11 +118,11 @@ impl AreaLight {
 mod tests {
     use std::borrow::BorrowMut;
     use canvas_draw::color::consts::WHITE;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::lights::area_light::AreaLight;
     use crate::features::lights::Light;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
     use crate::features::sequence::Sequence;
     use crate::features::world::World;
 

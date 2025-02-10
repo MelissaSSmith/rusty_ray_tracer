@@ -1,8 +1,8 @@
 use canvas_draw::color::consts::WHITE;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::lights::Light;
 use crate::features::lights::point_light::PointLight;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::shapes::shape::Object;
 use crate::features::world::World;
 

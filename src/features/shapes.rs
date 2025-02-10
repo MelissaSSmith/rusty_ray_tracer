@@ -1,6 +1,6 @@
+use linear_algebra::point::Point;
+use linear_algebra::vector::Vector;
 use crate::features::intersection::Intersection;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
 

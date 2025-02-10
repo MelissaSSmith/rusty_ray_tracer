@@ -1,8 +1,8 @@
 use canvas_draw::color::Color;
+use linear_algebra::point::Point;
 use crate::features::lights::area_light::AreaLight;
 use crate::features::lights::point_light::PointLight;
 use crate::features::lights::spot_light::SpotLight;
-use crate::features::primitives::point::Point;
 use crate::features::world::World;
 
 pub mod point_light;

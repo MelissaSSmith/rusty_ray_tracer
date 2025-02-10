@@ -1,13 +1,13 @@
 use canvas_draw::color::Color;
 use canvas_draw::color::consts::{BLACK, WHITE};
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::computation::Computation;
 use crate::features::intersection::Intersection;
 use crate::features::lights::Light;
 use crate::features::lights::point_light::PointLight;
 use crate::features::material::Material;
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::{Object, Shape};
@@ -211,17 +211,17 @@ impl World {
 mod tests {
     use canvas_draw::color::Color;
     use canvas_draw::color::consts::{BLACK, WHITE};
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::intersection::Intersection;
     use crate::features::lights::Light;
     use crate::features::lights::point_light::PointLight;
     use crate::features::material::Material;
     use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::ray::Ray;
-    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
     use crate::features::world::World;
 

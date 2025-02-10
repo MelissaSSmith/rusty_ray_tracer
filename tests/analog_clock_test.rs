@@ -2,19 +2,20 @@ use core::f64::consts::PI;
 use canvas_draw::ppm_format::PPMFile;
 use canvas_draw::canvas::Canvas;
 use canvas_draw::color::Color;
-use rusty_ray_tracer::features::primitives::matrix::Matrix;
-use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
+use canvas_draw::color::consts::BLACK;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 
 #[test]
 #[ignore]
 fn analog_clock_test() {
-    let mut canvas = Canvas::create(300, 300);
+    let mut canvas = Canvas::create(300, 300, BLACK);
     let color = Color::create(1.0,1.0,1.0);
-    let clock_radius = canvas.width as f64 * 0.375;
+    let clock_radius = canvas.width() as f64 * 0.375;
 
-    let center_x_coor = canvas.width / 2;
-    let center_y_coor = canvas.height / 2;
+    let center_x_coor = canvas.width() / 2;
+    let center_y_coor = canvas.height() / 2;
 
     let twelve = Point::create(0.0, 0.0, 1.0);
     let num_of_permutations = 13;

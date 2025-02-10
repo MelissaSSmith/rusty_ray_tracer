@@ -1,7 +1,7 @@
 use core::ops::Add;
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::shapes::shape::Object;
 use crate::features::transformations::Transform;
@@ -164,10 +164,10 @@ impl Add<Point> for BoundingBox {
 mod tests {
     use core::f64::consts::PI;
     use crate::features::bounding_box::BoundingBox;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::ray::Ray;
     use crate::features::transformations::Transform;
 

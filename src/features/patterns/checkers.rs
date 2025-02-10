@@ -1,9 +1,9 @@
 use canvas_draw::color::Color;
-use crate::features::primitives::matrix::Matrix;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::patterns::{OneColorCreate, Pattern, PatternAt, PatternAtWithInverse, Patterns, TwoColorCreate, TwoPatternCreate};
 use crate::features::patterns::solid::SolidPattern;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone, Debug)]
 pub struct CheckerPattern {
@@ -51,10 +51,10 @@ impl PatternAtWithInverse for CheckerPattern {
 #[cfg(test)]
 mod tests {
     use canvas_draw::color::consts::{BLACK, WHITE};
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
     use crate::features::patterns::checkers::CheckerPattern;
     use crate::features::patterns::{PatternAt, TwoColorCreate};
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
 
     #[test]
     fn test_checkers_should_repeat_in_x() {

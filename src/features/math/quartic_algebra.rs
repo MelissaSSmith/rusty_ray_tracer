@@ -1,5 +1,5 @@
+use linear_algebra::f64_operations::Operations;
 use std::f64::consts::PI;
-use crate::features::primitives::operations::Operations;
 
 pub fn quadratic(inputs: [f64; 3]) -> Vec<f64> {
     let p = inputs[1] / (2.0 * inputs[2]);

@@ -1,9 +1,9 @@
 use canvas_draw::canvas::Canvas;
 use canvas_draw::color::Color;
 use canvas_draw::ppm_format::PPMFile;
-use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::tuple_trait::Tuple;
-use rusty_ray_tracer::features::primitives::vector::Vector;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 
 mod world;
 
@@ -24,7 +24,7 @@ fn projectile_test() {
 
     while projectile.position.y() > 0.0 {
         let x = projectile.position.x().round() as i32;
-        let y = canvas.height - projectile.position.y().round() as i32;
+        let y = canvas.height() - projectile.position.y().round() as i32;
         canvas.write_pixel(x,y, color);
 
         projectile = world::tick(environment, projectile);

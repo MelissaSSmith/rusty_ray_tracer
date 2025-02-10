@@ -1,8 +1,8 @@
+use linear_algebra::f64_operations::consts::EPSILON;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::features::intersection::Intersection;
-use crate::features::primitives::operations::consts::EPSILON;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::{Object, Shape};
@@ -104,9 +104,9 @@ impl Normal for Triangle {
 
 #[cfg(test)]
 mod tests {
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::ray::Ray;
     use crate::features::shapes::{Intersect, Normal};
     use crate::features::shapes::shape::Shape;

@@ -1,6 +1,6 @@
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::ray::Ray;
 use crate::features::world::World;
 
@@ -119,11 +119,11 @@ mod tests {
     use core::f64::consts::PI;
     use crate::features::camera::Camera;
     use canvas_draw::color::Color;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::operations::Operations;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::f64_operations::Operations;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::world::World;
 
     #[test]

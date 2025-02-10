@@ -1,8 +1,8 @@
 use noise::{Perlin, NoiseFn};
 use canvas_draw::color::Color;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::patterns::{OnePatternWithScale, Pattern, PatternAt, Patterns};
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone, Debug)]
 pub struct PerturbedPattern {

@@ -1,6 +1,6 @@
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::features::shapes::shape::Object;
 
 #[derive(Clone)]

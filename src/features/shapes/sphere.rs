@@ -1,8 +1,8 @@
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::features::intersection::Intersection;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 use crate::features::ray::Ray;
-use crate::features::primitives::vector::Vector;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
 
@@ -37,14 +37,14 @@ impl Normal for Sphere {
 #[cfg(test)]
 mod tests {
     use core::f64::consts::{FRAC_1_SQRT_2, PI};
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::intersection::Intersection;
     use crate::features::material::Material;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
     use crate::features::ray::Ray;
     use crate::features::shapes::sphere::Sphere;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::{Intersect, NormalAt};
     use crate::features::shapes::shape::{Object, Shape};
 

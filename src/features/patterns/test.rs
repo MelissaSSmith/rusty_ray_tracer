@@ -1,7 +1,7 @@
 use canvas_draw::color::Color;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
 use crate::features::patterns::{EmptyCreate, Pattern, PatternAt, Patterns};
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
 
 #[derive(Clone, Debug)]
 pub struct TestPattern {}
@@ -21,11 +21,11 @@ impl PatternAt for TestPattern {
 #[cfg(test)]
 mod tests {
     use canvas_draw::color::Color;
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
     use crate::features::patterns::EmptyCreate;
     use crate::features::patterns::test::TestPattern;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
     use crate::features::shapes::shape::Shape;
 
     #[test]

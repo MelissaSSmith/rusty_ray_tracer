@@ -1,5 +1,5 @@
-use rusty_ray_tracer::features::primitives::point::Point;
-use rusty_ray_tracer::features::primitives::vector::Vector;
+use linear_algebra::point::Point;
+use linear_algebra::vector::Vector;
 
 pub struct Projectile {
     pub position: Point,

@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::draw::file_operations::open_file;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
 use crate::features::shapes::group::Group;
 use crate::features::shapes::shape::{Object, Shape};
 use crate::features::shapes::smooth_triangle::SmoothTriangle;
@@ -211,11 +211,11 @@ impl OBJParser {
 
 #[cfg(test)]
 mod tests {
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::draw::file_operations::write_to_file;
     use crate::draw::obj_format::OBJParser;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::shape::Shape;
 
     #[test]

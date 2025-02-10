@@ -1,5 +1,5 @@
 use canvas_draw::color::Color;
-use crate::features::primitives::point::Point;
+use linear_algebra::point::Point;
 use crate::features::world::World;
 
 #[derive(Clone, Copy)]
@@ -29,8 +29,8 @@ impl PointLight {
 mod tests {
     use canvas_draw::color::consts::WHITE;
     use crate::features::lights::point_light::PointLight;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
     use crate::features::world::World;
 
     #[test]
