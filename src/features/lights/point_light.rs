@@ -4,8 +4,8 @@ use crate::features::world::World;
 
 #[derive(Clone, Copy)]
 pub struct PointLight {
-    pub(crate) intensity: Color,
-    pub(crate) position: [Point; 1]
+    intensity: Color,
+    position: [Point; 1]
 }
 
 impl PointLight {
@@ -15,6 +15,10 @@ impl PointLight {
 
     pub fn positions(&self) -> &[Point] {
         &self.position
+    }
+
+    pub(crate) fn intensity(&self) -> Color {
+        self.intensity
     }
 
     pub(crate) fn intensity_at(&self, point: &Point, world: &World) -> f64 {

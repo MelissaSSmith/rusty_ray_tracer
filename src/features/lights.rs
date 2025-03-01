@@ -39,7 +39,7 @@ impl Light {
 
     pub fn intensity(&self) -> Color {
         match self {
-            Light::PointLight(point_light) => { point_light.intensity }
+            Light::PointLight(point_light) => { point_light.intensity() }
             Light::AreaLight(area_light) => { area_light.intensity() }
             Light::SpotLight(spot_light) => { spot_light.intensity() }
         }
