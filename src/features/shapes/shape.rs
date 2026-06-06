@@ -1,11 +1,10 @@
-use linear_algebra::matrix::Matrix;
-use linear_algebra::point::Point;
-use linear_algebra::transformations::Transform;
-use linear_algebra::tuple_trait::Tuple;
-use linear_algebra::vector::Vector;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
+use crate::features::primitives::matrix::Matrix;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple_trait::Tuple;
+use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal, NormalAt};
 use crate::features::shapes::capsule::Capsule;
@@ -20,6 +19,7 @@ use crate::features::shapes::plane::Plane;
 use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::torus::Torus;
 use crate::features::shapes::triangle::Triangle;
+use crate::features::transformations::Transform;
 
 #[derive(Clone, Debug)]
 pub enum Shape {
@@ -111,13 +111,11 @@ impl Shape {
                 Object::create(Shape::CSG(csg.clone()), has_shadow, material, bounds)
             },
             Shape::Torus(torus) => {
-                let bounds = Object::create_radial_bounds(torus.center(), torus.radius(), torus.radius()*3.0);
+                let bounds = Object::create_radial_bounds(torus.center(), torus.radius(), 0.0);
                 Object::create(Shape::Torus(*torus), has_shadow, material, bounds)
             },
             Shape::Disk(disk) => {
-                let bounds = BoundingBox::create()
-                    .with_minimum(Point::create(-disk.radius(), -disk.radius(), disk.height()))
-                    .with_maximum(Point::create(disk.radius(), disk.radius(), disk.height()));
+                let bounds = Object::create_radial_bounds(disk.center(), disk.radius(), disk.height());
                 Object::create(Shape::Disk(*disk), has_shadow, material, bounds)
             }
             _ => { Object::create(Shape::Object, has_shadow, material, BoundingBox::create()) }
@@ -248,15 +246,13 @@ impl Object {
             Shape::Group(_) => {
                 let group = Group::create_with_children(self.children(), _transformation);
                 self.shape = Shape::Group(group);
+
             }
             Shape::CSG(csg) => {
                 let left = csg.left().with_transform(_transformation);
                 let right = csg.right().with_transform(_transformation);
                 self.shape = Shape::CSG(CSG::create(csg.operation(), left, right));
             }
-            // Shape::Torus(torus) => {
-            //
-            // }
             _ => {
                 self.transformation = _transformation;
                 self.inverse_transformation = _transformation.inverse();
@@ -299,23 +295,6 @@ impl Object {
                     cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
                     parent_space_bounds: self.bounds.transform(_transform),
                     bounds: group_bounds,
-                    ..self
-                }
-            }
-            Shape::Torus(ref t) => {
-                let center = _transform * t.center();
-                let torus = Torus::create()
-                    .with_radius(t.radius())
-                    .with_tube_radius(t.tube_radius())
-                    .with_center(center);
-
-                Object {
-                    shape: Shape::Torus(torus),
-                    transformation: _transform,
-                    inverse_transformation: _transform.inverse(),
-                    cumulative_transform: _transform * self.cumulative_transform(),
-                    cumulative_inverse_transform: (_transform * self.cumulative_transform()).inverse(),
-                    parent_space_bounds: self.bounds.transform(_transform),
                     ..self
                 }
             }
@@ -428,39 +407,10 @@ impl Object {
         }
     }
 
-    pub fn capsule(&self) -> bool {
-        match self.shape() {
-            Shape::Cylinder(c) => { c.capsule() },
-            _ => false
-        }
-    }
-
-    pub fn cap_a(&self) -> Vector {
-        match self.shape() {
-            Shape::Cylinder(c) => { c.cap_a() }
-            _ => Vector::zero()
-        }
-    }
-
-    pub fn cap_b(&self) -> Vector {
-        match self.shape() {
-            Shape::Cylinder(c) => { c.cap_b() }
-            _ => Vector::zero()
-        }
-    }
-
     pub fn radius(&self) -> f64 {
         match self.shape() {
             Shape::Torus(t) => { t.radius() },
-            Shape::Disk(d) => { d.radius() },
-            Shape::Cylinder(c) => { c.cap_radius() }
-            _ => 0.0
-        }
-    }
-
-    pub fn inner_radius(&self) -> f64 {
-        match self.shape() {
-            Shape::Disk(d) => { d.inner_radius() }
+            Shape::Disk(d) => { d.radius() }
             _ => 0.0
         }
     }
@@ -483,13 +433,6 @@ impl Object {
     pub fn height(&self) -> f64 {
         match self.shape() {
             Shape::Disk(d) => { d.height() }
-            _ => 0.0
-        }
-    }
-
-    pub fn phi_max(&self) -> f64 {
-        match self.shape() {
-            Shape::Disk(d) => { d.phi_max() }
             _ => 0.0
         }
     }
@@ -600,7 +543,6 @@ impl Object {
 impl Intersect for Object {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = _ray.transform(_object.inverse_transformation());
-        let cul_ray = _ray.transform(_object.inverse_cumulative_transform());
         match _object.shape() {
             Shape::Sphere => { Sphere::intersect(_object, &transformed_ray) }
             Shape::Plane => { Plane::intersect(_object, &transformed_ray) }
@@ -612,8 +554,8 @@ impl Intersect for Object {
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
             Shape::SmoothTriangle(_) => { SmoothTriangle::intersect(_object, _ray) }
             Shape::CSG(csg) => { csg.intersect(_ray, _object) }
-            Shape::Torus(_) => { Torus::intersect(_object, &cul_ray) }
-            Shape::Disk(_) => { Disk::intersect(_object, &cul_ray) }
+            Shape::Torus(_) => { Torus::intersect(_object, &transformed_ray) }
+            Shape::Disk(_) => { Disk::intersect(_object, &transformed_ray) }
             _ => { vec![] }
         }
     }
@@ -633,7 +575,7 @@ impl NormalAt for Object {
             Shape::Triangle(t) => { t.normal_vector() }
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
             Shape::Torus(_) => { Torus::normal(_object, &object_point) }
-            Shape::Disk(d) => { d.normal() }
+            Shape::Disk(_) => { Disk::normal(_object, &object_point) }
             _ => { panic!("{} has no normal", _object.shape_type()); }
         };
 
@@ -644,11 +586,11 @@ impl NormalAt for Object {
 #[cfg(test)]
 mod tests {
     use core::f64::consts::PI;
-    use linear_algebra::matrix::Matrix;
-    use linear_algebra::point::Point;
-    use linear_algebra::tuple_trait::Tuple;
-    use linear_algebra::vector::Vector;
     use crate::features::intersection::Intersection;
+    use crate::features::primitives::matrix::Matrix;
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple_trait::Tuple;
+    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::group::Group;
     use crate::features::shapes::{NormalAt};
     use crate::features::shapes::shape::{Object, Shape};

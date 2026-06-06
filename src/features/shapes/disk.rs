@@ -1,11 +1,11 @@
-use linear_algebra::point::Point;
-use linear_algebra::tuple_trait::Tuple;
-use linear_algebra::vector::Vector;
-use std::f64::consts::PI;
 use crate::features::intersection::Intersection;
+use crate::features::primitives::operations::consts::EPSILON;
+use crate::features::primitives::point::Point;
+use crate::features::primitives::tuple_trait::Tuple;
+use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
-use crate::features::shapes::shape::Object;
+use crate::features::shapes::shape::{Object, Shape};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Disk {
@@ -23,7 +23,7 @@ impl Disk {
             radius: 1.0,
             inner_radius: 0.0,
             height: 0.0,
-            phi_max: PI * 2.0,
+            phi_max: 1.0,
             center: Point::zero(),
             normal: Vector::create(0.0, 0.0, -1.0)
         }
@@ -49,7 +49,7 @@ impl Disk {
         self.phi_max
     }
 
-    pub fn normal(&self) -> Vector {
+    pub fn normal_vector(&self) -> Vector {
         self.normal
     }
 
@@ -81,70 +81,138 @@ impl Disk {
         }
     }
 
-    pub fn with_phi_max(self, phi_max: f64) -> Self {
-        Self {
-            phi_max,
-            ..self
-        }
+    fn hash_three(n: f64) -> Vector {
+        let vector = Vector::create(n.sin(), (n + 1.0).sin(), (n + 2.0).sin());
+        vector * Vector::create(43758.5453123,12578.1459123,19642.3490423)
     }
 
     fn area(&self) -> f64 {
         self.phi_max() * 0.5 * (self.radius().powi(2) - self.inner_radius().powi(2))
     }
-
-    fn intersect_disk(t_hit: f64, object: &Object, ray: &Ray) -> Vec<Intersection> {
-        let mut intersections: Vec<Intersection> = vec![];
-        let p_hit = ray.position(t_hit);
-        let dist_2 = p_hit.x() * p_hit.x() + p_hit.y() * p_hit.y();
-        if dist_2 <= object.radius().powi(2) && dist_2 >= object.inner_radius().powi(2) {
-            let mut phi = p_hit.y().atan2(p_hit.x());
-            if phi < 0.0 {
-                phi += 2.0 * PI;
-            }
-            if phi > object.phi_max() {
-                return intersections
-            }
-
-            let u = phi / object.phi_max();
-            let r_hit = dist_2.sqrt();
-            let one_minus_v = (object.radius() / r_hit) / (object.radius() / object.inner_radius());
-            let v = 1.0 - one_minus_v;
-            intersections.push(Intersection::create(t_hit, object, u, v));
-        }
-
-        intersections
-    }
 }
 
 impl Intersect for Disk {
     fn intersect(_object: &Object, _ray: &Ray) -> Vec<Intersection> {
-        let mut intersections: Vec<Intersection> = vec![];
-        if _ray.direction().z() == 0.0 {
-            return intersections;
-        }
-        let t_shape_hit = (_object.height() - _ray.origin().z()) / _ray.direction().z();
-        if t_shape_hit > 0.0 {
-            intersections.append(&mut Disk::intersect_disk(t_shape_hit, _object, _ray));
-        }
-        let t_shape_hit = (-_object.height() - _ray.origin().z()) / _ray.direction().z();
-        if t_shape_hit <= 0.0 {
-            intersections.append(&mut Disk::intersect_disk(t_shape_hit, _object, _ray));
+        let disk = match _object.shape() {
+            Shape::Disk(d) => d,
+            _ => return vec![]
+        };
+
+        // A ray parallel to the disk's plane never hits it.
+        if _ray.direction().z().abs() < EPSILON {
+            return vec![];
         }
 
-        intersections
+        // Intersect the plane z = height, then keep the hit only if it falls
+        // within the annulus inner_radius <= r <= radius around the centre.
+        let t = (disk.height() - _ray.origin().z()) / _ray.direction().z();
+        let point = _ray.position(t);
+        let dx = point.x() - disk.center().x();
+        let dy = point.y() - disk.center().y();
+        let distance_squared = dx * dx + dy * dy;
+
+        if distance_squared > disk.radius().powi(2) || distance_squared < disk.inner_radius().powi(2) {
+            return vec![];
+        }
+
+        vec![Intersection::create(t, _object, 0.0, 0.0)]
     }
 }
 
 impl Normal for Disk {
     fn normal(_object: &Object, _point: &Point) -> Vector {
-        let object_squared = _object.radius().powi(2) + _object.inner_radius().powi(2)
-            + _object.height().powi(2);
-        let point_squared = _point.x().powi(2) + _point.y().powi(2) + _point.z().powi(2);
-        Vector::create(
-            4.0 * _point.x() * (point_squared - object_squared),
-            4.0 * _point.y() * (point_squared - object_squared +
-                2.0 * _object.radius() * _object.radius()),
-            4.0 * _point.z() * (point_squared - object_squared)
-        )
+        // A disk is flat, so its normal is constant across the surface.
+        match _object.shape() {
+            Shape::Disk(d) => d.normal_vector(),
+            _ => Vector::create(0.0, 0.0, -1.0)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::features::primitives::point::Point;
+    use crate::features::primitives::tuple_trait::Tuple;
+    use crate::features::primitives::vector::Vector;
+    use crate::features::ray::Ray;
+    use crate::features::shapes::disk::Disk;
+    use crate::features::shapes::{Intersect, Normal};
+    use crate::features::shapes::shape::Shape;
+
+    #[test]
+    fn test_ray_perpendicular_to_disk_hits_the_centre() {
+        let disk = Shape::Disk(Disk::create()).create();
+        let ray = Ray::create(Point::create(0.0, 0.0, -2.0), Vector::create(0.0, 0.0, 1.0));
+
+        let intersections = Disk::intersect(&disk, &ray);
+
+        assert_eq!(intersections.len(), 1);
+        assert_eq!(intersections[0].t, 2.0);
+    }
+
+    #[test]
+    fn test_ray_parallel_to_disk_misses() {
+        let disk = Shape::Disk(Disk::create()).create();
+        let ray = Ray::create(Point::create(0.0, 0.0, -2.0), Vector::create(0.0, 1.0, 0.0));
+
+        let intersections = Disk::intersect(&disk, &ray);
+
+        assert_eq!(intersections.len(), 0);
+    }
+
+    #[test]
+    fn test_ray_outside_the_radius_misses() {
+        let disk = Shape::Disk(Disk::create()).create();
+        let ray = Ray::create(Point::create(2.0, 0.0, -2.0), Vector::create(0.0, 0.0, 1.0));
+
+        let intersections = Disk::intersect(&disk, &ray);
+
+        assert_eq!(intersections.len(), 0);
+    }
+
+    #[test]
+    fn test_ray_just_inside_the_radius_hits() {
+        let disk = Shape::Disk(Disk::create()).create();
+        let ray = Ray::create(Point::create(0.9, 0.0, -2.0), Vector::create(0.0, 0.0, 1.0));
+
+        let intersections = Disk::intersect(&disk, &ray);
+
+        assert_eq!(intersections.len(), 1);
+        assert_eq!(intersections[0].t, 2.0);
+    }
+
+    #[test]
+    fn test_inner_radius_creates_a_hole() {
+        let disk = Shape::Disk(Disk::create().with_inner_radius(0.5)).create();
+
+        // Through the centre: inside the hole, should miss.
+        let centre_ray = Ray::create(Point::create(0.0, 0.0, -2.0), Vector::create(0.0, 0.0, 1.0));
+        assert_eq!(Disk::intersect(&disk, &centre_ray).len(), 0);
+
+        // In the annulus: should hit.
+        let annulus_ray = Ray::create(Point::create(0.75, 0.0, -2.0), Vector::create(0.0, 0.0, 1.0));
+        assert_eq!(Disk::intersect(&disk, &annulus_ray).len(), 1);
+    }
+
+    #[test]
+    fn test_height_shifts_the_disk_plane() {
+        let disk = Shape::Disk(Disk::create().with_height(1.0)).create();
+        let ray = Ray::create(Point::create(0.0, 0.0, -2.0), Vector::create(0.0, 0.0, 1.0));
+
+        let intersections = Disk::intersect(&disk, &ray);
+
+        assert_eq!(intersections.len(), 1);
+        assert_eq!(intersections[0].t, 3.0); // (1 - (-2)) / 1
+    }
+
+    #[test]
+    fn test_disk_normal_is_constant() {
+        let disk = Shape::Disk(Disk::create()).create();
+
+        let n1 = Disk::normal(&disk, &Point::create(0.0, 0.0, 0.0));
+        let n2 = Disk::normal(&disk, &Point::create(0.5, 0.5, 0.0));
+
+        assert_eq!(n1, Vector::create(0.0, 0.0, -1.0));
+        assert_eq!(n2, Vector::create(0.0, 0.0, -1.0));
     }
 }
