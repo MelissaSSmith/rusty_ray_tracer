@@ -8,6 +8,7 @@ use crate::features::intersection::Intersection;
 use crate::features::material::Material;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal, NormalAt};
+use crate::features::shapes::capsule::Capsule;
 use crate::features::shapes::cone::Cone;
 use crate::features::shapes::csg::CSG;
 use crate::features::shapes::cube::Cube;
@@ -27,6 +28,7 @@ pub enum Shape {
     Plane,
     Cube,
     Cylinder(Cylinder),
+    Capsule(Capsule),
     Cone(Cone),
     Group(Group),
     Triangle(Triangle),
@@ -43,6 +45,7 @@ impl Shape {
             Shape::Plane => "Plane",
             Shape::Cube => "Cube",
             Shape::Cylinder(_) => "Cylinder",
+            Shape::Capsule(_) => "Capsule",
             Shape::Cone(_) => "Cone",
             Shape::Group(_) => "Group",
             Shape::Triangle(_) => "Triangle",
@@ -78,6 +81,12 @@ impl Shape {
                     .with_minimum(Point::create(-1.0, c.minimum_bound(), -1.0))
                     .with_maximum(Point::create(1.0, c.maximum_bound(), 1.0));
                 Object::create(Shape::Cylinder(*c), has_shadow, material, bounds)
+            }
+            Shape::Capsule(c) => {
+                let bounds = BoundingBox::create()
+                    .with_minimum(Point::create(-1.0, c.minimum_bound() - 1.0, -1.0))
+                    .with_maximum(Point::create(1.0, c.maximum_bound() + 1.0, 1.0));
+                Object::create(Shape::Capsule(*c), has_shadow, material, bounds)
             }
             Shape::Cone(c) => {
                 let limit = f64::max(c.minimum_bound().abs(), c.maximum_bound().abs());
@@ -396,6 +405,7 @@ impl Object {
     pub fn maximum_bound(&self) -> f64 {
         match self.shape() {
             Shape::Cylinder(c) => { c.maximum_bound() },
+            Shape::Capsule(c) => { c.maximum_bound() },
             Shape::Cone(c) => { c.maximum_bound() },
             _ => 0.0
         }
@@ -404,6 +414,7 @@ impl Object {
     pub fn minimum_bound(&self) -> f64 {
         match self.shape() {
             Shape::Cylinder(c) => { c.minimum_bound() },
+            Shape::Capsule(c) => { c.minimum_bound() },
             Shape::Cone(c) => { c.minimum_bound() },
             _ => 0.0
         }
@@ -595,6 +606,7 @@ impl Intersect for Object {
             Shape::Plane => { Plane::intersect(_object, &transformed_ray) }
             Shape::Cube => { Cube::intersect(_object, &transformed_ray) }
             Shape::Cylinder(_) => { Cylinder::intersect(_object, &transformed_ray) }
+            Shape::Capsule(_) => { Capsule::intersect(_object, &transformed_ray) }
             Shape::Cone(_) => { Cone::intersect(_object, &transformed_ray) }
             Shape::Group(_) => { Group::intersect(_object, _ray) }
             Shape::Triangle(_) => { Triangle::intersect(_object, _ray) }
@@ -616,6 +628,7 @@ impl NormalAt for Object {
             Shape::Plane => { Plane::normal(_object, &object_point) }
             Shape::Cube => { Cube::normal(_object, &object_point) }
             Shape::Cylinder(_) => { Cylinder::normal(_object, &object_point) }
+            Shape::Capsule(_) => { Capsule::normal(_object, &object_point) }
             Shape::Cone(_) => { Cone::normal(_object, &object_point) }
             Shape::Triangle(t) => { t.normal_vector() }
             Shape::SmoothTriangle(_) => { SmoothTriangle::normal(_object, &object_point, _hit) }
