@@ -1,5 +1,6 @@
 use canvas_draw::canvas::Canvas;
 use canvas_draw::color::Color;
+use canvas_draw::color::consts::BLACK;
 use canvas_draw::ppm_format::PPMFile;
 use linear_algebra::point::Point;
 use linear_algebra::tuple_trait::Tuple;
@@ -14,7 +15,7 @@ fn projectile_test() {
     let wind= Vector::create(-0.01, 0.0, 0.0);
     let environment = world::Environment::create(gravity, wind);
 
-    let mut canvas = Canvas::create(900, 880);
+    let mut canvas = Canvas::create(900, 880, BLACK);
     let color = Color::create(1.0, 0.8, 0.6);
 
     let position = Point::create(0.0, 1.0, 0.0);
