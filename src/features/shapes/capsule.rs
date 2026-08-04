@@ -1,8 +1,8 @@
 use crate::features::intersection::Intersection;
-use crate::features::primitives::operations::Operations;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
+use linear_algebra::f64_operations::Operations;
+use linear_algebra::point::Point;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal};
 use crate::features::shapes::shape::Object;
@@ -141,10 +141,10 @@ impl Normal for Capsule {
 #[cfg(test)]
 mod tests {
     use crate::features::intersection::Intersection;
-    use crate::features::primitives::operations::Operations;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
+    use linear_algebra::f64_operations::Operations;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::ray::Ray;
     use crate::features::shapes::capsule::Capsule;
     use crate::features::shapes::{Intersect, Normal};

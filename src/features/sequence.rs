@@ -1,4 +1,4 @@
-use rand::{thread_rng, Rng};
+use rand::RngExt;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Sequence {
@@ -15,10 +15,10 @@ impl Sequence {
     }
 
     pub fn new() -> Sequence {
-        let mut rng = thread_rng();
+        let mut rng = rand::rng();
         let mut base = [0.0; 5];
         for n in &mut base {
-            *n = rng.gen_range(0.0..1.0);
+            *n = rng.random_range(0.0..1.0);
         }
         Sequence::create(base)
     }

@@ -1,10 +1,11 @@
+use linear_algebra::matrix::Matrix;
+use linear_algebra::point::Point;
+use linear_algebra::transformations::Transform;
+use linear_algebra::tuple_trait::Tuple;
+use linear_algebra::vector::Vector;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::material::Material;
-use crate::features::primitives::matrix::Matrix;
-use crate::features::primitives::point::Point;
-use crate::features::primitives::tuple_trait::Tuple;
-use crate::features::primitives::vector::Vector;
 use crate::features::ray::Ray;
 use crate::features::shapes::{Intersect, Normal, NormalAt};
 use crate::features::shapes::capsule::Capsule;
@@ -19,7 +20,6 @@ use crate::features::shapes::plane::Plane;
 use crate::features::shapes::smooth_triangle::SmoothTriangle;
 use crate::features::shapes::torus::Torus;
 use crate::features::shapes::triangle::Triangle;
-use crate::features::transformations::Transform;
 
 #[derive(Clone, Debug)]
 pub enum Shape {
@@ -410,7 +410,8 @@ impl Object {
     pub fn radius(&self) -> f64 {
         match self.shape() {
             Shape::Torus(t) => { t.radius() },
-            Shape::Disk(d) => { d.radius() }
+            Shape::Disk(d) => { d.radius() },
+            Shape::Cylinder(c) => { c.cap_radius() }
             _ => 0.0
         }
     }
@@ -419,6 +420,28 @@ impl Object {
         match self.shape() {
             Shape::Torus(t) => { t.tube_radius() }
             _ => 0.0
+        }
+    }
+    
+    pub fn capsule(&self) -> bool {
+        match self.shape() {
+            Shape::Capsule(_) => { true }
+            Shape::Cylinder(c) => { c.capsule() }
+            _ => false
+        }
+    }
+    
+    pub fn cap_a(&self) -> Vector {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.cap_a() }
+            _ => Vector::zero()
+        }
+    }
+
+    pub fn cap_b(&self) -> Vector {
+        match self.shape() {
+            Shape::Cylinder(c) => { c.cap_b() }
+            _ => Vector::zero()
         }
     }
 
@@ -586,11 +609,11 @@ impl NormalAt for Object {
 #[cfg(test)]
 mod tests {
     use core::f64::consts::PI;
+    use linear_algebra::matrix::Matrix;
+    use linear_algebra::point::Point;
+    use linear_algebra::tuple_trait::Tuple;
+    use linear_algebra::vector::Vector;
     use crate::features::intersection::Intersection;
-    use crate::features::primitives::matrix::Matrix;
-    use crate::features::primitives::point::Point;
-    use crate::features::primitives::tuple_trait::Tuple;
-    use crate::features::primitives::vector::Vector;
     use crate::features::shapes::group::Group;
     use crate::features::shapes::{NormalAt};
     use crate::features::shapes::shape::{Object, Shape};

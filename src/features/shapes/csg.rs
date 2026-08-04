@@ -1,11 +1,11 @@
-use core::ops::Deref;
+use std::ops::Deref;
 use crate::features::bounding_box::BoundingBox;
 use crate::features::intersection::Intersection;
 use crate::features::ray::Ray;
 use crate::features::shapes::Intersect;
 use crate::features::shapes::shape::Object;
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum CSGOperation {
     Union,
     Difference,

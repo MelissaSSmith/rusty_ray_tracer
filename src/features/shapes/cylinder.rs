@@ -127,7 +127,7 @@ impl Cylinder {
     }
 
     fn intersect_caps(object: &Object, ray: &Ray) -> Vec<Intersection> {
-        if object.capsule() {
+        if Object::capsule(object) {
             return Cylinder::intersect_capsule_caps(object, ray);
         }
 
